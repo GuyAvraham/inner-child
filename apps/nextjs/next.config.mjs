@@ -5,7 +5,7 @@ import "./src/env.mjs";
 const config = {
   reactStrictMode: true,
   /** Enables hot reloading for local packages without a build step */
-  transpilePackages: ["@acme/api", "@acme/db", "@acme/utils"],
+  transpilePackages: ["@innch/api", "@innch/db", "@innch/utils"],
   /** We already do linting and typechecking as separate tasks in CI */
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },

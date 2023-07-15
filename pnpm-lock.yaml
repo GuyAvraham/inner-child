@@ -35,9 +35,6 @@ importers:
       '@expo/metro-config':
         specifier: ^0.7.1
         version: 0.7.1
-      '@shopify/flash-list':
-        specifier: 1.4.3
-        version: 1.4.3(@babel/runtime@7.21.5)(react-native@0.71.8)(react@18.2.0)
       '@tanstack/react-query':
         specifier: ^4.29.23
         version: 4.29.23(react-dom@18.2.0)(react-native@0.71.8)(react@18.2.0)
@@ -90,15 +87,6 @@ importers:
         specifier: 1.9.1
         version: 1.9.1
     devDependencies:
-      '@acme/api':
-        specifier: ^0.1.0
-        version: link:../../packages/api
-      '@acme/eslint-config':
-        specifier: ^0.2.0
-        version: link:../../packages/config/eslint
-      '@acme/tailwind-config':
-        specifier: ^0.1.0
-        version: link:../../packages/config/tailwind
       '@babel/core':
         specifier: ^7.21.8
         version: 7.21.8
@@ -111,6 +99,15 @@ importers:
       '@expo/config-plugins':
         specifier: ^6.0.2
         version: 6.0.2
+      '@innch/api':
+        specifier: ^0.1.0
+        version: link:../../packages/api
+      '@innch/eslint-config':
+        specifier: ^0.2.0
+        version: link:../../packages/config/eslint
+      '@innch/tailwind-config':
+        specifier: ^0.1.0
+        version: link:../../packages/config/tailwind
       '@types/babel__core':
         specifier: ^7.20.0
         version: 7.20.0
@@ -138,18 +135,18 @@ importers:
 
   apps/nextjs:
     dependencies:
-      '@acme/api':
-        specifier: ^0.1.0
-        version: link:../../packages/api
-      '@acme/db':
-        specifier: ^0.1.0
-        version: link:../../packages/db
-      '@acme/utils':
-        specifier: ^0.1.0
-        version: link:../../packages/utils
       '@clerk/nextjs':
         specifier: ^4.21.15
         version: 4.21.15(next@13.4.10)(react-dom@18.2.0)(react@18.2.0)
+      '@innch/api':
+        specifier: ^0.1.0
+        version: link:../../packages/api
+      '@innch/db':
+        specifier: ^0.1.0
+        version: link:../../packages/db
+      '@innch/utils':
+        specifier: ^0.1.0
+        version: link:../../packages/utils
       '@t3-oss/env-nextjs':
         specifier: ^0.6.0
         version: 0.6.0(typescript@5.1.6)(zod@3.21.4)
@@ -190,10 +187,10 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
     devDependencies:
-      '@acme/eslint-config':
+      '@innch/eslint-config':
         specifier: ^0.2.0
         version: link:../../packages/config/eslint
-      '@acme/tailwind-config':
+      '@innch/tailwind-config':
         specifier: ^0.1.0
         version: link:../../packages/config/tailwind
       '@types/node':
@@ -226,10 +223,10 @@ importers:
 
   packages/api:
     dependencies:
-      '@acme/db':
+      '@innch/db':
         specifier: ^0.1.0
         version: link:../db
-      '@acme/utils':
+      '@innch/utils':
         specifier: ^0.1.0
         version: link:../utils
       '@trpc/client':
@@ -245,7 +242,7 @@ importers:
         specifier: ^3.21.4
         version: 3.21.4
     devDependencies:
-      '@acme/eslint-config':
+      '@innch/eslint-config':
         specifier: ^0.2.0
         version: link:../config/eslint
       eslint:
@@ -325,7 +322,7 @@ importers:
 
   packages/utils:
     devDependencies:
-      '@acme/eslint-config':
+      '@innch/eslint-config':
         specifier: ^0.2.0
         version: link:../config/eslint
       eslint:
@@ -3558,20 +3555,6 @@ packages:
     dependencies:
       component-type: 1.2.1
       join-component: 1.1.0
-    dev: false
-
-  /@shopify/flash-list@1.4.3(@babel/runtime@7.21.5)(react-native@0.71.8)(react@18.2.0):
-    resolution: {integrity: sha512-jtIReAbwWzYBV0dQ6Io9wBX+pD0C4qQFMrb5/fkEvX8PYDgBl5KRYvpfr9WLLj8CV2Jsn1X0mYOsB+ysWrI/8g==}
-    peerDependencies:
-      '@babel/runtime': '*'
-      react: '*'
-      react-native: '*'
-    dependencies:
-      '@babel/runtime': 7.21.5
-      react: 18.2.0
-      react-native: 0.71.8(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
-      recyclerlistview: 4.2.0(react-native@0.71.8)(react@18.2.0)
-      tslib: 2.4.0
     dev: false
 
   /@sideway/address@4.1.4:
@@ -10006,19 +9989,6 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /recyclerlistview@4.2.0(react-native@0.71.8)(react@18.2.0):
-    resolution: {integrity: sha512-uuBCi0c+ggqHKwrzPX4Z/mJOzsBbjZEAwGGmlwpD/sD7raXixdAbdJ6BTcAmuWG50Cg4ru9p12M94Njwhr/27A==}
-    peerDependencies:
-      react: '>= 15.2.1'
-      react-native: '>= 0.30.0'
-    dependencies:
-      lodash.debounce: 4.0.8
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-native: 0.71.8(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
-      ts-object-utils: 0.0.5
-    dev: false
-
   /regenerate-unicode-properties@10.1.0:
     resolution: {integrity: sha512-d1VudCLoIGitcU/hEg2QqvyGZQmdC0Lf8BqdOMXGFSvJP4bNV1+XqbPQeHHLD51Jh4QJJ225dlIFvY4Ly6MXmQ==}
     engines: {node: '>=4'}
@@ -11082,10 +11052,6 @@ packages:
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
-  /ts-object-utils@0.0.5:
-    resolution: {integrity: sha512-iV0GvHqOmilbIKJsfyfJY9/dNHCs969z3so90dQWsO1eMMozvTpnB1MEaUbb3FYtZTGjv5sIy/xmslEz0Rg2TA==}
-    dev: false
-
   /tsconfig-paths@3.14.2:
     resolution: {integrity: sha512-o/9iXgCYc5L/JxCHPe3Hvh8Q/2xm5Z+p18PESBU6Ff33695QnCHBEjcytY2q19ua7Mbl/DavtBOLq+oG0RCL+g==}
     dependencies:
@@ -11093,10 +11059,6 @@ packages:
       json5: 1.0.2
       minimist: 1.2.8
       strip-bom: 3.0.0
-    dev: false
-
-  /tslib@2.4.0:
-    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
     dev: false
 
   /tslib@2.4.1:

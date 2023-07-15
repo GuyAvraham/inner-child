@@ -1,8 +1,7 @@
+import type { AppRouter } from "@innch/api";
+import { transformer } from "@innch/utils";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
-
-import type { AppRouter } from "@acme/api";
-import { transformer } from "@acme/utils";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
@@ -30,4 +29,4 @@ export const api = createTRPCNext<AppRouter>({
   ssr: false,
 });
 
-export { type RouterInputs, type RouterOutputs } from "@acme/api";
+export { type RouterInputs, type RouterOutputs } from "@innch/api";
