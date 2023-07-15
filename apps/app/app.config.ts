@@ -1,11 +1,11 @@
 import type { ExpoConfig } from "@expo/config";
 
 const defineConfig = (): ExpoConfig => ({
-  name: "expo",
-  slug: "expo",
-  scheme: "expo",
+  name: "Inner Child",
+  slug: "innch",
+  scheme: "innch",
   version: "1.0.0",
-  orientation: "portrait",
+  orientation: "default",
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",
   splash: {
@@ -19,7 +19,7 @@ const defineConfig = (): ExpoConfig => ({
   assetBundlePatterns: ["**/*"],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "your.bundle.identifier",
+    bundleIdentifier: "com.innch.app",
   },
   android: {
     adaptiveIcon: {
@@ -29,7 +29,7 @@ const defineConfig = (): ExpoConfig => ({
   },
   extra: {
     eas: {
-      // projectId: "your-project-id",
+      projectId: "d82099cc-7eac-4848-b79f-006676b945d5",
     },
   },
   plugins: ["./expo-plugins/with-modify-gradle.js"],
