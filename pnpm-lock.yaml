@@ -307,7 +307,7 @@ importers:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.26)
       postcss:
-        specifier: ^8.4.24
+        specifier: ^8.4.26
         version: 8.4.26
       tailwindcss:
         specifier: 3.3.2
