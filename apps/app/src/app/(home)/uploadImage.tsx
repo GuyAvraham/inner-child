@@ -1,9 +1,10 @@
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
-import React from "react";
+import React, { useState } from "react";
+import * as Animatable from 'react-native-animatable';
 
 const UploadImage = () => {
-    
+    const [imageUri, setImageUri] = useState<string>("");
 
     const pickImage = () => {
       
@@ -16,39 +17,44 @@ const UploadImage = () => {
   
         ImagePicker.launchImageLibraryAsync(options)
         .then(result => {
+            const uri = result.assets ? result.assets[0]?.uri : null;
+            if(uri === undefined || uri === null) return;
             
+            setImageUri(uri);
         })
         .catch(e => console.log(e));
     };
-
+    
     return (
     <View className="bg-sky-300 p-2 w-full h-full">
-        <Text className="text-yellow-400 text-4xl font-bold self-baseline mt-5">Upload your photo</Text>
-        <Text className="text-white self-baseline text-lg">Please note to take your photo with your back to a clear wall so your background will be clean.</Text>
-        <View className=" mt-4 p-3 bg-sky-400 rounded-3xl ">
-            <View className="items-center justify-center mt-8 h-96 border-white border-dashed border-2">                
-                <TouchableOpacity onPress={pickImage} activeOpacity={0.5}>
-                    <Text className="text-white text-xl">Upload</Text>
-                </TouchableOpacity>            
-            </View>
-            <TouchableOpacity activeOpacity={0.5} className="p-4 self-center">
-                <Text className="text-white text-xl">or Take picture</Text>
+        <Animatable.Text className="text-yellow-400 text-4xl font-bold self-baseline mt-5" animation="fadeInDown">Upload your photo</Animatable.Text>
+        <Animatable.Text className="text-white self-baseline text-lg" animation="flipInY">Please note to take your photo with your back to a clear wall so your background will be clean.</Animatable.Text>
+        <Animatable.View className=" mt-4 p-3 bg-sky-400 rounded-3xl" animation="fadeInUp">
+            {
+                imageUri === "" ? 
+                (
+                    
+                <View className="items-center justify-center mt-8 h-96 border-white border-dashed border-2">  
+                    <TouchableOpacity onPress={pickImage} activeOpacity={0.5}>
+                        <Text className="text-white text-xl">Upload</Text>
+                    </TouchableOpacity>              
+                </View>   
+                ) : 
+                (
+                    <Image className="w-full mt-8 h-96" source={{uri: imageUri}} />
+                )
+            } 
+            <TouchableOpacity onPress={imageUri === "" ? () => {}: () => {setImageUri(prev => prev = "")}} activeOpacity={0.5} className="p-4 self-center">
+                <Text className="text-white text-xl">{imageUri === "" ? "or Take picture" : "Cancel"}</Text>
             </TouchableOpacity>
-        </View>
-        <View className="flex-1 justify-end">
+        </Animatable.View>
+        <Animatable.View className="flex-1 justify-end" animation="slideInUp">
             <TouchableOpacity activeOpacity={0.5} className="p-3 px-20 bg-yellow-400 self-center items-center justify-center rounded-3xl">
                 <Text className="text-2xl">Next</Text>
             </TouchableOpacity>
-        </View>
+        </Animatable.View>
     </View>
   )
 };
 
 export default UploadImage;
-
-const styles = StyleSheet.create({
-    takePictureButton: {
-        padding: 15,
-        alignSelf: "center"
-    }
-});
