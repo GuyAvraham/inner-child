@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { Pressable } from "react-native";
+import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useOAuth } from "@clerk/clerk-expo";
 import { FontAwesome } from "@expo/vector-icons";
@@ -36,8 +36,26 @@ export default function LogInButton() {
   }, [startOAuthFlow]);
 
   return (
-    <Pressable onPress={onPress}>
+    <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={onPress}>
       <FontAwesome name="google" size={24} color="black" />
-    </Pressable>
+      <Text style={styles.text}>Log In</Text>
+    </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  button: {
+    flexDirection: "row",
+    padding: 12.5,
+    paddingHorizontal: 45,
+    backgroundColor: "#19e3b0",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 25,
+  },
+  text: {
+    fontSize: 25,
+    marginLeft: 15
+  }
+});
