@@ -1,5 +1,8 @@
 import type { ExpoConfig } from "@expo/config";
 
+const CLERK_PUBLISHABLE_KEY =
+  "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ";
+
 const defineConfig = (): ExpoConfig => ({
   name: "Inner Child",
   slug: "innch",
@@ -31,6 +34,7 @@ const defineConfig = (): ExpoConfig => ({
     eas: {
       projectId: "d82099cc-7eac-4848-b79f-006676b945d5",
     },
+    CLERK_PUBLISHABLE_KEY,
   },
   plugins: ["./expo-plugins/with-modify-gradle.js"],
 });
