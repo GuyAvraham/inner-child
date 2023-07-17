@@ -1,5 +1,5 @@
 {
-  "name": "create-t3-turbo",
+  "name": "inner-child",
   "private": true,
   "engines": {
     "node": ">=v18.16.1"
@@ -9,7 +9,7 @@
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo clean",
-    "commit": "better-commits",
+    "commit": "pnpm lint && better-commits",
     "db:generate": "turbo db:generate",
     "db:push": "turbo db:push db:generate",
     "db:studio": "pnpm -F db dev",
