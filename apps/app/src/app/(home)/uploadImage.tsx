@@ -1,13 +1,25 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
+import { Camera, CameraType } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from "react";
 import * as Animatable from 'react-native-animatable';
 
 const UploadImage = () => {
     const [imageUri, setImageUri] = useState<string>("");
+    const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
+    const [cameraParmission, requestCameraPermission] = Camera.useCameraPermissions();
+    const [mediaLibPermission, requestMediaLibPermission] = ImagePicker.useMediaLibraryPermissions();
 
-    const pickImage = () => {
+    const pickImage = async () => {
       
+        if(!mediaLibPermission) return;
+        
+        if(!mediaLibPermission.granted) {
+            const response = await requestMediaLibPermission();
+
+            if(!response.granted) return;
+        }
+
         const options = {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -24,6 +36,19 @@ const UploadImage = () => {
         })
         .catch(e => console.log(e));
     };
+
+    const takePicture = async () => {
+      
+        if(!cameraParmission) return;
+        
+        if(!cameraParmission.granted) {
+            const response = await requestCameraPermission();
+
+            if(!response.granted) return;
+        }
+
+        setIsCameraOn(prev => prev = true);
+    };
     
     return (
     <View className="bg-sky-300 p-2 w-full h-full">
@@ -33,7 +58,6 @@ const UploadImage = () => {
             {
                 imageUri === "" ? 
                 (
-                    
                 <View className="items-center justify-center mt-8 h-96 border-white border-dashed border-2">  
                     <TouchableOpacity onPress={pickImage} activeOpacity={0.5}>
                         <Text className="text-white text-xl">Upload</Text>
@@ -41,10 +65,13 @@ const UploadImage = () => {
                 </View>   
                 ) : 
                 (
-                    <Image className="w-full mt-8 h-96" source={{uri: imageUri}} />
+                    // <Camera className="w-full mt-8 h-96 rounded-3xl" onFacesDetected={(faces) => { if(faces.faces.length > 0)console.log("detected")}} type={CameraType.front}>
+
+                    // </Camera>
+                    <Image className="w-full mt-8 h-96 rounded-3xl" source={{uri: imageUri}} />                
                 )
             } 
-            <TouchableOpacity onPress={imageUri === "" ? () => {}: () => {setImageUri(prev => prev = "")}} activeOpacity={0.5} className="p-4 self-center">
+            <TouchableOpacity onPress={imageUri === "" ? takePicture: () => {setImageUri(prev => prev = "")}} activeOpacity={0.5} className="p-4 self-center">
                 <Text className="text-white text-xl">{imageUri === "" ? "or Take picture" : "Cancel"}</Text>
             </TouchableOpacity>
         </Animatable.View>
