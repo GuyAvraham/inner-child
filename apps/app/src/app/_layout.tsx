@@ -1,30 +1,34 @@
-import React from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Stack } from "expo-router";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import Constants from "expo-constants";
+import { Slot } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { ClerkProvider } from "@clerk/clerk-expo";
 
 import { TRPCProvider } from "~/utils/api";
+import { tokenCache } from "~/utils/tokenCache";
+import ProtectedProvider from "~/auth/ProtectedProvider";
 
-// This is the main layout of the app
-// It wraps your pages with the providers they need
+export { ErrorBoundary } from "expo-router";
+
 const RootLayout = () => {
   return (
-    <TRPCProvider>
-      <SafeAreaProvider>
-        {/*
-          The Stack component displays the current page.
-          It also allows you to configure your screens 
-        */}
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: "#f472b6",
-            },
-          }}
-        />
-        <StatusBar />
-      </SafeAreaProvider>
-    </TRPCProvider>
+    <ClerkProvider
+      tokenCache={tokenCache}
+      publishableKey={
+        Constants.expoConfig?.extra?.CLERK_PUBLISHABLE_KEY as string
+      }
+    >
+      <TRPCProvider>
+        <SafeAreaProvider>
+          <SafeAreaView>
+            <ProtectedProvider>
+              <Slot />
+            </ProtectedProvider>
+          </SafeAreaView>
+          <StatusBar />
+        </SafeAreaProvider>
+      </TRPCProvider>
+    </ClerkProvider>
   );
 };
 
