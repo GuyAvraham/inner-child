@@ -36,26 +36,9 @@ export default function LogInButton() {
   }, [startOAuthFlow]);
 
   return (
-    <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={onPress}>
+    <TouchableOpacity className="flex-row p-3 px-10 bg-yellow-400 self-center items-center justify-center rounded-3xl" activeOpacity={0.5} onPress={onPress}>
       <FontAwesome name="google" size={24} color="black" />
-      <Text style={styles.text}>Log In</Text>
+      <Text className="text-2xl ml-3">Log In</Text>
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    flexDirection: "row",
-    padding: 12.5,
-    paddingHorizontal: 45,
-    backgroundColor: "#19e3b0",
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 25,
-  },
-  text: {
-    fontSize: 25,
-    marginLeft: 15
-  }
-});

@@ -1,40 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
+import * as Animatable from 'react-native-animatable';
 
 import LogInButton from "~/components/LogInButton";
 
 export default function Login() {
   return (
-    <View style={styles.root}>
-      
-      <Text style={styles.title}>Inner Child</Text>
-      <Text style={styles.description}>Reconnect with your inner</Text>
-      <View style={styles.buttonContainer}>
+    <View className="bg-sky-300 p-6 w-full h-full">
+      <Animatable.Text className="text-yellow-400 text-6xl font-bold self-center mt-4" animation="fadeInDown">Inner Child</Animatable.Text>
+      <Animatable.Text className="text-white text-2xl self-center" animation="flipInY">Reconnect with your inner</Animatable.Text>
+      <Animatable.View className="flex-1 justify-end" animation="slideInUp">
         <LogInButton />
-      </View>
+      </Animatable.View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    padding: 20,
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#0a1ed6"
-  },
-  title: {
-    alignSelf: "center",
-    fontSize: 50,
-    fontWeight: "bold",
-    color: "#19e3b0"
-  },
-  description: {
-    alignSelf: "center",
-    fontSize: 18,
-    color: "#fff"
-  },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: "flex-end"
-  }
-});

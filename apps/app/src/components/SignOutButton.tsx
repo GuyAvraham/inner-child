@@ -6,12 +6,12 @@ export default function LogOutButton() {
 
   return isLoaded ? (
     <TouchableOpacity
-      style={styles.button}
+      className="flex-row p-3 px-10 bg-red-500 self-center items-center justify-center rounded-3xl"
       onPress={() => {
         signOut();
       }}
     >
-      <Text style={styles.text}>Sign Out</Text>
+      <Text className="text-2xl text-white">Sign Out</Text>
     </TouchableOpacity>
   ) : // TODO: handle loading state
   null;
