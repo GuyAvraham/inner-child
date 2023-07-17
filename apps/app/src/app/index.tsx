@@ -1,9 +1,8 @@
-import { Text, View } from "react-native";
+import { Redirect } from "expo-router";
+
+import { ROUTE } from "~/config/routes";
 
 export default function Index() {
-  return (
-    <View>
-      <Text>Logged In</Text>
-    </View>
-  );
+  // TODO: add logic for handling new users
+  return <Redirect href={ROUTE.HOME.WELCOME} />;
 }

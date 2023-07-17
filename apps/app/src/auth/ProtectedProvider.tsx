@@ -11,7 +11,7 @@ const useProtectedRoute = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isSignedIn || !isLoaded) return;
+    if (!isLoaded) return;
 
     if (isSignedIn && isLoaded) {
       router.replace(ROUTE.ROOT);
