@@ -38,6 +38,9 @@ importers:
       '@expo/metro-config':
         specifier: ^0.7.1
         version: 0.7.1
+      '@innch/utils':
+        specifier: ^0.1.0
+        version: link:../../packages/utils
       '@tanstack/react-query':
         specifier: ^4.29.23
         version: 4.29.23(react-dom@18.2.0)(react-native@0.71.8)(react@18.2.0)

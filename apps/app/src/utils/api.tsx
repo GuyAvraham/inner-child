@@ -1,21 +1,19 @@
-import React from "react";
+import { useCallback, useMemo } from "react";
+import type { PropsWithChildren } from "react";
 import Constants from "expo-constants";
-import type { AppRouter } from "@innch/api";
+import { useAuth } from "@clerk/clerk-expo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
-import superjson from "superjson";
 
-/**
- * A set of typesafe hooks for consuming your API.
- */
-export const api = createTRPCReact<AppRouter>();
+import type { AppRouter } from "@innch/api";
+import { transformer } from "@innch/utils";
+
+import useErrorsHandler from "~/hooks/useErrorsHandler";
+
+export const trpc = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@innch/api";
 
-/**
- * Extend this function when going to production by
- * setting the baseUrl to your production API URL.
- */
 const getBaseUrl = () => {
   /**
    * Gets the IP address of your host-machine. If it cannot automatically find it,
@@ -39,29 +37,57 @@ const getBaseUrl = () => {
   return `http://${localhost}:3000`;
 };
 
-/**
- * A wrapper for your app that provides the TRPC context.
- * Use only in _app.tsx
- */
+export function TRPCProvider(props: PropsWithChildren) {
+  const { getToken } = useAuth();
+  const { handleError } = useErrorsHandler();
 
-export function TRPCProvider(props: { children: React.ReactNode }) {
-  const [queryClient] = React.useState(() => new QueryClient());
-  const [trpcClient] = React.useState(() =>
-    api.createClient({
-      transformer: superjson,
+  const errorHandler = useCallback(
+    (error: unknown) => {
+      handleError((error as Error).message, error);
+    },
+    [handleError],
+  );
+
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            onError: errorHandler,
+          },
+          mutations: {
+            onError: errorHandler,
+          },
+        },
+      }),
+    [errorHandler],
+  );
+
+  const trpcClient = useMemo(() => {
+    return trpc.createClient({
+      transformer,
       links: [
         httpBatchLink({
+          async headers() {
+            const authToken = await getToken();
+
+            if (!authToken) console.error("No token found");
+
+            return {
+              Authorization: authToken ?? undefined,
+            };
+          },
           url: `${getBaseUrl()}/api/trpc`,
         }),
       ],
-    }),
-  );
+    });
+  }, [getToken]);
 
   return (
-    <api.Provider client={trpcClient} queryClient={queryClient}>
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         {props.children}
       </QueryClientProvider>
-    </api.Provider>
+    </trpc.Provider>
   );
 }
