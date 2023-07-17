@@ -76,7 +76,7 @@ importers:
         version: 1.4.4
       nativewind:
         specifier: ^2.0.11
-        version: 2.0.11(react@18.2.0)(tailwindcss@3.3.3)
+        version: 2.0.11(react@18.2.0)(tailwindcss@3.3.2)
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -136,8 +136,8 @@ importers:
         specifier: ^8.4.26
         version: 8.4.26
       tailwindcss:
-        specifier: ^3.3.3
-        version: 3.3.3
+        specifier: 3.3.2
+        version: 3.3.2
       typescript:
         specifier: ^5.1.6
         version: 5.1.6
@@ -224,8 +224,8 @@ importers:
         specifier: ^8.4.26
         version: 8.4.26
       tailwindcss:
-        specifier: ^3.3.3
-        version: 3.3.3
+        specifier: 3.3.2
+        version: 3.3.2
       typescript:
         specifier: ^5.1.6
         version: 5.1.6
@@ -307,11 +307,11 @@ importers:
         specifier: ^10.4.14
         version: 10.4.14(postcss@8.4.26)
       postcss:
-        specifier: ^8.4.26
+        specifier: ^8.4.24
         version: 8.4.26
       tailwindcss:
-        specifier: ^3.3.3
-        version: 3.3.3
+        specifier: 3.3.2
+        version: 3.3.2
 
   packages/db:
     dependencies:
@@ -5570,6 +5570,7 @@ packages:
   /cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
+    hasBin: true
 
   /csstype@3.1.1:
     resolution: {integrity: sha512-DJR/VvkAvSZW9bTouZue2sSxDwdTN92uHjqeKVm+0dAqdfNykRzQ95tay8aXMBAAPpUiq4Qcug2L7neoRh2Egw==}
@@ -7818,6 +7819,7 @@ packages:
 
   /jiti@1.18.2:
     resolution: {integrity: sha512-QAdOptna2NYiSSpv0O/BwoHBSmz4YhpzJHyi+fnMRTXFjp7B8i/YG5Z8IfusxB1ufjcD2Sre1F3R+nX3fvy7gg==}
+    hasBin: true
 
   /jju@1.4.0:
     resolution: {integrity: sha512-8wb9Yw966OSxApiCt0K3yNJL8pnNeIv+OEq2YMidz4FKP6nonSRoOXc80iXY4JaN2FC11B9qsNmDsm+ZOfMROA==}
@@ -9036,6 +9038,7 @@ packages:
   /nanoid@3.3.6:
     resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
 
   /nanomatch@1.2.13:
     resolution: {integrity: sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA==}
@@ -9056,7 +9059,7 @@ packages:
       - supports-color
     dev: false
 
-  /nativewind@2.0.11(react@18.2.0)(tailwindcss@3.3.3):
+  /nativewind@2.0.11(react@18.2.0)(tailwindcss@3.3.2):
     resolution: {integrity: sha512-qCEXUwKW21RYJ33KRAJl3zXq2bCq82WoI564fI21D/TiqhfmstZOqPN53RF8qK1NDK6PGl56b2xaTxgObEePEg==}
     engines: {node: '>=14.18'}
     peerDependencies:
@@ -9074,7 +9077,7 @@ packages:
       postcss-css-variables: 0.18.0(postcss@8.4.26)
       postcss-nested: 5.0.6(postcss@8.4.26)
       react-is: 18.2.0
-      tailwindcss: 3.3.3
+      tailwindcss: 3.3.2
       use-sync-external-store: 1.2.0(react@18.2.0)
     transitivePeerDependencies:
       - react
@@ -11190,8 +11193,8 @@ packages:
     resolution: {integrity: sha512-Cat63mxsVJlzYvN51JmVXIgNoUokrIaT2zLclCXjRd8boZ0004U4KCs/sToJ75C6sdlByWxpYnb5Boif1VSFew==}
     dev: false
 
-  /tailwindcss@3.3.3:
-    resolution: {integrity: sha512-A0KgSkef7eE4Mf+nKJ83i75TMyq8HqY3qmFIJSWy8bNt0v1lG7jUcpGpoTFxAwYcWOphcTBLPPJg+bDfhDf52w==}
+  /tailwindcss@3.3.2:
+    resolution: {integrity: sha512-9jPkMiIBXvPc2KywkraqsUfbfj+dHDb+JPWtSJa9MLFdrPyazI7q6WX2sUrm7R9eVR7qqv3Pas7EvQFzxKnI6w==}
     engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
@@ -11215,6 +11218,7 @@ packages:
       postcss-load-config: 4.0.1(postcss@8.4.26)
       postcss-nested: 6.0.1(postcss@8.4.26)
       postcss-selector-parser: 6.0.12
+      postcss-value-parser: 4.2.0
       resolve: 1.22.2
       sucrase: 3.32.0
     transitivePeerDependencies:
