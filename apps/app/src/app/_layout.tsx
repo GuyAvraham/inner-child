@@ -10,7 +10,7 @@ import ProtectedProvider from "~/auth/ProtectedProvider";
 
 export { ErrorBoundary } from "expo-router";
 
-const RootLayout = () => {
+export default function RootLayout() {
   return (
     <ClerkProvider
       tokenCache={tokenCache}
@@ -30,6 +30,4 @@ const RootLayout = () => {
       </TRPCProvider>
     </ClerkProvider>
   );
-};
-
-export default RootLayout;
+}
