@@ -22,11 +22,10 @@ export default function LogInButton() {
 
   const onPress = useCallback(async () => {
     try {
-      const { createdSessionId, signIn, signUp, setActive } =
-        await startOAuthFlow();
+      const { createdSessionId, setActive } = await startOAuthFlow();
 
       if (createdSessionId) {
-        setActive?.({ session: createdSessionId });
+        setActive?.({ session: createdSessionId }).catch(console.error);
       } else {
         // Use signIn or signUp for next steps such as MFA
       }
