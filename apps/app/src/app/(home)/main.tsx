@@ -1,9 +1,8 @@
-import { useRef } from "react";
-import { TouchableOpacity, Image, Text, TextInput, View } from "react-native";
-import { useChatGpt } from "~/hooks/useChatGpt";
+import { Image, Text, View } from "react-native";
+import EditMessage from "~/components/EditMessage";
+import useChatGpt from "~/hooks/useChatGpt";
 
 export default function Main({pictureId, pictureUri}: { pictureId: string, pictureUri: string}) {
-    const inputRef = useRef<string>("");
     const { send } = useChatGpt();
 
     if(!pictureId || !pictureUri || pictureId === "" || pictureUri === "") 
@@ -13,11 +12,11 @@ export default function Main({pictureId, pictureUri}: { pictureId: string, pictu
             </View>
         );
 
-    const sendMessage = async () => {
-        if(inputRef.current === "") return;
+    const onSend = async (message: string) => {
+        if(message === "") return;
 
-        const result = await send(inputRef.current);
-        alert(result);
+        //const result = await send(inputRef.current);
+        alert(message);
     };
 
     return (
@@ -29,12 +28,7 @@ export default function Main({pictureId, pictureUri}: { pictureId: string, pictu
           className="bg-white w-full h-96 rounded-xl"
         />
         <View className="justify-end h-fit">
-            <View className="w-5/6 flex-row  mt-10 p-4 bg-slate-300 rounded-xl">
-                <TextInput onChangeText={(text) => inputRef.current = text} className="flex-1 text-lg " placeholder="Enter your message" />
-                <TouchableOpacity onPress={sendMessage} className="items-center justify-center">
-                    <Text className="text-lg font-bold">Send</Text>
-                </TouchableOpacity>
-            </View>
+            <EditMessage onSend={onSend} />
         </View>
     </View>
   );

@@ -1,8 +1,8 @@
-import { useFetchJson } from "./useFetchJson";
+import useFetchJson from "./useFetchJson";
 
 const REPLICATE_URL = "https://api.replicate.com/v1/predictions";
 
-async function useReplicateApi(version: string, input: object) {
+export default async function useReplicateApi(version: string, input: object) {
 
     const url = REPLICATE_URL;
     const token = "apiKey";

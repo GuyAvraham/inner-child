@@ -1,4 +1,4 @@
-export function useFetchJson(url: string, method: string, headers: HeadersInit, body?: object): Promise<Response> {
+export default function useFetchJson(url: string, method: string, headers: HeadersInit, body?: object): Promise<Response> {
 
     let promise: Promise<Response>;
 

@@ -6,7 +6,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export function useChatGpt() {
+export default function useChatGpt() {
 
     const messages: ChatCompletionRequestMessage[] = [];
     
