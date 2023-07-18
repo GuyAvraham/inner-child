@@ -11,6 +11,13 @@ datasource db {
 model Picture {
     id String @id @default(uuid())
 
+    age    AgeMode
     userId String
     uri    String
+}
+
+enum AgeMode {
+    YOUNG
+    CURRENT
+    OLD
 }

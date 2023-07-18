@@ -7,7 +7,7 @@ export default function LogOutButton() {
   return isLoaded ? (
     <Pressable
       onPress={() => {
-        signOut();
+        signOut().catch(console.error);
       }}
     >
       <Text>Sign Out </Text>

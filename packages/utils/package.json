@@ -10,7 +10,9 @@
     "lint:fix": "pnpm lint --fix",
     "type-check": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "superjson": "^1.13.1"
+  },
   "devDependencies": {
     "@innch/eslint-config": "^0.2.0",
     "eslint": "^8.45.0",
