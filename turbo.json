@@ -41,6 +41,8 @@
     "NODE_ENV",
     "SKIP_ENV_VALIDATION",
     "VERCEL",
-    "VERCEL_URL"
+    "VERCEL_URL",
+    "REPLICATE_API_TOKEN",
+    "OPENAI_API_KEY"
   ]
 }

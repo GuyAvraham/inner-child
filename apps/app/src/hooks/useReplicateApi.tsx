@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import useFetchJson from "./useFetchJson";
 
 const REPLICATE_URL = "https://api.replicate.com/v1/predictions";
-const token = "token";
+const token = process.env.REPLICATE_API_TOKEN;
 
 export default function useReplicateApi(version: string) {
 
@@ -23,7 +23,7 @@ export default function useReplicateApi(version: string) {
             },
             data
         );
-
+        
         if(jsonStartResponse.status === 402){
             setIsLoading(prev => prev = false);
             return;
