@@ -31,7 +31,19 @@ const UploadImage = ({imageUri, setImageUri, setIsImageUploaded}: {imageUri: str
             const uri = result.assets ? result.assets[0]?.uri : null;
             if(uri === undefined || uri === null) return;
             
-            setImageUri(uri);
+            void fetch(uri)
+            .then(result => result.blob())
+            .then(blob => {
+                const reader = new FileReader();
+    
+                reader.onloadend = () => {        
+                    const newUri: string = reader.result as any;
+                    
+                    setImageUri(prev => prev = newUri);
+                }
+    
+                reader.readAsDataURL(blob);
+            })
         })
         .catch(e => console.log(e));
     };

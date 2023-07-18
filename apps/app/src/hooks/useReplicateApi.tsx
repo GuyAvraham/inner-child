@@ -1,57 +1,65 @@
+import { useState, useRef } from "react";
 import useFetchJson from "./useFetchJson";
 
 const REPLICATE_URL = "https://api.replicate.com/v1/predictions";
+const token = "token";
 
-export default async function useReplicateApi(version: string, input: object) {
+export default function useReplicateApi(version: string) {
 
-    const url = REPLICATE_URL;
-    const token = "apiKey";
-    const data = {
-        version: version,
-        input: input
-    };
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const result = useRef<any>(null);
 
-    const jsonStartResponse = await useFetchJson(url, 'POST',
-        {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json',
-        },
-        data
-    )
+    const sendRequest = async (input: object) => {
+        setIsLoading(prev => prev = true);
+        const data = {
+            version: version,
+            input: input
+        };
 
-    console.log(jsonStartResponse);
-
-    if(jsonStartResponse.status === 402)
-        return null;
-
-    const replicateResponse: any = jsonStartResponse;
-    const endpointUrl: string = replicateResponse.urls.get;
-
-    let result = null;
-        
-    while(result == null) {
-
-        console.log('polling for result...');
-
-        const jsonFinalResponse = await useFetchJson(endpointUrl, 'GET', 
+        const jsonStartResponse = await useFetchJson(REPLICATE_URL, 'POST',
             {
                 'Authorization': `Token ${token}`,
                 'Content-Type': 'application/json',
-            }
+            },
+            data
         );
-        
-        const replicateFinalResponse: any = jsonFinalResponse;
 
-        if(replicateFinalResponse.status === 'succeeded')
-            result = replicateFinalResponse.output;
-        else if(replicateFinalResponse.status === 'failed')
-        {
-            console.log(replicateFinalResponse);
-            break;
+        if(jsonStartResponse.status === 402){
+            setIsLoading(prev => prev = false);
+            return;
         }
-        else
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
 
-    return result;
+        const replicateResponse: any = jsonStartResponse;
+        const endpointUrl: string = replicateResponse.urls.get;
+
+        let output = null;
+            
+        while(output == null) {
+
+            console.log('polling for result...');
+
+            const jsonFinalResponse = await useFetchJson(endpointUrl, 'GET', 
+                {
+                    'Authorization': `Token ${token}`,
+                    'Content-Type': 'application/json',
+                }
+            );
+            
+            const replicateFinalResponse: any = jsonFinalResponse;
+
+            if(replicateFinalResponse.status === 'succeeded')
+                output = replicateFinalResponse.output;
+            else if(replicateFinalResponse.status === 'failed')
+            {
+                break;
+            }
+            else
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        result.current = output;
+        setIsLoading(prev => prev = false);
+    };
+
+    return {sendRequest, isLoading, replicateResult: result.current};
 }
