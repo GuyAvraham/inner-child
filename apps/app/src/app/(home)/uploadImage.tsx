@@ -4,8 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from "react";
 import * as Animatable from 'react-native-animatable';
 
-const UploadImage = () => {
-    const [imageUri, setImageUri] = useState<string>("");
+const UploadImage = ({imageUri, setImageUri, setIsImageUploaded}: {imageUri: string, setImageUri: React.Dispatch<React.SetStateAction<string>>, setIsImageUploaded: React.Dispatch<React.SetStateAction<boolean>>}) => {
     const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
     const [cameraParmission, requestCameraPermission] = Camera.useCameraPermissions();
     const [mediaLibPermission, requestMediaLibPermission] = ImagePicker.useMediaLibraryPermissions();
@@ -76,7 +75,7 @@ const UploadImage = () => {
             </TouchableOpacity>
         </Animatable.View>
         <Animatable.View className="flex-1 justify-end" animation="slideInUp">
-            <TouchableOpacity activeOpacity={0.5} className="p-3 px-20 bg-yellow-400 self-center items-center justify-center rounded-3xl">
+            <TouchableOpacity onPress={() => setIsImageUploaded(prev => prev = true)} activeOpacity={0.5} className="p-3 px-20 bg-yellow-400 self-center items-center justify-center rounded-3xl">
                 <Text className="text-2xl">Next</Text>
             </TouchableOpacity>
         </Animatable.View>
