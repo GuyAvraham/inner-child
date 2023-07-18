@@ -1,14 +1,11 @@
-import { config } from "dotenv";
 import { useFetchJson } from "./useFetchJson";
-
-config();
 
 const REPLICATE_URL = "https://api.replicate.com/v1/predictions";
 
 async function useReplicateApi(version: string, input: object) {
 
     const url = REPLICATE_URL;
-    const token = process.env.REPLICATE_API_TOKEN;
+    const token = "r8_GHkrmlFDyeVfybNi98hbnwLTQaTY0l20RbsGt";
     const data = {
         version: version,
         input: input
