@@ -5,7 +5,7 @@ const REPLICATE_URL = "https://api.replicate.com/v1/predictions";
 async function useReplicateApi(version: string, input: object) {
 
     const url = REPLICATE_URL;
-    const token = "r8_GHkrmlFDyeVfybNi98hbnwLTQaTY0l20RbsGt";
+    const token = "apiKey";
     const data = {
         version: version,
         input: input
