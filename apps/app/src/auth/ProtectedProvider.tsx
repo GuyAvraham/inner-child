@@ -1,24 +1,27 @@
 import { useEffect } from "react";
 import type { PropsWithChildren } from "react";
 import { Text } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import { useAuth } from "@clerk/clerk-expo";
 
 import { ROUTE } from "~/config/routes";
 
 const useProtectedRoute = () => {
   const { isLoaded, isSignedIn } = useAuth();
+  const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoaded) return;
 
+    const inAuthGroup = segments[0] === "(auth)";
+
     if (isSignedIn && isLoaded) {
-      router.replace(ROUTE.ROOT);
+      if (inAuthGroup) router.replace(ROUTE.ROOT);
     } else {
       router.replace(ROUTE.LOGIN);
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, router, segments]);
 
   return {
     showLoader: !isLoaded,
