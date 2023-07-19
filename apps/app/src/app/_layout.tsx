@@ -1,6 +1,6 @@
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
-import { Slot } from "expo-router";
+import { Slot, usePathname, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ClerkProvider } from "@clerk/clerk-expo";
 
@@ -11,6 +11,10 @@ import ProtectedProvider from "~/auth/ProtectedProvider";
 export { ErrorBoundary } from "expo-router";
 
 export default function RootLayout() {
+  const pathname = usePathname();
+  const segments = useSegments();
+  console.log({ pathname, segments });
+
   return (
     <ClerkProvider
       tokenCache={tokenCache}

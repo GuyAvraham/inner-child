@@ -1,7 +1,9 @@
 export const ROUTE = {
   ROOT: "/",
+  ONBOARDING: {
+    WELCOME: "/(onboarding)/welcome",
+  },
   HOME: {
-    WELCOME: "/(home)/welcome",
     MAIN: "/(home)/main",
   },
   LOGIN: "/(auth)/login",

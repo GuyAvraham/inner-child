@@ -7,6 +7,8 @@ export default function Main() {
 
   if (isLoading) return <Text>Loading...</Text>;
 
+  console.log(JSON.stringify(data, null, 2));
+
   return (
     <View className="flex flex-row flex-wrap bg-red-400">
       {data?.map((picture) => (

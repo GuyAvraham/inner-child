@@ -9,7 +9,6 @@ import {
   requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useAuth } from "@clerk/clerk-expo";
 
 import { trpc } from "~/utils/api";
 import { uploadFileToS3 } from "~/utils/uploadFileToS3";
@@ -17,18 +16,11 @@ import { ROUTE } from "~/config/routes";
 
 export default function Welcome() {
   const [image, setImage] = useState<ImagePickerAsset | undefined>();
-  const [_, setTakenWithCamera] = useState<boolean>(false);
+  const [_takenWithCamera, setTakenWithCamera] = useState<boolean>(false);
 
-  const { userId } = useAuth();
   const router = useRouter();
 
-  const pictureS3UploadLinkMutation =
-    trpc.picture.createS3UploadLink.useMutation();
-  const pictureMetadataMutation = trpc.picture.saveMetadata.useMutation();
-
-  // if (userPictures && userPictures.length > 0) {
-  //   router.replace(ROUTE.HOME.MAIN);
-  // }
+  const uploadURIMutation = trpc.picture.getUploadURI.useMutation();
 
   const pickImage = async () => {
     const mediaLibraryPermission = await requestMediaLibraryPermissionsAsync();
@@ -77,29 +69,19 @@ export default function Welcome() {
   const submitPicture = useCallback(async () => {
     if (!image) return;
 
-    const pictureS3UploadLink = await pictureS3UploadLinkMutation.mutateAsync({
-      fileName: image.fileName ?? `${userId}-CURRENT.${image.type}`,
-    });
-    console.log(pictureS3UploadLink);
+    const imageBlob = await (await fetch(image.uri)).blob();
 
-    await uploadFileToS3(
-      pictureS3UploadLink.urlToUpload,
-      await fetch(image.uri).then((r) => r.blob()),
-    );
-
-    await pictureMetadataMutation.mutateAsync({
-      age: "CURRENT",
-      s3URI: pictureS3UploadLink.urlToSave,
+    const url = await uploadURIMutation.mutateAsync({
+      age: "YOUNG",
+      ext:
+        image.fileName?.split(".").at(-1) ??
+        imageBlob.type.split("/").at(-1) ??
+        "jpg",
     });
 
-    router.replace(ROUTE.HOME.MAIN);
-  }, [
-    image,
-    pictureS3UploadLinkMutation,
-    userId,
-    pictureMetadataMutation,
-    router,
-  ]);
+    await uploadFileToS3(url, imageBlob);
+    router.replace(ROUTE.ROOT);
+  }, [image, router, uploadURIMutation]);
 
   return (
     <>
