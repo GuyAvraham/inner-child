@@ -13,7 +13,7 @@ model Picture {
 
     age    AgeMode
     userId String
-    uri    String
+    key    String
 }
 
 enum AgeMode {

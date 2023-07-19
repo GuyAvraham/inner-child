@@ -25,15 +25,18 @@ export const createPresignedUrl = (key: string) => {
   return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 };
 
-export const getUrlForDb = (key: string) => {
-  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+export const getPresignedUrl = (key: string) => {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  });
 
-  return getSignedUrl(s3Client, command);
+  return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 };
 
 const s3 = {
   createPresignedUrl,
-  getUrlForDb,
+  getPresignedUrl,
 };
 
 export default s3;
