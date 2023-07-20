@@ -7,18 +7,28 @@
       "node": "18.15.0",
       "ios": {
         "resourceClass": "m-medium"
-      }
+      },
+      "channel": "base"
     },
     "development": {
       "extends": "base",
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
-      "extends": "base",
       "distribution": "internal",
+      "channel": "preview",
       "ios": {
-        "simulator": true
+        "simulator": true,
+        "resourceClass": "m-medium"
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "API_URL": "https://inner-child-server.vercel.app",
+        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ"
       }
     },
     "production": {

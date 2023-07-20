@@ -1,8 +1,5 @@
 import type { ExpoConfig } from "@expo/config";
 
-const CLERK_PUBLISHABLE_KEY =
-  "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ";
-
 const defineConfig = (): ExpoConfig => ({
   name: "Inner Child",
   slug: "innch",
@@ -18,6 +15,7 @@ const defineConfig = (): ExpoConfig => ({
   },
   updates: {
     fallbackToCacheTimeout: 0,
+    url: "https://u.expo.dev/d82099cc-7eac-4848-b79f-006676b945d5",
   },
   assetBundlePatterns: ["**/*"],
   ios: {
@@ -30,11 +28,15 @@ const defineConfig = (): ExpoConfig => ({
       backgroundColor: "#1F104A",
     },
   },
+  runtimeVersion: {
+    policy: "sdkVersion",
+  },
   extra: {
     eas: {
       projectId: "d82099cc-7eac-4848-b79f-006676b945d5",
     },
-    CLERK_PUBLISHABLE_KEY,
+    apiURL: process.env.API_URL,
+    clerkPublicKey: process.env.CLERK_PUBLIC_KEY,
   },
   plugins: [
     [
