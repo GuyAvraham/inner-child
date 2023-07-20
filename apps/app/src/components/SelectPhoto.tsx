@@ -11,6 +11,8 @@ import {
 } from "expo-image-picker";
 import type { ImagePickerAsset, ImagePickerOptions } from "expo-image-picker";
 
+import useErrorsHandler from "~/hooks/useErrorsHandler";
+
 const mediaOptions: ImagePickerOptions = {
   mediaTypes: MediaTypeOptions.Images,
   aspect: [1, 1],
@@ -30,6 +32,8 @@ export default function SubmitPhoto({
   const [croppedPhoto, setCroppedPhoto] = useState<ImagePickerAsset>();
   const [isCropping, setIsCropping] = useState(false);
 
+  const { handleError } = useErrorsHandler();
+
   const takePhoto = useCallback(async () => {
     const permissions = await requestCameraPermissionsAsync();
 
@@ -38,24 +42,23 @@ export default function SubmitPhoto({
       return;
     }
 
-    const photo = await launchCameraAsync(mediaOptions);
+    const result = await launchCameraAsync(mediaOptions);
 
-    if (!photo.canceled && photo.assets[0]) {
-      setPhoto(photo.assets[0]);
+    if (!result.canceled && result.assets[0]) {
+      setPhoto(result.assets[0]);
 
       try {
         setIsCropping(true);
-        const croppedPhoto = await cropToFace(photo.assets[0]);
+        const croppedPhoto = await cropToFace(result.assets[0]);
 
         setCroppedPhoto(croppedPhoto);
         onSelect(croppedPhoto);
         setIsCropping(false);
       } catch (error) {
-        console.error(error);
-        // TODO: show an error; Sentry log
+        handleError(error);
       }
     }
-  }, [onSelect]);
+  }, [handleError, onSelect]);
 
   const selectPhoto = useCallback(async () => {
     const permissions = await requestMediaLibraryPermissionsAsync();
@@ -65,24 +68,23 @@ export default function SubmitPhoto({
       return;
     }
 
-    const photo = await launchImageLibraryAsync(mediaOptions);
+    const result = await launchImageLibraryAsync(mediaOptions);
 
-    if (!photo.canceled && photo.assets[0]) {
-      setPhoto(photo.assets[0]);
+    if (!result.canceled && result.assets[0]) {
+      setPhoto(result.assets[0]);
 
       try {
         setIsCropping(true);
-        const croppedPhoto = await cropToFace(photo.assets[0]);
+        const croppedPhoto = await cropToFace(result.assets[0]);
 
         setCroppedPhoto(croppedPhoto);
         onSelect(croppedPhoto);
         setIsCropping(false);
       } catch (error) {
-        console.error(error);
-        // TODO: show an error; Sentry log
+        handleError(error);
       }
     }
-  }, [onSelect]);
+  }, [handleError, onSelect]);
 
   return (
     <>

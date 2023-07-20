@@ -24,7 +24,7 @@ export function TRPCProvider(props: PropsWithChildren) {
 
   const errorHandler = useCallback(
     (error: unknown) => {
-      handleError((error as Error).message, error);
+      handleError(error);
     },
     [handleError],
   );
@@ -52,7 +52,7 @@ export function TRPCProvider(props: PropsWithChildren) {
           async headers() {
             const authToken = await getToken();
 
-            if (!authToken) console.error("No token found");
+            if (!authToken) handleError(new Error("No auth token found"));
 
             return {
               Authorization: authToken ?? undefined,
@@ -62,7 +62,7 @@ export function TRPCProvider(props: PropsWithChildren) {
         }),
       ],
     });
-  }, [getToken]);
+  }, [getToken, handleError]);
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
