@@ -1,28 +1,15 @@
 import { Text } from "react-native";
 import { Redirect } from "expo-router";
+import { useUser } from "@clerk/clerk-expo";
 
-import { trpc } from "~/utils/api";
 import { ROUTE } from "~/config/routes";
 
 export default function Index() {
-  const { data: pictures, isLoading } = trpc.picture.getAll.useQuery(
-    undefined,
-    { staleTime: 5 },
-  );
+  const { isLoaded, user } = useUser();
 
-  if (isLoading) return <Text>Loading...</Text>;
-  // console.log({ pictures: JSON.stringify(pictures, null, 2), isLoading });
+  if (!isLoaded && !user) return <Text>Loading...</Text>;
 
-  // console.log(
-  //   (pictures?.find((picture) => picture.age === "CURRENT") &&
-  //     pictures?.find((picture) => picture.age === "YOUNG")) ||
-  //     false,
-  // );
-  if (
-    (pictures?.find((picture) => picture.age === "CURRENT") &&
-      pictures?.find((picture) => picture.age === "YOUNG")) ||
-    false
-  ) {
+  if (user?.unsafeMetadata.onboarded) {
     console.log("rerouting to main");
     return <Redirect href={ROUTE.HOME.MAIN} />;
   }
