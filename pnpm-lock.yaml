@@ -59,6 +59,12 @@ importers:
       expo-constants:
         specifier: ~14.2.1
         version: 14.2.1(expo@48.0.19)
+      expo-face-detector:
+        specifier: ~12.1.1
+        version: 12.1.2(expo@48.0.19)
+      expo-image-manipulator:
+        specifier: ~11.1.1
+        version: 11.1.1(expo@48.0.19)
       expo-image-picker:
         specifier: ^14.1.1
         version: 14.1.1(expo@48.0.19)
@@ -7496,6 +7502,14 @@ packages:
       expo: 48.0.19(@babel/core@7.21.8)
     dev: false
 
+  /expo-face-detector@12.1.2(expo@48.0.19):
+    resolution: {integrity: sha512-7bsn42J+BJ6ARjMP0vPR+sBTIyGH4QV4AoHCTUMphhyPPQiKiELB4SRxnH9awCHVVAqLp+bCf0umHTE3PPphmA==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      expo: 48.0.19(@babel/core@7.21.8)
+    dev: false
+
   /expo-file-system@15.2.2(expo@48.0.19):
     resolution: {integrity: sha512-LFkOLcWwlmnjkURxZ3/0ukS35OswX8iuQknLHRHeyk8mUA8fpRPPelD/a1lS+yclqfqavMJmTXVKM1Nsq5XVMA==}
     peerDependencies:
@@ -7529,6 +7543,15 @@ packages:
       expo: '*'
     dependencies:
       expo: 48.0.19(@babel/core@7.21.8)
+    dev: false
+
+  /expo-image-manipulator@11.1.1(expo@48.0.19):
+    resolution: {integrity: sha512-W9LfJK/IL7EhhkkC1JQnEX/1S9B09rcGasJiQjXc2s1bEsrQnqXvXEv7shUW8b/L8rE+ynf+XvvDE+YIDL7oFg==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      expo: 48.0.19(@babel/core@7.21.8)
+      expo-image-loader: 4.1.1(expo@48.0.19)
     dev: false
 
   /expo-image-picker@14.1.1(expo@48.0.19):

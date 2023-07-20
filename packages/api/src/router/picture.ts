@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { map } from "radash";
+import { parallel } from "radash";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -17,11 +17,7 @@ export const pictureRouter = createTRPCRouter({
         crypto.randomUUID().split("-")[0]
       }.${input.ext}`;
 
-      // TODO: add conversion to one format
-
       const s3Key = `${input.age}/${fileName}`;
-
-      const urlToUpload = await ctx.s3.createPresignedUrl(s3Key);
 
       await ctx.prisma.picture.create({
         data: {
@@ -31,7 +27,7 @@ export const pictureRouter = createTRPCRouter({
         },
       });
 
-      return urlToUpload;
+      return await ctx.s3.createPresignedUrl(s3Key);
     }),
   getURI: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -48,12 +44,21 @@ export const pictureRouter = createTRPCRouter({
     }),
   get: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.prisma.picture.findUnique({
+    .query(async ({ ctx, input }) => {
+      const picture = await ctx.prisma.picture.findUnique({
         where: {
           id: input.id,
         },
       });
+
+      if (!picture) throw new TRPCError({ code: "NOT_FOUND" });
+
+      const uri = await ctx.s3.getPresignedUrl(picture.key);
+
+      return {
+        ...picture,
+        uri,
+      };
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const pictures = await ctx.prisma.picture.findMany({
@@ -62,7 +67,7 @@ export const pictureRouter = createTRPCRouter({
       },
     });
 
-    return map(pictures, async (picture) => {
+    return parallel(5, pictures, async (picture) => {
       const uri = await ctx.s3.getPresignedUrl(picture.key);
 
       return {
