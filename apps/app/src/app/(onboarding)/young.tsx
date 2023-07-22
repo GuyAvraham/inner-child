@@ -71,12 +71,11 @@ export default function YoungPhotoScreen() {
             setYoungPhoto(youngPhoto);
           }}
         />
-        {photo ? (
-          <Button
-            title={isSubmitting ? "submitting..." : "submit"}
-            onPress={handleSubmit}
-          />
-        ) : null}
+        <Button
+          title={isSubmitting ? "submitting..." : "submit"}
+          onPress={handleSubmit}
+          disabled={!youngPhoto}
+        />
       </ClerkLoaded>
     </>
   );
