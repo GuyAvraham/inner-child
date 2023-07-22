@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Button, Image } from "react-native";
+import { Button, Image, View } from "react-native";
 import { detectFacesAsync, FaceDetectorMode } from "expo-face-detector";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import {
@@ -10,6 +10,7 @@ import {
   requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import type { ImagePickerAsset, ImagePickerOptions } from "expo-image-picker";
+import { FontAwesome } from "@expo/vector-icons";
 
 import useErrorsHandler from "~/hooks/useErrorsHandler";
 
@@ -55,11 +56,13 @@ export default function SubmitPhoto({
         onSelect(croppedPhoto);
         setIsCropping(false);
       } catch (error) {
+        setPhoto(undefined);
         handleError(error);
       }
     }
   }, [handleError, onSelect]);
 
+  // TODO: maybe make it generic; a lot of code is repeated
   const selectPhoto = useCallback(async () => {
     const permissions = await requestMediaLibraryPermissionsAsync();
 
@@ -81,25 +84,33 @@ export default function SubmitPhoto({
         onSelect(croppedPhoto);
         setIsCropping(false);
       } catch (error) {
+        setPhoto(undefined);
         handleError(error);
       }
     }
   }, [handleError, onSelect]);
 
   return (
-    <>
+    <View>
+      <View className="flex items-center p-4">
+        {!croppedPhoto ? (
+          // TODO: set proper designed placeholder
+          <FontAwesome name="user-circle" size={160} color="black" />
+        ) : (
+          <Image
+            source={{
+              uri: isCropping || !croppedPhoto ? photo?.uri : croppedPhoto.uri,
+            }}
+            className="h-40 w-40"
+          />
+        )}
+      </View>
+
       {enableCamera ? (
         <Button title="take a photo" onPress={takePhoto} />
       ) : null}
       <Button title="select a photo" onPress={selectPhoto} />
-
-      <Image
-        source={{
-          uri: isCropping || !croppedPhoto ? photo?.uri : croppedPhoto.uri,
-        }}
-        className="h-40 w-40"
-      />
-    </>
+    </View>
   );
 }
 

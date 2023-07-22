@@ -32,12 +32,11 @@ export default function CurrentPhotoScreen() {
           setPhoto(croppedPhoto);
         }}
       />
-      {photo ? (
-        <Button
-          title={isSubmitting ? "submitting..." : "submit"}
-          onPress={handleSubmit}
-        />
-      ) : null}
+      <Button
+        title={isSubmitting ? "submitting..." : "submit"}
+        onPress={handleSubmit}
+        disabled={!photo}
+      />
     </>
   );
 }
