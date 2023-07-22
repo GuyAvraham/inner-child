@@ -1,8 +1,7 @@
 import { useCallback, useEffect } from "react";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import { useOAuth } from "@clerk/clerk-expo";
-import { FontAwesome } from "@expo/vector-icons";
 
 import useErrorsHandler from "~/hooks/useErrorsHandler";
 
@@ -38,9 +37,14 @@ export default function LogInButton() {
     }
   }, [handleError, startOAuthFlow]);
 
+  // TODO: figure out why nativewind doesn't work most of the time
+  // FIXME: make it generic in case we need other providers
   return (
-    <Pressable onPress={onPress}>
-      <FontAwesome name="google" size={24} color="black" />
+    <Pressable
+      onPress={onPress}
+      className="flex flex-row items-center rounded-full border-2 border-black bg-black px-12 py-4"
+    >
+      <Text className="text-lg text-white">Continue with Google</Text>
     </Pressable>
   );
 }
