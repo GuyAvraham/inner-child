@@ -146,14 +146,14 @@ const cropToFace = async (photo: ImagePickerAsset) => {
       },
       {
         resize: {
-          height: 1024,
-          width: 1024,
+          height: 1000,
+          width: 1000,
         },
       },
     ],
     {
       compress: 1,
-      format: SaveFormat.PNG,
+      format: SaveFormat.JPEG,
       base64: true,
     },
   );
