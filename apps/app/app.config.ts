@@ -23,6 +23,7 @@ const defineConfig = (): ExpoConfig => ({
     bundleIdentifier: "com.innch.app",
   },
   android: {
+    package: "com.innch.app",
     adaptiveIcon: {
       foregroundImage: "./assets/icon.png",
       backgroundColor: "#1F104A",
@@ -37,6 +38,7 @@ const defineConfig = (): ExpoConfig => ({
     },
     apiURL: process.env.API_URL,
     clerkPublicKey: process.env.CLERK_PUBLIC_KEY,
+    replicateToken: process.env.REPLICATE_API_TOKEN,
   },
   plugins: [
     [
