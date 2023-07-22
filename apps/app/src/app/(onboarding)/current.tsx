@@ -1,15 +1,17 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Button, Text } from "react-native";
-import type { ImagePickerAsset } from "expo-image-picker";
 import { useRouter } from "expo-router";
+import { useAtom } from "jotai";
 
 import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
 import { useSubmitPhoto } from "~/hooks/useSavePhoto";
+import { photoAtom } from "~/store/photos";
 
 export default function CurrentPhotoScreen() {
-  const [photo, setPhoto] = useState<ImagePickerAsset | undefined>();
   const router = useRouter();
+
+  const [photo, setPhoto] = useAtom(photoAtom);
 
   const { isSubmitting, submitPhoto } = useSubmitPhoto();
 
