@@ -1,4 +1,4 @@
-import { Image, Text, View } from "react-native";
+import { Text, View, Image } from "react-native";
 
 import { trpc } from "~/utils/api";
 
@@ -6,9 +6,9 @@ export default function Main() {
   const { data, isLoading } = trpc.picture.getAll.useQuery();
 
   if (isLoading) return <Text>Loading...</Text>;
-
+  
   return (
-    <View className="flex flex-row flex-wrap">
+    <View className="w-full h-full">
       {data?.map((picture) => (
         <Image
           key={picture.id}

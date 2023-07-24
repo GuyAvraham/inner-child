@@ -29,7 +29,13 @@ module.exports = function (api) {
           tailwindConfig: lazyLoadConfig(),
         },
       ],
-      "expo-router/babel",
+      "expo-router/babel",      
+      [
+        "react-native-reanimated/plugin", 
+        {
+            relativeSourceLocation: true,
+        },
+      ],
       ["module-resolver", { alias: { "~": "./src" } }],
     ],
   };
