@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import { Button, Image, View } from "react-native";
+import { useCallback } from "react";
+import { Button, View } from "react-native";
 import { detectFacesAsync, FaceDetectorMode } from "expo-face-detector";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 import {
@@ -10,7 +10,6 @@ import {
   requestMediaLibraryPermissionsAsync,
 } from "expo-image-picker";
 import type { ImagePickerAsset, ImagePickerOptions } from "expo-image-picker";
-import { FontAwesome } from "@expo/vector-icons";
 
 import useErrorsHandler from "~/hooks/useErrorsHandler";
 
@@ -29,10 +28,6 @@ export default function SubmitPhoto({
   enableCamera?: boolean;
   onSelect: (photo: ImagePickerAsset) => void;
 }) {
-  const [photo, setPhoto] = useState<ImagePickerAsset>();
-  const [croppedPhoto, setCroppedPhoto] = useState<ImagePickerAsset>();
-  const [isCropping, setIsCropping] = useState(false);
-
   const { handleError } = useErrorsHandler();
 
   const takePhoto = useCallback(async () => {
@@ -46,17 +41,11 @@ export default function SubmitPhoto({
     const result = await launchCameraAsync(mediaOptions);
 
     if (!result.canceled && result.assets[0]) {
-      setPhoto(result.assets[0]);
-
       try {
-        setIsCropping(true);
         const croppedPhoto = await cropToFace(result.assets[0]);
 
-        setCroppedPhoto(croppedPhoto);
         onSelect(croppedPhoto);
-        setIsCropping(false);
       } catch (error) {
-        setPhoto(undefined);
         handleError(error);
       }
     }
@@ -74,17 +63,11 @@ export default function SubmitPhoto({
     const result = await launchImageLibraryAsync(mediaOptions);
 
     if (!result.canceled && result.assets[0]) {
-      setPhoto(result.assets[0]);
-
       try {
-        setIsCropping(true);
         const croppedPhoto = await cropToFace(result.assets[0]);
 
-        setCroppedPhoto(croppedPhoto);
         onSelect(croppedPhoto);
-        setIsCropping(false);
       } catch (error) {
-        setPhoto(undefined);
         handleError(error);
       }
     }
@@ -92,20 +75,6 @@ export default function SubmitPhoto({
 
   return (
     <View>
-      <View className="flex items-center p-4">
-        {!croppedPhoto ? (
-          // TODO: set proper designed placeholder
-          <FontAwesome name="user-circle" size={160} color="black" />
-        ) : (
-          <Image
-            source={{
-              uri: isCropping || !croppedPhoto ? photo?.uri : croppedPhoto.uri,
-            }}
-            className="h-40 w-40"
-          />
-        )}
-      </View>
-
       {enableCamera ? (
         <Button title="take a photo" onPress={takePhoto} />
       ) : null}
