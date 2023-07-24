@@ -3,6 +3,7 @@ export const ROUTE = {
   ONBOARDING: {
     CURRENT: "/(onboarding)/current",
     YOUNG: "/(onboarding)/young",
+    GENERATING: "/(onboarding)/generating",
   },
   HOME: {
     MAIN: "/(home)/main",
