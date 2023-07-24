@@ -7,6 +7,7 @@ import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
 import { useSubmitPhoto } from "~/hooks/useSavePhoto";
 import { photoAtom } from "~/store/photos";
+import useChatGpt from "~/hooks/useChatGpt";
 
 export default function CurrentPhotoScreen() {
   const router = useRouter();
