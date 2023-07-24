@@ -16,5 +16,5 @@ export default function Index() {
 
   console.log("rerouting to welcome");
 
-  return <Redirect href={ROUTE.HOME.MAIN} />;//return <Redirect href={ROUTE.ONBOARDING.CURRENT} />;
+  return <Redirect href={ROUTE.ONBOARDING.CURRENT} />;
 }
