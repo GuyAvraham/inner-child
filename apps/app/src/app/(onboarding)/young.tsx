@@ -9,6 +9,7 @@ import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
 import { useSubmitPhoto } from "~/hooks/useSavePhoto";
 import { youngPhotoAtom } from "~/store/photos";
+import { AgeMode } from "~/types";
 
 export default function YoungPhotoScreen() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function YoungPhotoScreen() {
   const handleSubmit = useCallback(async () => {
     if (!youngPhoto) return;
 
-    await submitPhoto(youngPhoto, "YOUNG");
+    await submitPhoto(youngPhoto, AgeMode.YOUNG);
 
     await user?.update({
       unsafeMetadata: {
@@ -44,7 +45,10 @@ export default function YoungPhotoScreen() {
         <Button
           title="generate automatically"
           onPress={() => {
-            router.push(ROUTE.ONBOARDING.GENERATING);
+            router.push({
+              pathname: ROUTE.ONBOARDING.GENERATING,
+              params: { young: true },
+            });
           }}
         />
         <Button

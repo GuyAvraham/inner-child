@@ -7,19 +7,20 @@ import SelectionPhoto from "~/components/SelectionPhoto";
 import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
 import { useSubmitPhoto } from "~/hooks/useSavePhoto";
-import { photoAtom } from "~/store/photos";
+import { currentPhotoAtom } from "~/store/photos";
+import { AgeMode } from "~/types";
 
 export default function CurrentPhotoScreen() {
   const router = useRouter();
 
-  const [photo, setPhoto] = useAtom(photoAtom);
+  const [photo, setPhoto] = useAtom(currentPhotoAtom);
 
   const { isSubmitting, submitPhoto } = useSubmitPhoto();
 
   const handleSubmit = useCallback(async () => {
     if (!photo) return;
 
-    await submitPhoto(photo, "CURRENT");
+    await submitPhoto(photo, AgeMode.CURRENT);
 
     router.push(ROUTE.ONBOARDING.YOUNG);
   }, [photo, router, submitPhoto]);
