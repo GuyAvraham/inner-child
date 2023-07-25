@@ -13,11 +13,9 @@ export const pictureRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const fileName = `${ctx.session.userId}-${
-        crypto.randomUUID().split("-")[0]
-      }.${input.ext}`;
+      const fileName = `${crypto.randomUUID().split("-")[0]}.${input.ext}`;
 
-      const s3Key = `${input.age}/${fileName}`;
+      const s3Key = `${ctx.session.userId}/${input.age}-${fileName}`;
 
       await ctx.prisma.picture.create({
         data: {
