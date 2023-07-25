@@ -1,9 +1,10 @@
+import { Text } from "react-native";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import { Slot, usePathname, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ClerkProvider } from "@clerk/clerk-expo";
+import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/clerk-expo";
 
 import { TRPCProvider } from "~/utils/api";
 import { tokenCache } from "~/utils/tokenCache";
@@ -28,11 +29,17 @@ export default function RootLayout() {
       <TRPCProvider>
         <SafeAreaProvider>
           <SafeAreaView>
-            <ProtectedProvider>
-              <RootSiblingParent>
-                <Slot />
-              </RootSiblingParent>
-            </ProtectedProvider>
+            <ClerkLoaded>
+              <ProtectedProvider>
+                <RootSiblingParent>
+                  <Slot />
+                </RootSiblingParent>
+              </ProtectedProvider>
+            </ClerkLoaded>
+            <ClerkLoading>
+              <Text>Loading ...</Text>
+              {/* TODO: show splash screen */}
+            </ClerkLoading>
           </SafeAreaView>
           <StatusBar />
         </SafeAreaProvider>
