@@ -69,7 +69,7 @@ export default function GeneratingScreen() {
     if (!youngPhoto || !oldPhoto) return;
 
     setIsSubmitting(true);
-    await uploadPhoto(youngPhoto, AgeMode.YOUNG);
+    if (!generateYoung) await uploadPhoto(youngPhoto, AgeMode.YOUNG);
     await uploadPhoto(oldPhoto, AgeMode.OLD);
 
     await user?.update({
@@ -79,7 +79,7 @@ export default function GeneratingScreen() {
     });
 
     router.replace(ROUTE.ROOT);
-  }, [oldPhoto, router, uploadPhoto, user, youngPhoto]);
+  }, [generateYoung, oldPhoto, router, uploadPhoto, user, youngPhoto]);
 
   return (
     <>

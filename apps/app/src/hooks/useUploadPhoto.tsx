@@ -15,14 +15,12 @@ const useUploadPhoto = () => {
     async (photo: ImagePickerAsset, age: AgeMode) => {
       setIsUploading(true);
 
-      const uploadedPhoto = await photoAPI.mutateAsync({
+      await photoAPI.mutateAsync({
         age,
         photoURI: `data:image/jpeg;base64,${
           photo.base64 ?? raise("Bad file reading")
         }`,
       });
-
-      console.log(uploadedPhoto);
 
       setIsUploading(false);
     },
