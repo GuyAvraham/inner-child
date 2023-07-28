@@ -34,9 +34,23 @@ export const getPresignedUrl = (key: string) => {
   return getSignedUrl(s3Client, command, { expiresIn: 3600 });
 };
 
+export const uploadFile = (
+  key: string,
+  file: string | Blob | Uint8Array | Buffer,
+) => {
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: file,
+  });
+
+  return s3Client.send(command);
+};
+
 const s3 = {
   createPresignedUrl,
   getPresignedUrl,
+  uploadFile,
 };
 
 export default s3;

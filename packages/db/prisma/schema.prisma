@@ -8,12 +8,14 @@ datasource db {
     directUrl = env("DIRECT_DATABASE_URL")
 }
 
-model Picture {
-    id String @id @default(uuid())
-
+model Photo {
+    id     String  @id @default(uuid())
     age    AgeMode
     userId String
-    key    String
+    key    String  @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 enum AgeMode {

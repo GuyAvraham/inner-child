@@ -12,7 +12,7 @@ import { transformer } from "@innch/utils";
 import { API_URL } from "~/config/consts";
 import useErrorsHandler from "~/hooks/useErrorsHandler";
 
-export const trpc = createTRPCReact<AppRouter>();
+export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@innch/api";
 
 const getApiUrl = () =>
@@ -45,7 +45,7 @@ export function TRPCProvider(props: PropsWithChildren) {
   );
 
   const trpcClient = useMemo(() => {
-    return trpc.createClient({
+    return api.createClient({
       transformer,
       links: [
         httpBatchLink({
@@ -65,10 +65,10 @@ export function TRPCProvider(props: PropsWithChildren) {
   }, [getToken, handleError]);
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    <api.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         {props.children}
       </QueryClientProvider>
-    </trpc.Provider>
+    </api.Provider>
   );
 }
