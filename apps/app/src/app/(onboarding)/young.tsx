@@ -7,7 +7,7 @@ import { useAtom } from "jotai";
 import SelectionPhoto from "~/components/SelectionPhoto";
 import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
-import { useSubmitPhoto } from "~/hooks/useSavePhoto";
+import useUploadPhoto from "~/hooks/useUploadPhoto";
 import { youngPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
@@ -17,12 +17,12 @@ export default function YoungPhotoScreen() {
 
   const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
 
-  const { isSubmitting, submitPhoto } = useSubmitPhoto();
+  const { isUploading, uploadPhoto } = useUploadPhoto();
 
   const handleSubmit = useCallback(async () => {
     if (!youngPhoto) return;
 
-    await submitPhoto(youngPhoto, AgeMode.YOUNG);
+    await uploadPhoto(youngPhoto, AgeMode.YOUNG);
 
     await user?.update({
       unsafeMetadata: {
@@ -31,7 +31,7 @@ export default function YoungPhotoScreen() {
     });
 
     router.push(ROUTE.HOME.MAIN);
-  }, [router, submitPhoto, user, youngPhoto]);
+  }, [youngPhoto, uploadPhoto, user, router]);
 
   return (
     <>
@@ -52,7 +52,7 @@ export default function YoungPhotoScreen() {
           }}
         />
         <Button
-          title={isSubmitting ? "submitting..." : "submit"}
+          title={isUploading ? "submitting..." : "submit"}
           onPress={handleSubmit}
           disabled={!youngPhoto}
         />

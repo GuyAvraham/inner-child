@@ -6,7 +6,7 @@ import { useAtom } from "jotai";
 import SelectionPhoto from "~/components/SelectionPhoto";
 import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
-import { useSubmitPhoto } from "~/hooks/useSavePhoto";
+import useUploadPhoto from "~/hooks/useUploadPhoto";
 import { currentPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
@@ -15,15 +15,15 @@ export default function CurrentPhotoScreen() {
 
   const [photo, setPhoto] = useAtom(currentPhotoAtom);
 
-  const { isSubmitting, submitPhoto } = useSubmitPhoto();
+  const { isUploading, uploadPhoto } = useUploadPhoto();
 
   const handleSubmit = useCallback(async () => {
     if (!photo) return;
 
-    await submitPhoto(photo, AgeMode.CURRENT);
+    await uploadPhoto(photo, AgeMode.CURRENT);
 
     router.push(ROUTE.ONBOARDING.YOUNG);
-  }, [photo, router, submitPhoto]);
+  }, [photo, router, uploadPhoto]);
 
   return (
     <>
@@ -36,7 +36,7 @@ export default function CurrentPhotoScreen() {
         }}
       />
       <Button
-        title={isSubmitting ? "submitting..." : "submit"}
+        title={isUploading ? "submitting..." : "submit"}
         onPress={handleSubmit}
         disabled={!photo}
       />

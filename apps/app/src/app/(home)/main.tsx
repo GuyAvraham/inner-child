@@ -1,9 +1,9 @@
 import { Image, Text, View } from "react-native";
 
-import { trpc } from "~/utils/api";
+import { api } from "~/utils/api";
 
 export default function Main() {
-  const { data, isLoading } = trpc.picture.getAll.useQuery();
+  const { data, isLoading } = api.photo.getAll.useQuery();
 
   if (isLoading) return <Text>Loading...</Text>;
 
