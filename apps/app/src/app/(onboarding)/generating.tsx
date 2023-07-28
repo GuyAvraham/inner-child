@@ -9,7 +9,7 @@ import { useAtom, useAtomValue } from "jotai";
 import SelectionPhoto from "~/components/SelectionPhoto";
 import { ROUTE } from "~/config/routes";
 import useErrorsHandler from "~/hooks/useErrorsHandler";
-import { useSubmitPhoto } from "~/hooks/useSavePhoto";
+import useUploadPhoto from "~/hooks/useUploadPhoto";
 import { currentPhotoAtom, oldPhotoAtom, youngPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
@@ -43,7 +43,7 @@ export default function GeneratingScreen() {
   const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
   const [oldPhoto, setOldPhoto] = useAtom(oldPhotoAtom);
 
-  const { submitPhoto } = useSubmitPhoto();
+  const { uploadPhoto } = useUploadPhoto();
 
   useEffect(() => {
     if (!currentPhoto || !generateYoung) return;
@@ -69,8 +69,8 @@ export default function GeneratingScreen() {
     if (!youngPhoto || !oldPhoto) return;
 
     setIsSubmitting(true);
-    await submitPhoto(youngPhoto, AgeMode.YOUNG);
-    await submitPhoto(oldPhoto, AgeMode.OLD);
+    await uploadPhoto(youngPhoto, AgeMode.YOUNG);
+    await uploadPhoto(oldPhoto, AgeMode.OLD);
 
     await user?.update({
       unsafeMetadata: {
@@ -79,7 +79,7 @@ export default function GeneratingScreen() {
     });
 
     router.replace(ROUTE.ROOT);
-  }, [oldPhoto, router, submitPhoto, user, youngPhoto]);
+  }, [oldPhoto, router, uploadPhoto, user, youngPhoto]);
 
   return (
     <>
