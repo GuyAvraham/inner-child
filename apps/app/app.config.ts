@@ -5,6 +5,7 @@ const defineConfig = (): ExpoConfig => ({
   slug: "innch",
   scheme: "innch",
   version: "1.0.0",
+  owner: "inner-child",
   orientation: "default",
   icon: "./assets/icon.png",
   userInterfaceStyle: "light",
@@ -15,7 +16,7 @@ const defineConfig = (): ExpoConfig => ({
   },
   updates: {
     fallbackToCacheTimeout: 0,
-    url: "https://u.expo.dev/d82099cc-7eac-4848-b79f-006676b945d5",
+    url: "https://u.expo.dev/b0cd7774-1f25-4469-a2ed-21ae8e40206f",
   },
   assetBundlePatterns: ["**/*"],
   ios: {
@@ -34,7 +35,7 @@ const defineConfig = (): ExpoConfig => ({
   },
   extra: {
     eas: {
-      projectId: "d82099cc-7eac-4848-b79f-006676b945d5",
+      projectId: "b0cd7774-1f25-4469-a2ed-21ae8e40206f",
     },
     apiURL: process.env.API_URL,
     clerkPublicKey: process.env.CLERK_PUBLIC_KEY,
