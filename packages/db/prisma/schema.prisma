@@ -18,6 +18,29 @@ model Photo {
     updatedAt DateTime @updatedAt
 }
 
+model Conversation {
+    id        String  @id @default(uuid())
+    targetAge AgeMode @unique
+
+    messages Message[]
+}
+
+model Message {
+    id Int @id @default(autoincrement())
+
+    content   String
+    role      SenderRole
+    createdAt DateTime   @default(now())
+
+    conversationId String
+    Conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
+
+enum SenderRole {
+    ASSISTANT
+    USER
+}
+
 enum AgeMode {
     YOUNG
     CURRENT
