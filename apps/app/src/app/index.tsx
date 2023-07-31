@@ -6,7 +6,7 @@ import { ROUTE } from "~/config/routes";
 
 export default function Index() {
   const { isLoaded, user } = useUser();
-
+  
   if (!isLoaded && !user) return <Text>Loading...</Text>;
 
   if (user?.unsafeMetadata.onboarded) {

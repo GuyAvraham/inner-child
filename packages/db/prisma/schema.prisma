@@ -20,6 +20,7 @@ model Photo {
 
 model Conversation {
     id        String  @id @default(uuid())
+    userId    String
     targetAge AgeMode @unique
 
     messages Message[]

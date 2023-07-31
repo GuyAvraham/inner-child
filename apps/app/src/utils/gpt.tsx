@@ -1,5 +1,5 @@
 import { createContext, useRef, useState, useEffect } from "react";
-import type { PropsWithChildren} from "react";
+import type { ReactNode} from "react";
 import type { ChatCompletionRequestMessage } from "openai";
 import { Configuration, OpenAIApi} from "openai";
 import { api } from "./api";
@@ -37,18 +37,21 @@ export const GptContext = createContext({
     send: (message: string | PreparedMessage): Promise<string> => new Promise<string>(() => {}), 
     isLoading: false
 });
-
-export function GPTProvider(props: PropsWithChildren) {
+interface GPTProps {
+    conversationId: string
+    children?: ReactNode
+}
+export function GPTProvider({conversationId, children}: GPTProps) {
     const allMessages = useRef<ChatCompletionRequestMessage[]>([]);
     const [ messages, setMessages ] = useState<ChatCompletionRequestMessage[]>([]);    
-    const { data, isLoading } = api.message.getAll.useQuery({conversationId: "conversationId"});
+    const { data, isLoading } = api.message.getAll.useQuery({conversationId});
     const { mutateAsync: sendDB } = api.message.send.useMutation();
 
     const send = async (message: string | PreparedMessage) => {
         await sendDB({
             role: "USER",
             content: message.toString(),
-            conversationId: "conversationId"
+            conversationId
         });
 
         allMessages.current.push({role: 'user', content: message});
@@ -96,7 +99,7 @@ export function GPTProvider(props: PropsWithChildren) {
 
     return (
         <GptContext.Provider value={{messages, send, isLoading}}>
-            {props.children}
+            {children}
         </GptContext.Provider>
     );
 }

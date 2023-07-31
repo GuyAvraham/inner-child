@@ -4,45 +4,45 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 
 export const conversationRouter = createTRPCRouter({
-  getNew: protectedProcedure
+  create: protectedProcedure
     .input(
         z.object({
-            targetAge: z.enum(["OLD", "YOUNG", "CURRENT"]),
-            messages: z.array(z.object({
-                role: z.enum(["ASSISTANT", "USER"]),
-                content: z.string(),
-                conversationId: z.string()
-            }))
+            targetAge: z.enum(["OLD", "YOUNG", "CURRENT"])
         }),
     )
     .mutation(async ({ ctx, input }) => {
-        const message = await ctx.db.conversation.create({
-        data: {
-            targetAge: input.targetAge,
-            messages: input.messages,
-        }
-        });
+      const conversation = await ctx.db.conversation.create({
+      data: {
+        targetAge: input.targetAge,
+        userId: ctx.session.userId
+      });
 
-    return message;
-  }),
+      return conversation;
+    }),
   get: protectedProcedure
     .input(z.object({ targetAge: z.enum(["OLD", "YOUNG", "CURRENT"]) }))
     .query(async ({ ctx, input }) => {
-      const message = await ctx.db.conversation.findUnique({
+      const conversation = await ctx.db.conversation.findUnique({
         where: {
           targetAge: input.targetAge,
+          userId:  ctx.session.userId
         },
       });
       
-      if (!message) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!conversation) throw new TRPCError({ code: "NOT_FOUND" });
 
-      return message;
+      return conversation;
     }),
-  getAll: protectedProcedure.query(async ({ ctx }) => {
-    const messages = await ctx.db.message.findMany();
+  getAll: protectedProcedure
+    .query(async ({ ctx }) => {
+      const conversations = await ctx.db.conversation.findMany({
+        where: {
+          userId: ctx.session.userId
+        }
+      });
 
-    if (!messages) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!conversations) throw new TRPCError({ code: "NOT_FOUND" });
 
-    return messages;
-  }),
+      return conversations;
+    }),
 });
