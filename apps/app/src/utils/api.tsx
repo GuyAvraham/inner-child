@@ -3,7 +3,7 @@ import type { PropsWithChildren } from "react";
 import Constants from "expo-constants";
 import { useAuth } from "@clerk/clerk-expo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink } from "@trpc/client";
+import { httpLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 
 import type { AppRouter } from "@innch/api";
@@ -48,7 +48,7 @@ export function TRPCProvider(props: PropsWithChildren) {
     return api.createClient({
       transformer,
       links: [
-        httpBatchLink({
+        httpLink({
           async headers() {
             const authToken = await getToken();
 
