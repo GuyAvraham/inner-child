@@ -1,30 +1,34 @@
 import { useCallback, useState } from "react";
-import type { ImagePickerAsset } from "expo-image-picker";
-
-import { raise } from "@innch/utils";
+import { randomUUID } from "expo-crypto";
 
 import { api } from "~/utils/api";
+import { uploadFileToS3 } from "~/utils/uploadFileToS3";
 import type { AgeMode } from "~/types";
 
 const useUploadPhoto = () => {
   const [isUploading, setIsUploading] = useState(false);
 
-  const photoAPI = api.photo.upload.useMutation();
+  const { mutateAsync: getUploadURL } = api.upload.getURL.useMutation();
+  const { mutateAsync: createDBRecord } = api.photo.create.useMutation();
 
   const uploadPhoto = useCallback(
-    async (photo: ImagePickerAsset, age: AgeMode) => {
+    async (photoURI: string, age: AgeMode) => {
       setIsUploading(true);
 
-      await photoAPI.mutateAsync({
+      const key = `${age}-${randomUUID().split("-")[0]}.jpeg`;
+
+      const uploadURL = await getUploadURL({ key });
+
+      await uploadFileToS3(uploadURL, await (await fetch(photoURI)).blob());
+
+      await createDBRecord({
         age,
-        photoURI: `data:image/jpeg;base64,${
-          photo.base64 ?? raise("Bad file reading")
-        }`,
+        key,
       });
 
       setIsUploading(false);
     },
-    [photoAPI],
+    [createDBRecord, getUploadURL],
   );
 
   return {

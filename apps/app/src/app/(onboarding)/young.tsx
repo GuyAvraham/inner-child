@@ -1,19 +1,21 @@
 import { useCallback } from "react";
 import { Button, Text } from "react-native";
 import { useRouter } from "expo-router";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
+import { cropToFace } from "~/utils/cropToFace";
 import SelectionPhoto from "~/components/SelectionPhoto";
 import SubmitPhoto from "~/components/SelectPhoto";
 import { ROUTE } from "~/config/routes";
 import useUploadPhoto from "~/hooks/useUploadPhoto";
-import { youngPhotoAtom } from "~/store/photos";
+import { currentPhotoAtom, youngPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
 export default function YoungPhotoScreen() {
   const router = useRouter();
 
   const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
+  const currentPhoto = useAtomValue(currentPhotoAtom);
 
   const { isUploading, uploadPhoto } = useUploadPhoto();
 
@@ -28,8 +30,17 @@ export default function YoungPhotoScreen() {
   return (
     <>
       <Text>Upload a photo of you as a child</Text>
-      <SelectionPhoto photo={youngPhoto} />
-      <SubmitPhoto onSelect={setYoungPhoto} />
+      <SelectionPhoto
+        source={youngPhoto ? { uri: youngPhoto } : { uri: currentPhoto }}
+        blurRadius={!youngPhoto ? 100 : 0}
+      />
+      <SubmitPhoto
+        onSelect={(photo) => {
+          void cropToFace(photo.uri).then((result) => {
+            setYoungPhoto(result.uri);
+          });
+        }}
+      />
       <Button
         title="generate automatically"
         onPress={() => {

@@ -62,6 +62,9 @@ importers:
       expo-constants:
         specifier: ~14.2.1
         version: 14.2.1(expo@48.0.19)
+      expo-crypto:
+        specifier: ~12.2.1
+        version: 12.2.2(expo@48.0.19)
       expo-face-detector:
         specifier: ~12.1.1
         version: 12.1.2(expo@48.0.19)
@@ -7543,6 +7546,15 @@ packages:
       uuid: 3.4.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /expo-crypto@12.2.2(expo@48.0.19):
+    resolution: {integrity: sha512-83SZju/l0UL4n+Dgt+T1csiySa0gwCeE6BKKHzlO+4lJ6B8xXZ5ypu97ttWATBsqcpF/bj1RmYPbfbKsZ+4ixA==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      base64-js: 1.5.1
+      expo: 48.0.19(@babel/core@7.21.8)
     dev: false
 
   /expo-crypto@12.4.1(expo@48.0.19):

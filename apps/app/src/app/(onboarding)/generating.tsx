@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button, Text } from "react-native";
-import type { ImagePickerAsset } from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { useAtom, useAtomValue } from "jotai";
 
-// import { replicate } from "~/utils/replicate";
+import { api } from "~/utils/api";
 import SelectionPhoto from "~/components/SelectionPhoto";
 import { ROUTE } from "~/config/routes";
 import useErrorsHandler from "~/hooks/useErrorsHandler";
@@ -13,22 +12,8 @@ import useUploadPhoto from "~/hooks/useUploadPhoto";
 import { currentPhotoAtom, oldPhotoAtom, youngPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
-const generateAgedPhoto = async (
-  photo: ImagePickerAsset,
-  _age: Exclude<AgeMode, AgeMode.CURRENT>,
-  // eslint-disable-next-line @typescript-eslint/require-await
-) => {
-  return photo;
-  // const generatedPhoto = await replicate.generateSAMImage({
-  //   age: age === AgeMode.YOUNG ? 10 : 70,
-  //   image: `data:image/jpeg;base64,${photo.base64!}`,
-  // });
-
-  // console.log(JSON.stringify(generatedPhoto, null, 2));
-};
-
 export default function GeneratingScreen() {
-  const { handleError } = useErrorsHandler();
+  const { handleError: _ } = useErrorsHandler();
 
   const generateYoung = Boolean(
     useLocalSearchParams<{ young: string }>().young,
@@ -36,39 +21,42 @@ export default function GeneratingScreen() {
   const { user } = useUser();
   const router = useRouter();
 
-  const [isGenerating, setIsGenerating] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutateAsync: _generateAgedPhoto } =
+    api.photo.generateAged.useMutation();
+
+  const [status, setStatus] = useState<"idle" | "generating" | "uploading">(
+    "generating",
+  );
 
   const currentPhoto = useAtomValue(currentPhotoAtom);
-  const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
-  const [oldPhoto, setOldPhoto] = useAtom(oldPhotoAtom);
+  const [youngPhoto, _setYoungPhoto] = useAtom(youngPhotoAtom);
+  const [oldPhoto, _setOldPhoto] = useAtom(oldPhotoAtom);
 
   const { uploadPhoto } = useUploadPhoto();
 
   useEffect(() => {
     if (!currentPhoto || !generateYoung) return;
 
-    void generateAgedPhoto(currentPhoto, AgeMode.YOUNG)
-      .then(setYoungPhoto)
-      .catch(handleError);
-  }, [currentPhoto, generateYoung, handleError, setOldPhoto, setYoungPhoto]);
+    console.log("young photo generation");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!currentPhoto) return;
 
-    void generateAgedPhoto(currentPhoto, AgeMode.OLD)
-      .then(setOldPhoto)
-      .catch(handleError);
-  }, [currentPhoto, handleError, setOldPhoto]);
+    console.log("old photo generation");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    setIsGenerating(!youngPhoto && !oldPhoto);
+    if (youngPhoto || oldPhoto) setStatus("idle");
   }, [oldPhoto, youngPhoto]);
 
   const handleSubmit = useCallback(async () => {
     if (!youngPhoto || !oldPhoto) return;
 
-    setIsSubmitting(true);
+    setStatus("uploading");
+
     if (!generateYoung) await uploadPhoto(youngPhoto, AgeMode.YOUNG);
     await uploadPhoto(oldPhoto, AgeMode.OLD);
 
@@ -84,11 +72,24 @@ export default function GeneratingScreen() {
   return (
     <>
       <Text>Generating your photos</Text>
-      <SelectionPhoto photo={youngPhoto} />
-      <SelectionPhoto photo={oldPhoto} />
+      {generateYoung ? (
+        <>
+          <Text>You young</Text>
+          !youngPhoto ? (
+          <SelectionPhoto source={{ uri: currentPhoto }} blurRadius={100} />
+          ) : (
+          <SelectionPhoto source={{ uri: youngPhoto }} />)
+        </>
+      ) : null}
+      <Text>You old</Text>
+      {!oldPhoto ? (
+        <SelectionPhoto source={{ uri: currentPhoto }} blurRadius={100} />
+      ) : (
+        <SelectionPhoto source={{ uri: oldPhoto }} />
+      )}
       <Button
-        title={isSubmitting ? "submitting..." : "continue"}
-        disabled={isGenerating}
+        title={status === "uploading" ? "submitting..." : "continue"}
+        disabled={status === "generating"}
         onPress={handleSubmit}
       />
     </>

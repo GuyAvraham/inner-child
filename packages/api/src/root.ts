@@ -1,7 +1,9 @@
 import { photoRouter } from "./router/photo.router";
+import { uploadRoute } from "./router/upload.route";
 import { createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
+  upload: uploadRoute,
   photo: photoRouter,
 });
 

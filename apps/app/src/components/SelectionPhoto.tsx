@@ -1,24 +1,19 @@
+import type { ImageProps, ImageSourcePropType } from "react-native";
 import { Image, View } from "react-native";
-import type { ImagePickerAsset } from "expo-image-picker";
 import { FontAwesome } from "@expo/vector-icons";
 
-export default function SelectionPhoto({
-  photo,
-}: {
-  photo?: ImagePickerAsset;
-}) {
+interface SelectionPhotoProps extends Omit<ImageProps, "source"> {
+  source?: ImageSourcePropType;
+}
+
+export default function SelectionPhoto({ ...props }: SelectionPhotoProps) {
   return (
     <View className="flex items-center p-4">
-      {!photo ? (
+      {!props.source ? (
         // TODO: set proper designed placeholder
         <FontAwesome name="user-circle" size={160} color="black" />
       ) : (
-        <Image
-          source={{
-            uri: photo.uri,
-          }}
-          className="h-40 w-40"
-        />
+        <Image className="h-40 w-40" source={props.source} {...props} />
       )}
     </View>
   );
