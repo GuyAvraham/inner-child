@@ -8,6 +8,8 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url(),
+    DIRECT_DATABASE_URL: z.string().url(),
+    REPLICATE_API_TOKEN: z.string(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -21,7 +23,8 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
-    // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+    DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
+    REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,
   },
   skipValidation: !!process.env.CI || !!process.env.SKIP_ENV_VALIDATION,
 });
