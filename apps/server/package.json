@@ -10,7 +10,7 @@
     "lint:fix": "pnpm lint --fix",
     "start": "pnpm with-env next start",
     "type-check": "tsc --noEmit",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env -e ../../.env.local --"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.21.15",
@@ -29,6 +29,7 @@
     "radash": "^11.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "replicate": "^0.13.0",
     "zod": "^3.21.4"
   },
   "devDependencies": {

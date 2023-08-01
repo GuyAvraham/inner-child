@@ -1,5 +1,5 @@
 {
-  "name": "@innch/api",
+  "name": "@innch/s3",
   "version": "0.1.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -11,12 +11,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@innch/db": "^0.1.0",
-    "@innch/s3": "^0.1.0",
-    "@innch/utils": "^0.1.0",
-    "@trpc/client": "^10.34.0",
-    "@trpc/server": "^10.34.0",
-    "zod": "^3.21.4"
+    "@aws-sdk/client-s3": "^3.370.0",
+    "@aws-sdk/s3-request-presigner": "^3.370.0",
+    "@innch/utils": "^0.1.0"
   },
   "devDependencies": {
     "@innch/eslint-config": "^0.2.0",
