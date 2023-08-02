@@ -89,12 +89,15 @@ export default function GeneratingScreen() {
 
   return (
     <>
-      <Text>Generating your photos</Text>
+      <Text>Generating your photos... It might take up to 20 seconds</Text>
       {generateYoung ? (
         <>
           <Text>You young</Text>
           {!youngPhoto ? (
-            <SelectionPhoto source={{ uri: currentPhoto }} blurRadius={100} />
+            <SelectionPhoto
+              source={{ uri: currentPhoto }}
+              blurRadius={100}
+            />
           ) : (
             <SelectionPhoto source={{ uri: youngPhoto }} />
           )}
@@ -102,7 +105,10 @@ export default function GeneratingScreen() {
       ) : null}
       <Text>You old</Text>
       {!oldPhoto ? (
-        <SelectionPhoto source={{ uri: currentPhoto }} blurRadius={100} />
+        <SelectionPhoto
+          source={{ uri: currentPhoto }}
+          blurRadius={100}
+        />
       ) : (
         <SelectionPhoto source={{ uri: oldPhoto }} />
       )}
