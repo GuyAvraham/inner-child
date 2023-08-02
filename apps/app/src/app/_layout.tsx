@@ -47,3 +47,7 @@ export default function RootLayout() {
     </ClerkProvider>
   );
 }
+
+// TODO:
+// 1. add point to ask about gender to match the voice
+// 2. find a way to speed up video generation cuz it soooo slow

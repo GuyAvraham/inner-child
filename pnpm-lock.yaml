@@ -59,6 +59,9 @@ importers:
       expo:
         specifier: ^48.0.19
         version: 48.0.19(@babel/core@7.21.8)
+      expo-av:
+        specifier: ~13.2.1
+        version: 13.2.1(expo@48.0.19)
       expo-constants:
         specifier: ~14.2.1
         version: 14.2.1(expo@48.0.19)
@@ -7521,6 +7524,14 @@ packages:
     transitivePeerDependencies:
       - expo
       - supports-color
+    dev: false
+
+  /expo-av@13.2.1(expo@48.0.19):
+    resolution: {integrity: sha512-mC0mYSzaOaZgXjzhW2l4Ag325JjH6q5IbptfwD7gkMOFYy7VPOMxEMUnetadbs3DDzmgE6vUWrTjUIUbwq59qg==}
+    peerDependencies:
+      expo: '*'
+    dependencies:
+      expo: 48.0.19(@babel/core@7.21.8)
     dev: false
 
   /expo-constants@14.2.1(expo@48.0.19):

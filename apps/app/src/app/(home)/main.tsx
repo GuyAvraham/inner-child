@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Button,
   FlatList,
@@ -8,15 +8,22 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { ResizeMode, Video } from "expo-av";
 
 import { api } from "~/utils/api";
 import { AgeMode } from "~/types";
 
 export default function Main() {
+  const [conversationStatus, setConversationStatus] = useState<
+    "idle" | "waiting"
+  >("idle");
   const [conversationMode, setConversationMode] = useState<"OLD" | "YOUNG">(
     "OLD",
   );
   const [message, setMessage] = useState<string>("");
+  const [video, setVideo] = useState<string>();
+
+  const playback = useRef<Video | null>(null);
 
   const { data: youngPhoto, isLoading: isYoungLoading } =
     api.photo.getByAge.useQuery({
@@ -29,9 +36,42 @@ export default function Main() {
   const { data: messages, isLoading: areMessagesLoading } =
     api.conversation.get.useQuery({ age: conversationMode });
 
-  const { mutateAsync: talk } = api.conversation.talk.useMutation();
+  const { mutateAsync: getText } = api.conversation.text.useMutation();
+  const { mutateAsync: getVoice } = api.conversation.voice.useMutation();
+  const { mutateAsync: getVideo } = api.conversation.video.useMutation();
 
   const utils = api.useContext();
+
+  playback.current?.setOnPlaybackStatusUpdate((status) => {
+    if (status.isLoaded && status.durationMillis === status.positionMillis) {
+      console.log("finished");
+      setVideo(undefined);
+      setConversationStatus("idle");
+    }
+  });
+
+  const handleSendMessage = useCallback(async () => {
+    setConversationStatus("waiting");
+    const textFromAssistant = await getText({ age: conversationMode, message });
+    setMessage("");
+    void utils.conversation.get.invalidate();
+    const voiceFromAssistant = await getVoice({ text: textFromAssistant.text });
+    const videoURL = await getVideo({
+      image: conversationMode === "OLD" ? oldPhoto!.uri : youngPhoto!.uri,
+      voice: voiceFromAssistant,
+    });
+
+    setVideo(videoURL);
+  }, [
+    conversationMode,
+    getText,
+    getVideo,
+    getVoice,
+    message,
+    oldPhoto,
+    utils.conversation.get,
+    youngPhoto,
+  ]);
 
   if (isOldLoading || isYoungLoading) return <Text>Loading...</Text>;
 
@@ -46,14 +86,24 @@ export default function Main() {
             zIndex: conversationMode === "YOUNG" ? 1 : undefined,
           }}
         >
-          <Image
-            source={{ uri: youngPhoto?.uri }}
-            alt=""
-            className="m-2 h-40 w-40"
-            style={{
-              transform: [{ scale: conversationMode === "YOUNG" ? 1.3 : 1 }],
-            }}
-          />
+          {conversationMode === "YOUNG" && video ? (
+            <Video
+              className="m-2 h-40 w-40"
+              source={{ uri: video }}
+              ref={playback}
+              shouldPlay={true}
+              resizeMode={ResizeMode.CONTAIN}
+            />
+          ) : (
+            <Image
+              source={{ uri: youngPhoto?.uri }}
+              alt=""
+              className="m-2 h-40 w-40"
+              style={{
+                transform: [{ scale: conversationMode === "YOUNG" ? 1.3 : 1 }],
+              }}
+            />
+          )}
         </Pressable>
         <Pressable
           onPress={() => {
@@ -63,17 +113,27 @@ export default function Main() {
             zIndex: conversationMode === "OLD" ? 1 : undefined,
           }}
         >
-          <Image
-            source={{ uri: oldPhoto?.uri }}
-            alt=""
-            className="m-2 h-40 w-40"
-            style={{
-              transform: [{ scale: conversationMode === "OLD" ? 1.3 : 1 }],
-            }}
-          />
+          {conversationMode === "OLD" && video ? (
+            <Video
+              className="m-2 h-40 w-40"
+              source={{ uri: video }}
+              ref={playback}
+              shouldPlay={true}
+              resizeMode={ResizeMode.CONTAIN}
+            />
+          ) : (
+            <Image
+              source={{ uri: oldPhoto?.uri }}
+              alt=""
+              className="m-2 h-40 w-40"
+              style={{
+                transform: [{ scale: conversationMode === "OLD" ? 1.3 : 1 }],
+              }}
+            />
+          )}
         </Pressable>
       </View>
-      <View className="mt-6 flex w-full flex-grow p-8">
+      <View className="mt-6 flex w-full p-8">
         <FlatList
           data={messages}
           keyExtractor={(message) => message.id}
@@ -94,24 +154,23 @@ export default function Main() {
       </View>
       <View>
         <TextInput
-          editable={!areMessagesLoading}
+          editable={!areMessagesLoading || conversationStatus !== "waiting"}
+          focusable={conversationStatus !== "waiting"}
           className="w-full border-2 p-4"
           value={message}
           onChangeText={setMessage}
           multiline
         />
         <Button
-          disabled={areMessagesLoading || message.trim().length === 0}
-          title="Send"
-          onPress={() => {
-            const prevMessage = message;
-            setMessage("");
-            void talk({ age: conversationMode, message: prevMessage }).then(
-              () => {
-                void utils.conversation.get.invalidate();
-              },
-            );
-          }}
+          disabled={
+            areMessagesLoading ||
+            message.trim().length === 0 ||
+            conversationStatus === "waiting"
+          }
+          title={
+            conversationStatus === "idle" ? "Send" : "Waiting for response"
+          }
+          onPress={handleSendMessage}
         />
       </View>
     </View>
