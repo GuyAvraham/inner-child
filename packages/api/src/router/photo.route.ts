@@ -1,5 +1,8 @@
+import { TRPCError } from "@trpc/server";
 import { parallel } from "radash";
 import { z } from "zod";
+
+import { AgeMode } from "@innch/db";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { ageMap } from "../utils/ageMap";
@@ -29,21 +32,37 @@ export const photoRoute = createTRPCRouter({
     .input(
       z.object({
         age: z.enum(["YOUNG", "OLD"]),
-        photoURL: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const photo = await ctx.db.photo.findFirst({
+        where: {
+          userId: ctx.session.userId,
+          age: AgeMode.CURRENT,
+        },
+      });
+
+      if (!photo)
+        throw new TRPCError({
+          message: "No current photo found",
+          code: "NOT_FOUND",
+        });
+
+      const photoURL = await ctx.s3.getPresignedUrl(
+        `${ctx.session.userId}/${photo.key}`,
+      );
+
       const generatedPhotoURL = await replicate.run(
         "yuval-alaluf/sam:9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c",
         {
           input: {
-            image: input.photoURL,
+            image: photoURL,
             target_age: ageMap[input.age],
           },
         },
       );
 
-      return generatedPhotoURL;
+      return generatedPhotoURL as unknown as string;
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const photos = await ctx.db.photo.findMany();

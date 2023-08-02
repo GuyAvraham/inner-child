@@ -4,6 +4,8 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { useAtom, useAtomValue } from "jotai";
 
+import { blobToDataURL } from "@innch/utils";
+
 import { api } from "~/utils/api";
 import SelectionPhoto from "~/components/SelectionPhoto";
 import { ROUTE } from "~/config/routes";
@@ -13,7 +15,7 @@ import { currentPhotoAtom, oldPhotoAtom, youngPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
 export default function GeneratingScreen() {
-  const { handleError: _ } = useErrorsHandler();
+  const { handleError } = useErrorsHandler();
 
   const generateYoung = Boolean(
     useLocalSearchParams<{ young: string }>().young,
@@ -21,7 +23,7 @@ export default function GeneratingScreen() {
   const { user } = useUser();
   const router = useRouter();
 
-  const { mutateAsync: _generateAgedPhoto } =
+  const { mutateAsync: generateAgedPhoto } =
     api.photo.generateAged.useMutation();
 
   const [status, setStatus] = useState<"idle" | "generating" | "uploading">(
@@ -29,27 +31,43 @@ export default function GeneratingScreen() {
   );
 
   const currentPhoto = useAtomValue(currentPhotoAtom);
-  const [youngPhoto, _setYoungPhoto] = useAtom(youngPhotoAtom);
-  const [oldPhoto, _setOldPhoto] = useAtom(oldPhotoAtom);
+  const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
+  const [oldPhoto, setOldPhoto] = useAtom(oldPhotoAtom);
 
   const { uploadPhoto } = useUploadPhoto();
 
   useEffect(() => {
     if (!currentPhoto || !generateYoung) return;
 
-    console.log("young photo generation");
+    generateAgedPhoto({ age: AgeMode.YOUNG })
+      .then(async (url) => {
+        return await (await fetch(url)).blob();
+      })
+      .then(async (blob) => {
+        const photoURI = await blobToDataURL(blob);
+        setYoungPhoto(photoURI);
+      })
+      .catch(handleError);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!currentPhoto) return;
 
-    console.log("old photo generation");
+    generateAgedPhoto({ age: AgeMode.OLD })
+      .then(async (url) => {
+        return await (await fetch(url)).blob();
+      })
+      .then(async (blob) => {
+        const photoURI = await blobToDataURL(blob);
+        setOldPhoto(photoURI);
+      })
+      .catch(handleError);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (youngPhoto || oldPhoto) setStatus("idle");
+    if (youngPhoto && oldPhoto) setStatus("idle");
   }, [oldPhoto, youngPhoto]);
 
   const handleSubmit = useCallback(async () => {
@@ -57,7 +75,7 @@ export default function GeneratingScreen() {
 
     setStatus("uploading");
 
-    if (!generateYoung) await uploadPhoto(youngPhoto, AgeMode.YOUNG);
+    if (generateYoung) await uploadPhoto(youngPhoto, AgeMode.YOUNG);
     await uploadPhoto(oldPhoto, AgeMode.OLD);
 
     await user?.update({
@@ -75,10 +93,11 @@ export default function GeneratingScreen() {
       {generateYoung ? (
         <>
           <Text>You young</Text>
-          !youngPhoto ? (
-          <SelectionPhoto source={{ uri: currentPhoto }} blurRadius={100} />
+          {!youngPhoto ? (
+            <SelectionPhoto source={{ uri: currentPhoto }} blurRadius={100} />
           ) : (
-          <SelectionPhoto source={{ uri: youngPhoto }} />)
+            <SelectionPhoto source={{ uri: youngPhoto }} />
+          )}
         </>
       ) : null}
       <Text>You old</Text>
