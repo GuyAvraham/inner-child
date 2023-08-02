@@ -72,4 +72,28 @@ export const photoRoute = createTRPCRouter({
       uri: await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo.key}`),
     }));
   }),
+  getByAge: protectedProcedure
+    .input(
+      z.object({
+        age: z.enum(["YOUNG", "CURRENT", "OLD"]),
+      }),
+    )
+    .query(async ({ ctx, input: { age } }) => {
+      const photo = await ctx.db.photo.findFirst({
+        where: {
+          userId: ctx.session.userId,
+          age,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (!photo) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return {
+        ...photo,
+        uri: await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo.key}`),
+      };
+    }),
 });

@@ -5,6 +5,7 @@ import LogOutButton from "~/components/LogOutButton";
 
 export default function HomeLayout() {
   const { isSignedIn } = useAuth();
+
   return (
     <>
       {isSignedIn ? <LogOutButton /> : null}
