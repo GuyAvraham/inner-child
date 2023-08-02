@@ -5,7 +5,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { ageMap } from "../utils/ageMap";
 import { replicate } from "../utils/replicate";
 
-export const photoRouter = createTRPCRouter({
+export const photoRoute = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
