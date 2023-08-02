@@ -16,7 +16,7 @@ enum AgeMode {
 
 enum MessageSender {
     USER
-    CHATGPT
+    ASSISTANT
 }
 
 model Photo {
