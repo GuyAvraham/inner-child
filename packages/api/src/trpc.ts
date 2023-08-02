@@ -11,6 +11,8 @@ import { db } from "@innch/db";
 import { s3 } from "@innch/s3";
 import { transformer } from "@innch/utils";
 
+import { openai } from "./utils/openai";
+
 interface CreateContextOptions {
   session: SignedInAuthObject | SignedOutAuthObject | null;
 }
@@ -20,6 +22,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
     session: opts.session,
     db,
     s3,
+    openai,
   };
 };
 
