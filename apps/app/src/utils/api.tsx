@@ -65,7 +65,10 @@ export function TRPCProvider(props: PropsWithChildren) {
   }, [getToken, handleError]);
 
   return (
-    <api.Provider client={trpcClient} queryClient={queryClient}>
+    <api.Provider
+      client={trpcClient}
+      queryClient={queryClient}
+    >
       <QueryClientProvider client={queryClient}>
         {props.children}
       </QueryClientProvider>
