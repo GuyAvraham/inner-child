@@ -21,7 +21,7 @@ export default function Main() {
     "OLD",
   );
   const [message, setMessage] = useState<string>("");
-  const [video, setVideo] = useState<string>();
+  const [videoPredictionId, setVideoPredictionId] = useState<string>();
 
   const playback = useRef<Video | null>(null);
 
@@ -38,14 +38,18 @@ export default function Main() {
 
   const { mutateAsync: getText } = api.conversation.text.useMutation();
   const { mutateAsync: getVoice } = api.conversation.voice.useMutation();
-  const { mutateAsync: getVideo } = api.conversation.video.useMutation();
+  const { mutateAsync: getVideo } =
+    api.conversation.getVideoPredictionID.useMutation();
+  const { data: videoURI } = api.conversation.waitForVideo.useQuery(
+    { predictionId: videoPredictionId },
+    { enabled: !!videoPredictionId && !video, refetchInterval: 2000 },
+  );
 
   const utils = api.useContext();
 
   playback.current?.setOnPlaybackStatusUpdate((status) => {
     if (status.isLoaded && status.durationMillis === status.positionMillis) {
       console.log("finished");
-      setVideo(undefined);
       setConversationStatus("idle");
     }
   });
@@ -56,12 +60,12 @@ export default function Main() {
     setMessage("");
     void utils.conversation.get.invalidate();
     const voiceFromAssistant = await getVoice({ text: textFromAssistant.text });
-    const videoURL = await getVideo({
+    const videoPrediction = await getVideo({
       image: conversationMode === "OLD" ? oldPhoto!.uri : youngPhoto!.uri,
       voice: voiceFromAssistant,
     });
 
-    setVideo(videoURL);
+    setVideoPredictionId(videoPrediction.id);
   }, [
     conversationMode,
     getText,
@@ -76,7 +80,7 @@ export default function Main() {
   if (isOldLoading || isYoungLoading) return <Text>Loading...</Text>;
 
   return (
-    <View className="grid h-full bg-pink-200">
+    <View className="mt-4 grid h-full">
       <View className="flex flex-row flex-wrap">
         <Pressable
           onPress={() => {
@@ -86,10 +90,10 @@ export default function Main() {
             zIndex: conversationMode === "YOUNG" ? 1 : undefined,
           }}
         >
-          {conversationMode === "YOUNG" && video ? (
+          {conversationMode === "YOUNG" && videoURI ? (
             <Video
               className="m-2 h-40 w-40"
-              source={{ uri: video }}
+              source={{ uri: videoURI }}
               ref={playback}
               shouldPlay={true}
               resizeMode={ResizeMode.CONTAIN}
@@ -113,10 +117,10 @@ export default function Main() {
             zIndex: conversationMode === "OLD" ? 1 : undefined,
           }}
         >
-          {conversationMode === "OLD" && video ? (
+          {conversationMode === "OLD" && videoURI ? (
             <Video
               className="m-2 h-40 w-40"
-              source={{ uri: video }}
+              source={{ uri: videoURI }}
               ref={playback}
               shouldPlay={true}
               resizeMode={ResizeMode.CONTAIN}

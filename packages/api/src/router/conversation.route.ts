@@ -90,10 +90,10 @@ export const conversationRoute = createTRPCRouter({
         )
       ).text();
     }),
-  video: protectedProcedure
+  getVideoPredictionID: protectedProcedure
     .input(z.object({ voice: z.string(), image: z.string() }))
     .mutation(async ({ input }) => {
-      const videoURL = await replicate.run(
+      return replicate.predictions.create(
         "cjwbw/sadtalker:3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
         {
           input: {
@@ -102,7 +102,14 @@ export const conversationRoute = createTRPCRouter({
           },
         },
       );
+    }),
+  waitForVideo: protectedProcedure
+    .input(z.object({ predictionId: z.string() }))
+    .query(async ({ input: { predictionId } }) => {
+      const prediction = await replicate.predictions.get(predictionId);
 
-      return videoURL as unknown as string;
+      if (prediction.status !== "succeeded") return null;
+
+      return prediction.output as string;
     }),
 });
