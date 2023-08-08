@@ -15,6 +15,8 @@ import { currentPhotoAtom, oldPhotoAtom, youngPhotoAtom } from "~/store/photos";
 import { AgeMode } from "~/types";
 
 export default function GeneratingScreen() {
+  const [youngPredictionId, setYoungPredictionId] = useState<string>();
+  const [oldPredictionId, setOldPredictionId] = useState<string>();
   const { handleError } = useErrorsHandler();
 
   const generateYoung = Boolean(
@@ -23,16 +25,28 @@ export default function GeneratingScreen() {
   const { user } = useUser();
   const router = useRouter();
 
+  const currentPhoto = useAtomValue(currentPhotoAtom);
+  const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
+  const [oldPhoto, setOldPhoto] = useAtom(oldPhotoAtom);
+
   const { mutateAsync: generateAgedPhoto } =
     api.photo.generateAged.useMutation();
+  const { data: youngPhotoURI } = api.photo.wait.useQuery(
+    {
+      predictionId: youngPredictionId,
+    },
+    { enabled: !!youngPredictionId && !youngPhoto, refetchInterval: 2000 },
+  );
+  const { data: oldPhotoURI } = api.photo.wait.useQuery(
+    {
+      predictionId: oldPredictionId,
+    },
+    { enabled: !!oldPredictionId && !oldPhoto, refetchInterval: 2000 },
+  );
 
   const [status, setStatus] = useState<"idle" | "generating" | "uploading">(
     "generating",
   );
-
-  const currentPhoto = useAtomValue(currentPhotoAtom);
-  const [youngPhoto, setYoungPhoto] = useAtom(youngPhotoAtom);
-  const [oldPhoto, setOldPhoto] = useAtom(oldPhotoAtom);
 
   const { uploadPhoto } = useUploadPhoto();
 
@@ -40,12 +54,8 @@ export default function GeneratingScreen() {
     if (!currentPhoto || !generateYoung) return;
 
     generateAgedPhoto({ age: AgeMode.YOUNG })
-      .then(async (url) => {
-        return await (await fetch(url)).blob();
-      })
-      .then(async (blob) => {
-        const photoURI = await blobToDataURL(blob);
-        setYoungPhoto(photoURI);
+      .then((prediction) => {
+        setYoungPredictionId(prediction.id);
       })
       .catch(handleError);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,16 +65,36 @@ export default function GeneratingScreen() {
     if (!currentPhoto) return;
 
     generateAgedPhoto({ age: AgeMode.OLD })
-      .then(async (url) => {
-        return await (await fetch(url)).blob();
+      .then((prediction) => {
+        setOldPredictionId(prediction.id);
       })
+      .catch(handleError);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!youngPhotoURI) return;
+
+    fetch(youngPhotoURI)
+      .then((response) => response.blob())
+      .then(async (blob) => {
+        const photoURI = await blobToDataURL(blob);
+        setYoungPhoto(photoURI);
+      })
+      .catch(handleError);
+  }, [handleError, setYoungPhoto, youngPhotoURI]);
+
+  useEffect(() => {
+    if (!oldPhotoURI) return;
+
+    fetch(oldPhotoURI)
+      .then((response) => response.blob())
       .then(async (blob) => {
         const photoURI = await blobToDataURL(blob);
         setOldPhoto(photoURI);
       })
       .catch(handleError);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handleError, oldPhotoURI, setOldPhoto]);
 
   useEffect(() => {
     if (youngPhoto && oldPhoto) setStatus("idle");

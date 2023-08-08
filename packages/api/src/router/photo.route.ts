@@ -52,17 +52,23 @@ export const photoRoute = createTRPCRouter({
         `${ctx.session.userId}/${photo.key}`,
       );
 
-      const generatedPhotoURL = await replicate.run(
-        "yuval-alaluf/sam:9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c",
-        {
-          input: {
-            image: photoURL,
-            target_age: ageMap[input.age],
-          },
+      return replicate.predictions.create({
+        version:
+          "9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c",
+        input: {
+          image: photoURL,
+          target_age: ageMap[input.age],
         },
-      );
+      });
+    }),
+  wait: protectedProcedure
+    .input(z.object({ predictionId: z.string() }))
+    .query(async ({ input: { predictionId } }) => {
+      const prediction = await replicate.predictions.get(predictionId);
 
-      return generatedPhotoURL as unknown as string;
+      if (prediction.status !== "succeeded") return null;
+
+      return prediction.output as string;
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const photos = await ctx.db.photo.findMany();
@@ -89,7 +95,9 @@ export const photoRoute = createTRPCRouter({
         },
       });
 
-      if (!photo) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!photo) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
       return {
         ...photo,
