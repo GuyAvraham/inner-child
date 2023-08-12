@@ -2,9 +2,9 @@
   "name": "inner-child",
   "private": true,
   "engines": {
-    "node": ">=v18.16.1"
+    "node": ">=v18.17.0"
   },
-  "packageManager": "pnpm@8.6.7",
+  "packageManager": "pnpm@8.6.12",
   "scripts": {
     "build": "turbo build",
     "clean": "git clean -xdf node_modules",
