@@ -104,4 +104,11 @@ export const photoRoute = createTRPCRouter({
         uri: await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo.key}`),
       };
     }),
+  deleteAll: protectedProcedure.mutation(({ ctx }) => {
+    return ctx.db.photo.deleteMany({
+      where: {
+        userId: ctx.session.userId,
+      },
+    });
+  }),
 });
