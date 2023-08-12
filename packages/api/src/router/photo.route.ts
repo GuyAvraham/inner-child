@@ -73,7 +73,7 @@ export const photoRoute = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const photos = await ctx.db.photo.findMany();
 
-    return parallel(2, photos, async (photo) => ({
+    return parallel(3, photos, async (photo) => ({
       ...photo,
       uri: await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo.key}`),
     }));
