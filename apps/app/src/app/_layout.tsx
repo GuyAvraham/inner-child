@@ -1,5 +1,4 @@
 import { Text } from "react-native";
-import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 import { Slot, usePathname, useSegments } from "expo-router";
@@ -27,9 +26,7 @@ export default function RootLayout() {
           <SafeAreaView>
             <ClerkLoaded>
               <ProtectedProvider>
-                <RootSiblingParent>
-                  <Slot />
-                </RootSiblingParent>
+                <Slot />
               </ProtectedProvider>
             </ClerkLoaded>
             <ClerkLoading>

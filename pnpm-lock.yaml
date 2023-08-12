@@ -110,9 +110,6 @@ importers:
       react-native:
         specifier: 0.71.8
         version: 0.71.8(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
-      react-native-root-toast:
-        specifier: ^3.4.1
-        version: 3.4.1(react-native@0.71.8)
       react-native-safe-area-context:
         specifier: 4.5.3
         version: 4.5.3(react-native@0.71.8)(react@18.2.0)
@@ -6936,14 +6933,6 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
-  /deprecated-react-native-prop-types@2.3.0:
-    resolution: {integrity: sha512-pWD0voFtNYxrVqvBMYf5gq3NA2GCpfodS1yNynTPc93AYA/KEMGeWDqqeUB6R2Z9ZofVhks2aeJXiuQqKNpesA==}
-    dependencies:
-      '@react-native/normalize-color': 2.1.0
-      invariant: 2.2.4
-      prop-types: 15.8.1
-    dev: false
-
   /deprecated-react-native-prop-types@3.0.1:
     resolution: {integrity: sha512-J0jCJcsk4hMlIb7xwOZKLfMpuJn6l8UtrPEzzQV5ewz5gvKNYakhBuq9h2rWX7YwHHJZFhU5W8ye7dB9oN8VcQ==}
     dependencies:
@@ -11565,21 +11554,6 @@ packages:
 
   /react-native-gradle-plugin@0.71.19:
     resolution: {integrity: sha512-1dVk9NwhoyKHCSxcrM6vY6cxmojeATsBobDicX0ZKr7DgUF2cBQRTKsimQFvzH8XhOVXyH8p4HyDSZNIFI8OlQ==}
-    dev: false
-
-  /react-native-root-siblings@4.1.1:
-    resolution: {integrity: sha512-sdmLElNs5PDWqmZmj4/aNH4anyxreaPm61c4ZkRiR8SO/GzLg6KjAbb0e17RmMdnBdD0AIQbS38h/l55YKN4ZA==}
-    dev: false
-
-  /react-native-root-toast@3.4.1(react-native@0.71.8):
-    resolution: {integrity: sha512-rZFoaVZWZiPCcwP9n5a+1KtVM22JNp6pkodluCoRIb5oE2ip8mhpdvlZUIWoM5nxfmL4TBThWDp7se6j4X7lPA==}
-    peerDependencies:
-      react-native: '>=0.47.0'
-    dependencies:
-      deprecated-react-native-prop-types: 2.3.0
-      prop-types: 15.8.1
-      react-native: 0.71.8(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
-      react-native-root-siblings: 4.1.1
     dev: false
 
   /react-native-safe-area-context@4.5.3(react-native@0.71.8)(react@18.2.0):
