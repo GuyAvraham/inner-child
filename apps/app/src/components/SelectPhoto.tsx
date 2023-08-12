@@ -17,6 +17,7 @@ const mediaOptions: ImagePickerOptions = {
   quality: 1,
   base64: true,
   exif: true,
+  allowsEditing: true,
 };
 
 export default function SubmitPhoto({
@@ -70,9 +71,15 @@ export default function SubmitPhoto({
   return (
     <View>
       {enableCamera ? (
-        <Button title="take a photo" onPress={takePhoto} />
+        <Button
+          title="take a photo"
+          onPress={takePhoto}
+        />
       ) : null}
-      <Button title="select a photo" onPress={selectPhoto} />
+      <Button
+        title="select a photo"
+        onPress={selectPhoto}
+      />
     </View>
   );
 }
