@@ -133,6 +133,8 @@ export default function GeneratingScreen() {
           )}
         </>
       ) : null}
+      <Text>You today</Text>
+      <SelectionPhoto source={{ uri: currentPhoto }} />
       <Text>You old</Text>
       {!oldPhoto ? (
         <SelectionPhoto
