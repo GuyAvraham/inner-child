@@ -9,14 +9,12 @@ import { createTRPCReact } from "@trpc/react-query";
 import type { AppRouter } from "@innch/api";
 import { transformer } from "@innch/utils";
 
-import { API_URL } from "~/config/consts";
 import useErrorsHandler from "~/hooks/useErrorsHandler";
 
 export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@innch/api";
 
-const getApiUrl = () =>
-  (Constants?.expoConfig?.extra?.apiUrl as string | undefined) ?? API_URL;
+const getApiUrl = () => Constants?.expoConfig?.extra?.apiUrl as string;
 
 export function TRPCProvider(props: PropsWithChildren) {
   const { getToken } = useAuth();

@@ -14,7 +14,11 @@
       "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development"
+      "channel": "development",
+      "env": {
+        "API_URL": "http://localhost:3000",
+        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ"
+      }
     },
     "preview": {
       "distribution": "internal",
@@ -28,8 +32,7 @@
       },
       "env": {
         "API_URL": "https://inner-child-server.vercel.app",
-        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ",
-        "REPLICATE_API_TOKEN": "r8_8iJJNgmej00bJK9QAN0hmtJXuuXR8Jz2wZWcM" // TODO: replace with proper one
+        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ"
       }
     },
     "production": {

@@ -9,7 +9,6 @@ import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/clerk-expo";
 import { TRPCProvider } from "~/utils/api";
 import { tokenCache } from "~/utils/tokenCache";
 import ProtectedProvider from "~/auth/ProtectedProvider";
-import { CLERK_PUBLIC_KEY } from "~/config/consts";
 
 export { ErrorBoundary } from "expo-router";
 
@@ -21,10 +20,7 @@ export default function RootLayout() {
   return (
     <ClerkProvider
       tokenCache={tokenCache}
-      publishableKey={
-        (Constants.expoConfig?.extra?.clerkPublicKey as string | undefined) ??
-        CLERK_PUBLIC_KEY
-      }
+      publishableKey={Constants.expoConfig?.extra?.clerkPublicKey as string}
     >
       <TRPCProvider>
         <SafeAreaProvider>

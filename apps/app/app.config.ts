@@ -37,9 +37,10 @@ const defineConfig = (): ExpoConfig => ({
     eas: {
       projectId: "b0cd7774-1f25-4469-a2ed-21ae8e40206f",
     },
-    apiURL: process.env.API_URL,
-    clerkPublicKey: process.env.CLERK_PUBLIC_KEY,
-    replicateToken: process.env.REPLICATE_API_TOKEN,
+    apiURL: process.env.API_URL || "http://localhost:3000",
+    clerkPublicKey:
+      process.env.CLERK_PUBLIC_KEY ||
+      "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ",
   },
   plugins: [
     [
