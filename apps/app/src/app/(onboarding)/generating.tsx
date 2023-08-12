@@ -82,7 +82,7 @@ export default function GeneratingScreen() {
         setYoungPhoto(photoURI);
       })
       .catch(handleError);
-  }, [handleError, setYoungPhoto, youngPhotoURI]);
+  }, [youngPhotoURI]);
 
   useEffect(() => {
     if (!oldPhotoURI) return;
@@ -94,7 +94,7 @@ export default function GeneratingScreen() {
         setOldPhoto(photoURI);
       })
       .catch(handleError);
-  }, [handleError, oldPhotoURI, setOldPhoto]);
+  }, [oldPhotoURI]);
 
   useEffect(() => {
     if (youngPhoto && oldPhoto) setStatus("idle");
