@@ -112,4 +112,13 @@ export const conversationRoute = createTRPCRouter({
 
       return prediction.output as string;
     }),
+  clear: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input: { id } }) => {
+      return ctx.db.message.deleteMany({
+        where: {
+          conversationId: id,
+        },
+      });
+    }),
 });

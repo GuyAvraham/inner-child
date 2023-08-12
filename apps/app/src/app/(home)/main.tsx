@@ -44,6 +44,8 @@ export default function Main() {
     { predictionId: videoPredictionId },
     { enabled: !!videoPredictionId && !video, refetchInterval: 2000 },
   );
+  const { mutateAsync: clearConversation } =
+    api.conversation.clear.useMutation();
 
   const utils = api.useContext();
 
@@ -76,6 +78,13 @@ export default function Main() {
     utils.conversation.get,
     youngPhoto,
   ]);
+
+  const handleClearConversation = useCallback(async () => {
+    if (!messages[0]) return;
+
+    await clearConversation({ id: messages[0].conversationId });
+    await utils.conversation.invalidate();
+  }, [clearConversation, messages, utils.conversation]);
 
   if (isOldLoading || isYoungLoading || areMessagesLoading)
     return <Text>Loading...</Text>;
@@ -177,6 +186,11 @@ export default function Main() {
           }
           onPress={handleSendMessage}
         />
+        <Button
+          title="Clear"
+          onPress={handleClearConversation}
+          disabled={messages?.length === 0}
+        ></Button>
       </View>
     </View>
   );
