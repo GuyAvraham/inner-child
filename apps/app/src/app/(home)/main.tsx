@@ -77,7 +77,8 @@ export default function Main() {
     youngPhoto,
   ]);
 
-  if (isOldLoading || isYoungLoading) return <Text>Loading...</Text>;
+  if (isOldLoading || isYoungLoading || areMessagesLoading)
+    return <Text>Loading...</Text>;
 
   return (
     <View className="mt-4 grid h-full">
