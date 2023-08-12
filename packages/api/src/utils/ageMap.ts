@@ -1,4 +1,4 @@
 export const ageMap = {
-  YOUNG: "10",
+  YOUNG: "0",
   OLD: "60",
 };
