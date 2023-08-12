@@ -9,7 +9,7 @@ export const cropToFace = async (uri: string) => {
   if (!detectedFaces.faces[0]) throw new Error("no face detected");
   if (detectedFaces.faces.length > 1) throw new Error("too many faces");
 
-  if (detectedFaces.faces[0].bounds.size.height < 1000)
+  if (detectedFaces.faces[0].bounds.size.height < 512)
     throw new Error("face too small");
 
   const OFFSET = detectedFaces.faces[0].bounds.size.width / 3;
