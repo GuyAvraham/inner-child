@@ -15,7 +15,6 @@ const mediaOptions: ImagePickerOptions = {
   mediaTypes: MediaTypeOptions.Images,
   aspect: [1, 1],
   quality: 1,
-  base64: true,
   exif: true,
   allowsEditing: true,
 };
