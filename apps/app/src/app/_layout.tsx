@@ -7,6 +7,7 @@ import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/clerk-expo";
 
 import { TRPCProvider } from "~/utils/api";
 import { tokenCache } from "~/utils/tokenCache";
+import DEV_ResetProfile from "~/components/DEV_ResetProfile";
 import ProtectedProvider from "~/auth/ProtectedProvider";
 
 export { ErrorBoundary } from "expo-router";
@@ -26,6 +27,7 @@ export default function RootLayout() {
           <SafeAreaView>
             <ClerkLoaded>
               <ProtectedProvider>
+                <DEV_ResetProfile />
                 <Slot />
               </ProtectedProvider>
             </ClerkLoaded>

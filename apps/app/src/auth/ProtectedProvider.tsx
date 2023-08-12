@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import type { PropsWithChildren } from "react";
 import { Text } from "react-native";
 import { useRouter, useSegments } from "expo-router";
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import { Provider } from "jotai";
 
 import { ROUTE } from "~/config/routes";
 
@@ -30,6 +31,7 @@ const useProtectedRoute = () => {
 
 export default function ProtectedProvider({ children }: PropsWithChildren) {
   const { showLoader } = useProtectedRoute();
+  const { user } = useUser();
 
   return showLoader ? (
     // TODO: replace with proper loader
@@ -37,6 +39,6 @@ export default function ProtectedProvider({ children }: PropsWithChildren) {
       <Text>Loading...</Text>
     </>
   ) : (
-    <>{children}</>
+    <Provider key={user?.id}>{children}</Provider>
   );
 }
