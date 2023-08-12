@@ -14,7 +14,7 @@ import useErrorsHandler from "~/hooks/useErrorsHandler";
 export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@innch/api";
 
-const getApiUrl = () => Constants?.expoConfig?.extra?.apiUrl as string;
+const getApiUrl = () => Constants?.expoConfig?.extra?.apiURL as string;
 
 export function TRPCProvider(props: PropsWithChildren) {
   const { getToken } = useAuth();
