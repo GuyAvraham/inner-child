@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Button, Text } from "react-native";
 import { useRouter } from "expo-router";
 import { useAtom, useSetAtom } from "jotai";
@@ -19,11 +19,15 @@ export default function CurrentPhotoScreen() {
 
   const { isUploading, uploadPhoto } = useUploadPhoto();
 
+  const [isCropping, setIsCropping] = useState<boolean>(false);
+  const [warning, setWarning] = useState<boolean>(false);
+
   const handleSubmit = useCallback(async () => {
     if (!currentPhoto) return;
 
     await uploadPhoto(currentPhoto, AgeMode.CURRENT);
 
+    setWarning(false);
     router.push(ROUTE.ONBOARDING.YOUNG);
   }, [currentPhoto, router, uploadPhoto]);
 
@@ -33,20 +37,36 @@ export default function CurrentPhotoScreen() {
       <SelectionPhoto
         source={currentPhoto ? { uri: currentPhoto } : undefined}
       />
+      {isCropping ? <Text>Cropping face</Text> : null}
       <SubmitPhoto
         enableCamera
         onSelect={(photo) => {
           setOriginalPhoto(photo);
+          setCurrentPhoto(photo.uri);
+          setIsCropping(true);
 
-          void cropToFace(photo.uri).then((result) => {
-            setCurrentPhoto(result.uri);
-          });
+          cropToFace(photo.uri)
+            .then((result) => {
+              setCurrentPhoto(result.uri);
+            })
+            .catch(() => {
+              setWarning(true);
+            })
+            .finally(() => {
+              setIsCropping(false);
+            });
         }}
       />
       <Button
-        title={isUploading ? "submitting..." : "submit"}
+        title={
+          isUploading
+            ? "submitting..."
+            : warning
+            ? "no face detected! submit anyway"
+            : "submit"
+        }
         onPress={handleSubmit}
-        disabled={!currentPhoto}
+        disabled={!currentPhoto || isCropping}
       />
     </>
   );
