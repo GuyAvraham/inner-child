@@ -18,13 +18,16 @@ const useUploadPhoto = () => {
       const key = `${age}-${randomUUID().split("-")[0]}.jpeg`;
 
       const uploadURL = await getUploadURL({ key });
+      alert("got the url " + uploadURL);
 
       await uploadFileToS3(uploadURL, await (await fetch(photoURI)).blob());
+      alert("uploaded photo " + key);
 
       await createDBRecord({
         age,
         key,
       });
+      alert("saved photo " + key);
 
       setIsUploading(false);
     },
