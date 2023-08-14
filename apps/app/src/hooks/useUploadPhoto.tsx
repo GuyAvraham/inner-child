@@ -20,7 +20,10 @@ const useUploadPhoto = () => {
       const uploadURL = await getUploadURL({ key });
       alert("got the url " + uploadURL);
 
-      await uploadFileToS3(uploadURL, await (await fetch(photoURI)).blob());
+      await uploadFileToS3(
+        uploadURL,
+        await (await fetch(photoURI)).blob(),
+      ).catch((error) => alert((error as Error).message ?? error));
       alert("uploaded photo " + key);
 
       await createDBRecord({
