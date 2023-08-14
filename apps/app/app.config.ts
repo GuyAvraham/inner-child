@@ -37,7 +37,7 @@ const defineConfig = (): ExpoConfig => ({
     eas: {
       projectId: "b0cd7774-1f25-4469-a2ed-21ae8e40206f",
     },
-    apiURL: process.env.API_URL || "http://localhost:3000",
+    apiURL: process.env.API_URL || "https://inner-child-server.vercel.app",
     clerkPublicKey:
       process.env.CLERK_PUBLIC_KEY ||
       "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ",
