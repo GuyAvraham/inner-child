@@ -4,7 +4,6 @@ import { MessageSender } from "@innch/db";
 import { raise } from "@innch/utils";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { replicate } from "../utils/replicate";
 
 export const conversationRoute = createTRPCRouter({
   get: protectedProcedure
@@ -78,39 +77,74 @@ export const conversationRoute = createTRPCRouter({
         },
       });
     }),
-  voice: protectedProcedure
-    .input(z.object({ text: z.string() }))
-    .mutation(async ({ input }) => {
-      return (
-        await fetch(
-          `http://api.voicerss.org/?key=cd6f3357f8ea4454bd2b182f8611a40e&hl=en-us&c=mp3&f=32khz_16bit_stereo&src=${input.text}&b64=true`,
-          {
-            method: "POST",
+  video: protectedProcedure
+    .input(z.object({ text: z.string(), age: z.enum(["OLD", "YOUNG"]) }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const photo = await ctx.db.photo.findFirst({
+          where: {
+            age: input.age,
+            userId: ctx.session.userId,
           },
-        )
-      ).text();
-    }),
-  getVideoPredictionID: protectedProcedure
-    .input(z.object({ voice: z.string(), image: z.string() }))
-    .mutation(async ({ input }) => {
-      return replicate.predictions.create(
-        "cjwbw/sadtalker:3aa3dac9353cc4d6bd62a8f95957bd844003b401ca4e4a9b33baa574c549d376",
-        {
-          input: {
-            source_image: input.image,
-            driven_audio: input.voice,
+        });
+
+        const url = await ctx.s3.getPresignedUrl(
+          `${ctx.session.userId}/${photo?.key ?? raise("No photo found")}`,
+        );
+
+        const options = {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            "content-type": "application/json",
+            authorization:
+              "Basic Ym9nZGFuQGd1eS1hdnJhaGFtLmNvbQ:y-dAsLP59JUwdAaB0wHgY",
           },
-        },
-      );
+          body: JSON.stringify({
+            source_url: url,
+            script: {
+              type: "text",
+              input: input.text,
+              subtitles: "false",
+              provider: { type: "microsoft", voice_id: "en-US-JennyNeural" },
+              ssml: "false",
+            },
+            config: { fluent: "false", pad_audio: "0.0" },
+          }),
+        };
+
+        const talk = (await (
+          await fetch("https://api.d-id.com/talks", options)
+        ).json()) as { id: string };
+
+        return talk.id;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
     }),
   waitForVideo: protectedProcedure
     .input(z.object({ predictionId: z.string() }))
     .query(async ({ input: { predictionId } }) => {
-      const prediction = await replicate.predictions.get(predictionId);
+      const options = {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          authorization:
+            "Basic Ym9nZGFuQGd1eS1hdnJhaGFtLmNvbQ:y-dAsLP59JUwdAaB0wHgY",
+        },
+      };
 
-      if (prediction.status !== "succeeded") return null;
+      const talk = (await (
+        await fetch(`https://api.d-id.com/talks/${predictionId}`, options)
+      ).json()) as {
+        status: "started" | "done";
+        result_url?: string;
+      };
 
-      return prediction.output as string;
+      if (talk.status !== "done") return null;
+
+      return talk.result_url;
     }),
   clear: protectedProcedure
     .input(z.object({ id: z.string() }))

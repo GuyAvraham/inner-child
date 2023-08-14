@@ -37,13 +37,12 @@ export default function Main() {
     api.conversation.get.useQuery({ age: conversationMode });
 
   const { mutateAsync: getText } = api.conversation.text.useMutation();
-  const { mutateAsync: getVoice } = api.conversation.voice.useMutation();
-  const { mutateAsync: getVideo } =
-    api.conversation.getVideoPredictionID.useMutation();
+  const { mutateAsync: getVideo } = api.conversation.video.useMutation();
   const { data: videoURI } = api.conversation.waitForVideo.useQuery(
     { predictionId: videoPredictionId },
-    { enabled: !!videoPredictionId && !video, refetchInterval: 2000 },
+    { enabled: !!videoPredictionId, refetchInterval: 2000 },
   );
+
   const { mutateAsync: clearConversation } =
     api.conversation.clear.useMutation();
 
@@ -58,26 +57,18 @@ export default function Main() {
 
   const handleSendMessage = useCallback(async () => {
     setConversationStatus("waiting");
-    const textFromAssistant = await getText({ age: conversationMode, message });
+    const { text } = await getText({ age: conversationMode, message });
     setMessage("");
     void utils.conversation.get.invalidate();
-    const voiceFromAssistant = await getVoice({ text: textFromAssistant.text });
-    const videoPrediction = await getVideo({
-      image: conversationMode === "OLD" ? oldPhoto!.uri : youngPhoto!.uri,
-      voice: voiceFromAssistant,
+
+    setConversationStatus("idle");
+    const predictionId = await getVideo({
+      age: conversationMode,
+      text,
     });
 
-    setVideoPredictionId(videoPrediction.id);
-  }, [
-    conversationMode,
-    getText,
-    getVideo,
-    getVoice,
-    message,
-    oldPhoto,
-    utils.conversation.get,
-    youngPhoto,
-  ]);
+    setVideoPredictionId(predictionId);
+  }, [conversationMode, getText, getVideo, message, utils.conversation.get]);
 
   const handleClearConversation = useCallback(async () => {
     if (!messages[0]) return;
