@@ -105,14 +105,23 @@ export default function GeneratingScreen() {
 
     setStatus("uploading");
 
-    if (generateYoung) await uploadPhoto(youngPhoto, AgeMode.YOUNG);
-    await uploadPhoto(oldPhoto, AgeMode.OLD);
-
-    await user?.update({
-      unsafeMetadata: {
-        onboarded: true,
-      },
+    if (generateYoung)
+      await uploadPhoto(youngPhoto, AgeMode.YOUNG).then(() => {
+        alert("young photo uploaded");
+      });
+    await uploadPhoto(oldPhoto, AgeMode.OLD).then(() => {
+      alert("old photo uploaded");
     });
+
+    await user
+      ?.update({
+        unsafeMetadata: {
+          onboarded: true,
+        },
+      })
+      .then(() => {
+        alert("user onboarded");
+      });
 
     router.replace(ROUTE.ROOT);
   }, [generateYoung, oldPhoto, router, uploadPhoto, user, youngPhoto]);
