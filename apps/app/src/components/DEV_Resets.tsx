@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { useSetAtom } from "jotai";
 
-import { api } from "~/utils/api";
+import { api, getApiUrl } from "~/utils/api";
 import { ROUTE } from "~/config/routes";
 import {
   currentPhotoAtom,
@@ -59,6 +59,7 @@ export default function DEV_Resets() {
 
   return isSignedIn ? (
     <>
+      <Text>{getApiUrl()}</Text>
       <Pressable onPress={DEV_resetProfile}>
         <Text>DEV Reset Profile</Text>
       </Pressable>

@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from "react";
 import type { PropsWithChildren } from "react";
-import { Text } from "react-native";
 import Constants from "expo-constants";
 import { useAuth } from "@clerk/clerk-expo";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -15,7 +14,7 @@ import useErrorsHandler from "~/hooks/useErrorsHandler";
 export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from "@innch/api";
 
-const getApiUrl = () => Constants?.expoConfig?.extra?.apiURL as string;
+export const getApiUrl = () => Constants?.expoConfig?.extra?.apiURL as string;
 
 export function TRPCProvider(props: PropsWithChildren) {
   const { getToken } = useAuth();
@@ -69,7 +68,6 @@ export function TRPCProvider(props: PropsWithChildren) {
       queryClient={queryClient}
     >
       <QueryClientProvider client={queryClient}>
-        <Text>{getApiUrl()}</Text>
         {props.children}
       </QueryClientProvider>
     </api.Provider>
