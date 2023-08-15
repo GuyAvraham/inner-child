@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import '~/styles/globals.css';
 
 import { headers } from 'next/headers';
+import { ClerkProvider } from '@clerk/nextjs';
 
 import { TRPCReactProvider } from './providers';
 
@@ -13,29 +14,31 @@ const fontSans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Create T3 Turbo',
-  description: 'Simple monorepo with shared backend for web & mobile apps',
+  title: 'Inner Child',
+  description: 'Get in touch with your inner self',
   openGraph: {
-    title: 'Create T3 Turbo',
-    description: 'Simple monorepo with shared backend for web & mobile apps',
-    url: 'https://create-t3-turbo.vercel.app',
-    siteName: 'Create T3 Turbo',
+    title: 'Inner Child',
+    description: 'Get in touch with your inner self',
+    url: 'https://inner-child-server.vercel.app',
+    siteName: 'Inner Child',
   },
   twitter: {
     card: 'summary_large_image',
-    site: '@jullerino',
-    creator: '@jullerino',
+    site: '@lanky_johnny',
+    creator: '@lanky_johnny',
   },
 };
 
 export default function Layout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={['font-sans', fontSans.variable].join(' ')}>
-        <TRPCReactProvider headers={headers()}>
-          {props.children}
-        </TRPCReactProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={['font-sans', fontSans.variable].join(' ')}>
+          <TRPCReactProvider headers={headers()}>
+            {props.children}
+          </TRPCReactProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
