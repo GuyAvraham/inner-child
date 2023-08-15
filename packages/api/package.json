@@ -11,16 +11,16 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@innch/auth": "^0.1.0",
     "@innch/db": "^0.1.0",
-    "@innch/s3": "^0.1.0",
-    "@innch/utils": "^0.1.0",
-    "@trpc/client": "^10.34.0",
-    "@trpc/server": "^10.34.0",
-    "zod": "^3.21.4"
+    "@trpc/client": "^10.37.1",
+    "@trpc/server": "^10.37.1",
+    "superjson": "1.13.1",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@innch/eslint-config": "^0.2.0",
-    "eslint": "^8.45.0",
+    "eslint": "^8.47.0",
     "typescript": "^5.1.6"
   },
   "eslintConfig": {

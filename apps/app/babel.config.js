@@ -1,6 +1,7 @@
-const path = require("path");
-const loadConfig = require("tailwindcss/loadConfig");
+const path = require('path');
+const loadConfig = require('tailwindcss/loadConfig');
 
+/** @type {import("tailwindcss").Config | null} */
 let _tailwindConfig = null;
 /**
  * Transpiles tailwind.config.ts for babel
@@ -8,7 +9,7 @@ let _tailwindConfig = null;
  */
 function lazyLoadConfig() {
   return (
-    _tailwindConfig ?? loadConfig(path.join(__dirname, "tailwind.config.ts"))
+    _tailwindConfig ?? loadConfig(path.join(__dirname, 'tailwind.config.ts'))
   );
 }
 
@@ -16,21 +17,16 @@ function lazyLoadConfig() {
 module.exports = function (api) {
   api.cache.forever();
 
-  // Make Expo Router run from `src/app` instead of `app`.
-  // Path is relative to `/node_modules/expo-router`
-  process.env.EXPO_ROUTER_APP_ROOT = "../../apps/expo/src/app";
-
   return {
-    presets: ["babel-preset-expo"],
+    presets: ['babel-preset-expo'],
     plugins: [
       [
-        "nativewind/babel",
+        'nativewind/babel',
         {
           tailwindConfig: lazyLoadConfig(),
         },
       ],
-      "expo-router/babel",
-      ["module-resolver", { alias: { "~": "./src" } }],
+      require.resolve('expo-router/babel'),
     ],
   };
 };

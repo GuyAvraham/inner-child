@@ -4,7 +4,7 @@
     "enable": true,
     "initial_value": "feat",
     "infer_type_from_branch": true,
-    "append_emoji_to_label": false,
+    "append_emoji_to_label": true,
     "append_emoji_to_commit": true,
     "options": [
       {
@@ -73,32 +73,24 @@
     "initial_value": "app",
     "options": [
       {
-        "value": "project",
-        "label": "project"
-      },
-      {
         "value": "app",
         "label": "app"
+      },
+      {
+        "value": "lib",
+        "label": "lib"
       },
       {
         "value": "server",
         "label": "server"
       },
       {
-        "value": "api",
-        "label": "api"
+        "value": "mobile",
+        "label": "mobile"
       },
       {
-        "value": "db",
-        "label": "db"
-      },
-      {
-        "value": "config",
-        "label": "config"
-      },
-      {
-        "value": "lib",
-        "label": "lib"
+        "value": "tools",
+        "label": "tools"
       },
       {
         "value": "",

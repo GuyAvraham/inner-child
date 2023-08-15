@@ -1,72 +1,71 @@
-import { useCallback, useMemo } from "react";
-import type { PropsWithChildren } from "react";
-import Constants from "expo-constants";
-import { useAuth } from "@clerk/clerk-expo";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpLink } from "@trpc/client";
-import { createTRPCReact } from "@trpc/react-query";
+import React from 'react';
+import Constants from 'expo-constants';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { httpBatchLink } from '@trpc/client';
+import { createTRPCReact } from '@trpc/react-query';
+import superjson from 'superjson';
 
-import type { AppRouter } from "@innch/api";
-import { transformer } from "@innch/utils";
+import type { AppRouter } from '@innch/api';
 
-import useErrorsHandler from "~/hooks/useErrorsHandler";
-
+/**
+ * A set of typesafe hooks for consuming your API.
+ */
 export const api = createTRPCReact<AppRouter>();
-export { type RouterInputs, type RouterOutputs } from "@innch/api";
+export { type RouterInputs, type RouterOutputs } from '@innch/api';
 
-export const getApiUrl = () => Constants?.expoConfig?.extra?.apiURL as string;
+/**
+ * Extend this function when going to production by
+ * setting the baseUrl to your production API URL.
+ */
+const getBaseUrl = () => {
+  /**
+   * Gets the IP address of your host-machine. If it cannot automatically find it,
+   * you'll have to manually set it. NOTE: Port 3000 should work for most but confirm
+   * you don't have anything else running on it, or you'd have to change it.
+   *
+   * **NOTE**: This is only for development. In production, you'll want to set the
+   * baseUrl to your production API URL.
+   */
 
-export function TRPCProvider(props: PropsWithChildren) {
-  const { getToken } = useAuth();
-  const { handleError } = useErrorsHandler();
+  const debuggerHost = Constants.expoConfig?.hostUri;
+  const localhost = debuggerHost?.split(':')[0];
 
-  const errorHandler = useCallback(
-    (error: unknown) => {
-      handleError(error);
-    },
-    [handleError],
-  );
+  if (!localhost) {
+    // return "https://turbo.t3.gg";
+    throw new Error(
+      'Failed to get localhost. Please point to your production server.',
+    );
+  }
+  return `http://${localhost}:3000`;
+};
 
-  const queryClient = useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            onError: errorHandler,
-          },
-          mutations: {
-            onError: errorHandler,
-          },
-        },
-      }),
-    [errorHandler],
-  );
+/**
+ * A wrapper for your app that provides the TRPC context.
+ * Use only in _app.tsx
+ */
 
-  const trpcClient = useMemo(() => {
-    return api.createClient({
-      transformer,
+export function TRPCProvider(props: { children: React.ReactNode }) {
+  const [queryClient] = React.useState(() => new QueryClient());
+  const [trpcClient] = React.useState(() =>
+    api.createClient({
+      transformer: superjson,
       links: [
-        httpLink({
-          async headers() {
-            const authToken = await getToken();
-
-            if (!authToken) handleError(new Error("No auth token found"));
-
-            return {
-              Authorization: authToken ?? undefined,
-            };
+        httpBatchLink({
+          url: `${getBaseUrl()}/api/trpc`,
+          headers() {
+            const headers = new Map<string, string>();
+            headers.set('x-trpc-source', 'expo-react');
+            return Object.fromEntries(headers);
           },
-          url: `${getApiUrl()}/api/trpc`,
         }),
       ],
-    });
-  }, [getToken, handleError]);
+    }),
+  );
 
   return (
     <api.Provider
       client={trpcClient}
-      queryClient={queryClient}
-    >
+      queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         {props.children}
       </QueryClientProvider>
