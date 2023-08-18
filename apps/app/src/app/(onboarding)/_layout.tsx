@@ -1,10 +1,12 @@
-import { View } from "react-native";
-import { Slot } from "expo-router";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Slot } from 'expo-router';
 
-export default function OnboardingLayout() {
+import { isAndroid } from '~/config/variables';
+
+export default function AuthLayout() {
   return (
-    <View className="flex p-8">
+    <SafeAreaView className={`flex-1 px-4 ${isAndroid ? 'py-6' : ''}`}>
       <Slot />
-    </View>
+    </SafeAreaView>
   );
 }

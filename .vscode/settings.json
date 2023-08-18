@@ -1,5 +1,4 @@
 {
-  "[prisma]": { "editor.defaultFormatter": "Prisma.prisma" },
   "editor.codeActionsOnSave": { "source.fixAll.eslint": true },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
@@ -10,5 +9,8 @@
   ],
   "tailwindCSS.experimental.configFile": "./packages/config/tailwind/index.ts",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  }
 }

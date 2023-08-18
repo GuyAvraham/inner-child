@@ -1,44 +1,38 @@
-import { useEffect } from "react";
-import type { PropsWithChildren } from "react";
-import { Text } from "react-native";
-import { useRouter, useSegments } from "expo-router";
-import { useAuth, useUser } from "@clerk/clerk-expo";
-import { Provider } from "jotai";
+import { useEffect } from 'react';
+import type { PropsWithChildren } from 'react';
+import { useRouter, useSegments } from 'expo-router';
+import { useAuth, useUser } from '@clerk/clerk-expo';
+import { Provider } from 'jotai';
 
-import { ROUTE } from "~/config/routes";
+import useUserData from '~/hooks/useUserData';
 
 const useProtectedRoute = () => {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded: isAuthLoaded } = useAuth();
+  const { data } = useUserData();
+  const { user } = useUser();
+
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isAuthLoaded) return;
+    const inAuthGroup = segments[0] === '(auth)';
 
-    const inAuthGroup = segments[0] === "(auth)";
+    if (!isSignedIn) return router.replace('/(auth)/oauth');
 
-    if (isSignedIn && isLoaded) {
-      if (inAuthGroup) router.replace(ROUTE.ROOT);
-    } else {
-      router.replace(ROUTE.LOGIN);
-    }
-  }, [isLoaded, isSignedIn, router, segments]);
+    if (data && !data.gender) return router.replace('/(auth)/gender');
 
-  return {
-    showLoader: !isLoaded,
-  };
+    if (inAuthGroup) return router.replace('/');
+  }, [data, isAuthLoaded, isSignedIn, router, segments, user]);
 };
 
 export default function ProtectedProvider({ children }: PropsWithChildren) {
-  const { showLoader } = useProtectedRoute();
-  const { user } = useUser();
+  const { data, user } = useUserData();
+  useProtectedRoute();
 
-  return showLoader ? (
-    // TODO: replace with proper loader
-    <>
-      <Text>Loading...</Text>
-    </>
-  ) : (
-    <Provider key={user?.id}>{children}</Provider>
+  return (
+    <Provider key={(data?.token as string | undefined) ?? user?.id}>
+      {children}
+    </Provider>
   );
 }

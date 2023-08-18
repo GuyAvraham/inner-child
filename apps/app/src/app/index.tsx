@@ -1,20 +1,32 @@
-import { Text } from "react-native";
-import { Redirect } from "expo-router";
-import { useUser } from "@clerk/clerk-expo";
+import type { ReactElement } from 'react';
+import { Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Redirect } from 'expo-router';
 
-import { ROUTE } from "~/config/routes";
+import useUserData from '~/hooks/useUserData';
 
-export default function Index() {
-  const { isLoaded, user } = useUser();
+const onboardingMap: Record<string, ReactElement> = {
+  current: <Redirect href={'/(onboarding)/current'} />,
+  young: <Redirect href={'/(onboarding)/young'} />,
+  generate: <Redirect href={'/(onboarding)/generate'} />,
+};
 
-  if (!isLoaded && !user) return <Text>Loading...</Text>;
+const Index = () => {
+  const { data, isLoaded } = useUserData();
 
-  if (user?.unsafeMetadata.onboarded) {
-    console.log("rerouting to main");
-    return <Redirect href={ROUTE.HOME.MAIN} />;
-  }
+  if (!isLoaded)
+    return (
+      <SafeAreaView className="flex h-full w-full items-center justify-center">
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
 
-  console.log("rerouting to welcome");
+  if (!data.onboarded) return <Redirect href={'/(onboarding)/current'} />;
 
-  return <Redirect href={ROUTE.ONBOARDING.CURRENT} />;
-}
+  if (data.onboarded !== 'finished')
+    return onboardingMap[data.onboarded as string];
+
+  return <Redirect href={'/(home)'} />;
+};
+
+export default Index;

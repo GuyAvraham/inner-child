@@ -9,14 +9,14 @@ datasource db {
 }
 
 enum AgeMode {
-    YOUNG
-    CURRENT
-    OLD
+    young
+    current
+    old
 }
 
 enum MessageSender {
-    USER
-    ASSISTANT
+    user
+    assistant
 }
 
 model Photo {

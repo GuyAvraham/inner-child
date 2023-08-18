@@ -1,26 +1,37 @@
-import { useCallback, useMemo } from "react";
-import type { PropsWithChildren } from "react";
-import Constants from "expo-constants";
-import { useAuth } from "@clerk/clerk-expo";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpLink } from "@trpc/client";
-import { createTRPCReact } from "@trpc/react-query";
+import type { PropsWithChildren } from 'react';
+import { useCallback, useMemo } from 'react';
+import Constants from 'expo-constants';
+import { useAuth } from '@clerk/clerk-expo';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { httpBatchLink } from '@trpc/client';
+import { createTRPCReact } from '@trpc/react-query';
+import superjson from 'superjson';
 
-import type { AppRouter } from "@innch/api";
-import { transformer } from "@innch/utils";
+import type { AppRouter } from '@innch/api';
+import { raise } from '@innch/utils';
 
-import useErrorsHandler from "~/hooks/useErrorsHandler";
+import useErrorHandler from '~/hooks/useErrorHandler';
 
 export const api = createTRPCReact<AppRouter>();
-export { type RouterInputs, type RouterOutputs } from "@innch/api";
+export { type RouterInputs, type RouterOutputs } from '@innch/api';
 
-export const getApiUrl = () => Constants?.expoConfig?.extra?.apiURL as string;
+export const getBaseUrl = () => {
+  const debuggerHost = Constants.expoConfig?.hostUri;
+  const localhost = debuggerHost?.split(':')[0];
+
+  if (!localhost)
+    return (
+      process.env.EXPO_PUBLIC_API_URL ?? raise('No EXPO_PUBLIC_API_URL found')
+    );
+
+  return `http://${localhost}:3000`;
+};
 
 export function TRPCProvider(props: PropsWithChildren) {
-  const { getToken } = useAuth();
-  const { handleError } = useErrorsHandler();
+  const { getToken, isSignedIn } = useAuth();
+  const { handleError } = useErrorHandler();
 
-  const errorHandler = useCallback(
+  const onError = useCallback(
     (error: unknown) => {
       handleError(error);
     },
@@ -32,41 +43,46 @@ export function TRPCProvider(props: PropsWithChildren) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            onError: errorHandler,
+            onError,
           },
           mutations: {
-            onError: errorHandler,
+            onError,
           },
         },
       }),
-    [errorHandler],
+    [onError],
   );
+  const trpcClient = useMemo(
+    () =>
+      api.createClient({
+        transformer: superjson,
+        links: [
+          httpBatchLink({
+            url: `${getBaseUrl()}/api/trpc`,
+            async headers() {
+              const authToken = await getToken();
 
-  const trpcClient = useMemo(() => {
-    return api.createClient({
-      transformer,
-      links: [
-        httpLink({
-          async headers() {
-            const authToken = await getToken();
+              const headers = new Map<string, string>();
 
-            if (!authToken) handleError(new Error("No auth token found"));
+              headers.set('x-trpc-source', 'expo-react');
+              if (isSignedIn)
+                headers.set(
+                  'Authorization',
+                  authToken ?? raise('No auth token'),
+                );
 
-            return {
-              Authorization: authToken ?? undefined,
-            };
-          },
-          url: `${getApiUrl()}/api/trpc`,
-        }),
-      ],
-    });
-  }, [getToken, handleError]);
+              return Object.fromEntries(headers);
+            },
+          }),
+        ],
+      }),
+    [getToken, isSignedIn],
+  );
 
   return (
     <api.Provider
       client={trpcClient}
-      queryClient={queryClient}
-    >
+      queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         {props.children}
       </QueryClientProvider>

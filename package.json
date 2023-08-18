@@ -2,7 +2,7 @@
   "name": "inner-child",
   "private": true,
   "engines": {
-    "node": ">=v18.17.0"
+    "node": ">=v18.17.1"
   },
   "packageManager": "pnpm@8.6.12",
   "scripts": {
@@ -14,9 +14,9 @@
     "db:push": "turbo db:push db:generate",
     "db:studio": "pnpm -F db dev",
     "dev": "turbo dev --parallel",
-    "dev:server": "pnpm --filter server dev",
-    "dev:app:ios": "pnpm --filter app dev:ios -- --clear",
-    "dev:app:android": "pnpm --filter app dev:android -- --clear",
+    "dev:server": "pnpm -F server dev",
+    "dev:app:ios": "pnpm -F app dev:ios -- --clear",
+    "dev:app:android": "pnpm -F app dev:android -- --clear",
     "format": "prettier --write \"**/*.{js,cjs,mjs,ts,tsx,md,json}\" --ignore-path .gitignore",
     "lint": "turbo lint && manypkg check",
     "lint:fix": "turbo lint:fix && manypkg fix",
@@ -25,9 +25,9 @@
   "dependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.1.0",
     "@manypkg/cli": "^0.21.0",
-    "better-commits": "^1.5.1",
-    "prettier": "^3.0.0",
-    "prettier-plugin-tailwindcss": "^0.4.1",
+    "better-commits": "^1.5.2",
+    "prettier": "^3.0.1",
+    "prettier-plugin-tailwindcss": "^0.5.2",
     "turbo": "^1.10.12",
     "typescript": "^5.1.6"
   }

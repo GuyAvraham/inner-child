@@ -1,17 +1,18 @@
+import type { NextRequest } from 'next/server';
 import type {
   SignedInAuthObject,
   SignedOutAuthObject,
-} from "@clerk/nextjs/api";
-import { getAuth } from "@clerk/nextjs/server";
-import { initTRPC, TRPCError } from "@trpc/server";
-import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { ZodError } from "zod";
+} from '@clerk/nextjs/api';
+import { getAuth } from '@clerk/nextjs/server';
+import { initTRPC, TRPCError } from '@trpc/server';
+import superjson from 'superjson';
+import { ZodError } from 'zod';
 
-import { db } from "@innch/db";
-import { s3 } from "@innch/s3";
-import { transformer } from "@innch/utils";
+import { db } from '@innch/db';
 
-import { openai } from "./utils/openai";
+import { openai } from './openai';
+import { replicate } from './replicate';
+import { s3 } from './s3';
 
 interface CreateContextOptions {
   session: SignedInAuthObject | SignedOutAuthObject | null;
@@ -21,13 +22,17 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     db,
-    s3,
     openai,
+    replicate,
+    s3,
   };
 };
 
-export const createTRPCContext = (opts: CreateNextContextOptions) => {
+export const createTRPCContext = (opts: { req: NextRequest }) => {
   const session = getAuth(opts.req);
+  const source = opts.req.headers.get('x-trpc-source') ?? 'unknown';
+
+  console.log('>>> tRPC Request from', source, 'by', session?.userId);
 
   return createInnerTRPCContext({
     session,
@@ -35,7 +40,7 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
-  transformer,
+  transformer: superjson,
   errorFormatter({ shape, error }) {
     return {
       ...shape,
@@ -50,7 +55,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 
 const enforceUserIsAuthorized = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.userId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
+    throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
   return next({
     ctx: {

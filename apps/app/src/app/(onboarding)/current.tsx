@@ -1,73 +1,53 @@
-import { useCallback, useState } from "react";
-import { Button, Text } from "react-native";
-import { useRouter } from "expo-router";
-import { useAtom, useSetAtom } from "jotai";
+import { useCallback } from 'react';
+import { Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { cropToFace } from "~/utils/cropToFace";
-import SelectionPhoto from "~/components/SelectionPhoto";
-import SubmitPhoto from "~/components/SelectPhoto";
-import { ROUTE } from "~/config/routes";
-import useUploadPhoto from "~/hooks/useUploadPhoto";
-import { currentPhotoAtom, originalPhotoAtom } from "~/store/photos";
-import { AgeMode } from "~/types";
+import Button from '~/components/Button';
+import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
+import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
+import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
+import { currentPhotoAtom } from '~/atoms';
+import useHandlePhoto from '~/hooks/useHandlePhoto';
+import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 
-export default function CurrentPhotoScreen() {
+export default function CurrentScreen() {
+  useOnboardedScreen('current');
+
   const router = useRouter();
 
-  const setOriginalPhoto = useSetAtom(originalPhotoAtom);
-  const [currentPhoto, setCurrentPhoto] = useAtom(currentPhotoAtom);
+  const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto(
+    'current',
+    currentPhotoAtom,
+  );
 
-  const { isUploading, uploadPhoto } = useUploadPhoto();
+  const submitPhoto = useCallback(async () => {
+    await upload();
 
-  const [isCropping, setIsCropping] = useState<boolean>(false);
-  const [warning, setWarning] = useState<boolean>(false);
-
-  const handleSubmit = useCallback(async () => {
-    if (!currentPhoto) return;
-
-    await uploadPhoto(currentPhoto, AgeMode.CURRENT);
-
-    setWarning(false);
-    router.push(ROUTE.ONBOARDING.YOUNG);
-  }, [currentPhoto, router, uploadPhoto]);
+    router.push('/(onboarding)/young');
+  }, [router, upload]);
 
   return (
     <>
-      <Text>Take or upload a photo against plain surface</Text>
-      <SelectionPhoto
-        source={currentPhoto ? { uri: currentPhoto } : undefined}
-      />
-      {isCropping ? <Text>Cropping face</Text> : null}
-      <SubmitPhoto
-        enableCamera
-        onSelect={(photo) => {
-          setOriginalPhoto(photo);
-          setCurrentPhoto(photo.uri);
-          setIsCropping(true);
-
-          cropToFace(photo.uri)
-            .then((result) => {
-              setCurrentPhoto(result.uri);
-            })
-            .catch(() => {
-              setWarning(true);
-            })
-            .finally(() => {
-              setIsCropping(false);
-            });
-        }}
-      />
-      <Button
-        title={
-          isUploading
-            ? "submitting..."
-            : warning
-            ? "no face detected! submit anyway"
-            : "submit"
-        }
-        onPress={handleSubmit}
-        disabled={!currentPhoto || isCropping}
-      />
+      <View className="flex-1 justify-center px-6">
+        <SelectedPhoto source={photo} />
+        <Text className="mt-2 text-center italic text-slate-500">
+          Current Photo
+        </Text>
+      </View>
+      <View className="items-center justify-center">
+        <SelectPhotoButton onSelect={(photo) => handlePhoto(photo.uri)} />
+        <View className="h-4"></View>
+        <TakePhotoButton onTake={(photo) => handlePhoto(photo.uri)} />
+        <View className="h-4"></View>
+        <Button
+          onPress={submitPhoto}
+          className={`${!canSubmit ? 'bg-slate-600' : ''} w-full`}
+          disabled={!canSubmit}>
+          <Button.Text className="text-center text-lg">
+            {isUploading ? 'Uploading...' : 'Upload'}
+          </Button.Text>
+        </Button>
+      </View>
     </>
   );
 }

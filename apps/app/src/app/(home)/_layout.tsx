@@ -1,18 +1,11 @@
-import { Dimensions, View } from "react-native";
-import { Slot } from "expo-router";
-import { useAuth } from "@clerk/clerk-expo";
+import { View } from 'react-native';
+import { Slot } from 'expo-router';
 
-import LogOutButton from "~/components/LogOutButton";
+import { isAndroid } from '~/config/variables';
 
 export default function HomeLayout() {
-  const { isSignedIn } = useAuth();
-
   return (
-    <View
-      className="grid grid-rows-2 overflow-hidden"
-      style={{ height: Dimensions.get("window").height }}
-    >
-      {isSignedIn ? <LogOutButton /> : null}
+    <View className={`flex-1 px-4 ${isAndroid ? 'py-6' : ''}`}>
       <Slot />
     </View>
   );

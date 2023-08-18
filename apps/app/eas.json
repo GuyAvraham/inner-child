@@ -4,7 +4,7 @@
   },
   "build": {
     "base": {
-      "node": "18.15.0",
+      "node": "18.16.1",
       "ios": {
         "resourceClass": "m-medium"
       },
@@ -14,40 +14,19 @@
       "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development",
-      "env": {
-        "API_URL": "http://localhost:3000",
-        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ"
-      }
+      "channel": "development"
     },
     "preview": {
+      "extends": "base",
       "distribution": "internal",
-      "channel": "preview",
       "ios": {
-        "simulator": true,
-        "resourceClass": "m-medium"
+        "simulator": true
       },
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "API_URL": "https://inner-child-server.vercel.app",
-        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ"
-      }
+      "channel": "preview"
     },
     "production": {
-      "distribution": "internal",
       "extends": "base",
-      "ios": {
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "API_URL": "https://inner-child-server.vercel.app",
-        "CLERK_PUBLIC_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ"
-      }
+      "channel": "production"
     }
   },
   "submit": {
