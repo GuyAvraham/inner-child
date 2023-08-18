@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@clerk/clerk-expo';
 import { Portal } from '@gorhom/portal';
 
-import { api } from '~/utils/api';
+import { api, getBaseUrl } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import { isAndroid, isIos } from '~/config/variables';
 import useUserData from '~/hooks/useUserData';
@@ -94,7 +94,7 @@ function DEV_MENU() {
             </View>
             <View className="my-2"></View>
             <Text>Platform: {Platform.OS}</Text>
-            <Text>EXPO_PUBLIC_API_URL: {process.env.EXPO_PUBLIC_API_URL}</Text>
+            <Text>API URL: {getBaseUrl()}</Text>
             <Text>
               EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY:{' '}
               {process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
