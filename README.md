@@ -17,6 +17,7 @@ Cd into it and install dependencies
 ```bash
 cd inner-child
 pnpm i
+pnpm db:generate
 ```
 
 Create `.env` and fill the necessary values.  
