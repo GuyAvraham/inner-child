@@ -22,6 +22,9 @@
       "ios": {
         "simulator": true
       },
+      "android": {
+        "buildType": "apk"
+      },
       "channel": "preview"
     },
     "production": {
