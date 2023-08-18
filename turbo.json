@@ -2,13 +2,21 @@
   "$schema": "https://turborepo.org/schema.json",
   "globalDependencies": ["**/.env", "tsconfig.json"],
   "pipeline": {
+    "db:generate": {
+      "inputs": ["prisma/schema.prisma"],
+      "cache": false
+    },
+    "db:push": {
+      "inputs": ["prisma/schema.prisma"],
+      "cache": false
+    },
     "dev": {
       "persistent": true,
       "cache": false
     },
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts", ".expo/**"]
+      "dependsOn": ["^build", "^db:generate"],
+      "outputs": [".next/**", ".expo/**"]
     },
     "lint": {},
     "lint:fix": {},
@@ -19,6 +27,7 @@
       "cache": false
     },
     "type-check": {
+      "dependsOn": ["^db:generate"],
       "cache": false
     }
   },
@@ -31,7 +40,11 @@
     "CLERK_PUBLIC_KEY",
     "CLERK_SECRET_KEY",
     "DATABASE_URL",
+    "DEVELOPER",
+    "DID_API_TOKEN",
     "DIRECT_DATABASE_URL",
+    "EXPO_PUBLIC_API_URL",
+    "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY",
     "EXPO_ROUTER_APP_ROOT",
     "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
     "NODE_ENV",

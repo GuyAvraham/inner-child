@@ -10,6 +10,10 @@ import { ZodError } from 'zod';
 
 import { db } from '@innch/db';
 
+import { openai } from './openai';
+import { replicate } from './replicate';
+import { s3 } from './s3';
+
 interface CreateContextOptions {
   session: SignedInAuthObject | SignedOutAuthObject | null;
 }
@@ -18,6 +22,9 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     db,
+    openai,
+    replicate,
+    s3,
   };
 };
 

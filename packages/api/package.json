@@ -11,11 +11,18 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.391.0",
+    "@aws-sdk/s3-request-presigner": "^3.391.0",
+    "@aws-sdk/signature-v4-crt": "^3.391.0",
     "@innch/db": "^0.1.0",
+    "@innch/utils": "^0.1.0",
     "@trpc/client": "^10.37.1",
     "@trpc/server": "^10.37.1",
+    "openai": "^4.0.0",
+    "radash": "^11.0.0",
+    "replicate": "^0.16.1",
     "superjson": "1.13.1",
-    "zod": "^3.22.0"
+    "zod": "^3.22.1"
   },
   "devDependencies": {
     "@innch/eslint-config": "^0.2.0",

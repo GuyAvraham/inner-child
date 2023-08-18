@@ -8,7 +8,7 @@ const defineConfig = (): ExpoConfig => ({
   owner: 'inner-child',
   orientation: 'portrait',
   icon: './assets/icon.png',
-  userInterfaceStyle: 'dark',
+  userInterfaceStyle: 'light',
   splash: {
     image: './assets/icon.png',
     resizeMode: 'contain',
@@ -42,7 +42,17 @@ const defineConfig = (): ExpoConfig => ({
     tsconfigPaths: true,
     typedRoutes: true,
   },
-  plugins: ['expo-router', './expo-plugins/with-modify-gradle.js'],
+  plugins: [
+    'expo-router',
+    [
+      'expo-image-picker',
+      {
+        photosPermission: 'Allow $(PRODUCT_NAME) to access your photos.',
+        cameraPermission: 'Allow $(PRODUCT_NAME) to access your camera.',
+      },
+    ],
+    './expo-plugins/with-modify-gradle.js',
+  ],
 });
 
 export default defineConfig;

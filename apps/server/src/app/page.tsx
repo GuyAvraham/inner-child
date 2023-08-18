@@ -1,8 +1,4 @@
-import { Suspense } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
-
-import Secret from './_components/Secret';
-import Session from './_components/Session';
 
 export const runtime = 'edge';
 
@@ -25,10 +21,7 @@ export default function HomePage() {
       </header>
       <main>
         <SignedIn>
-          <Suspense fallback={<div>Loading...</div>}>
-            <Session />
-            <Secret />
-          </Suspense>
+          <h1>Hello</h1>
         </SignedIn>
       </main>
     </>
