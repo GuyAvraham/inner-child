@@ -16,6 +16,9 @@ export const api = createTRPCReact<AppRouter>();
 export { type RouterInputs, type RouterOutputs } from '@innch/api';
 
 export const getBaseUrl = () => {
+  return (
+    process.env.EXPO_PUBLIC_API_URL ?? raise('No EXPO_PUBLIC_API_URL found')
+  );
   const debuggerHost = Constants.expoConfig?.hostUri;
   const localhost = debuggerHost?.split(':')[0];
 

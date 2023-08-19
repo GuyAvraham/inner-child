@@ -20,7 +20,6 @@ export const env = createEnv({
     OPENAI_API_KEY: z.string(),
     CLERK_SECRET_KEY: z.string(),
     DID_API_TOKEN: z.string(),
-    DEVELOPER: z.string(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -43,7 +42,6 @@ export const env = createEnv({
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     DID_API_TOKEN: process.env.DID_API_TOKEN,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    DEVELOPER: process.env.DEVELOPER,
   },
   skipValidation: !!process.env.CI || !!process.env.SKIP_ENV_VALIDATION,
 });
