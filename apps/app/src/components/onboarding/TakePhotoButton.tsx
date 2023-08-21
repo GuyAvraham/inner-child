@@ -7,7 +7,7 @@ import {
 } from 'expo-image-picker';
 
 import useErrorHandler from '~/hooks/useErrorHandler';
-import Button from '../Button';
+import Button from '../ui/Button';
 
 export default function TakePhotoButton({
   onTake,
@@ -41,8 +41,8 @@ export default function TakePhotoButton({
   return (
     <Button
       onPress={selectPhoto}
-      className="w-full">
-      <Button.Text className="text-center text-lg">Take a Photo</Button.Text>
+      wide>
+      <Button.Text>Take a Photo</Button.Text>
     </Button>
   );
 }

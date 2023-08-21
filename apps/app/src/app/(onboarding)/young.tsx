@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAtomValue, useSetAtom } from 'jotai';
 
-import Button from '~/components/Button';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
+import Button from '~/components/ui/Button';
+import Text from '~/components/ui/Text';
 import { currentPhotoAtom, generateYoungAtom, youngPhotoAtom } from '~/atoms';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -35,7 +36,7 @@ export default function YoungScreen() {
           source={photo ? photo : currentPhoto}
           blurRadius={!photo ? 100 : 0}
         />
-        <Text className="mt-2 text-center italic text-slate-500">
+        <Text className="mt-2 text-center font-[Poppins-Italic]">
           Child Photo
         </Text>
       </View>
@@ -47,18 +48,15 @@ export default function YoungScreen() {
             setGenerateYoung(true);
             router.push('/(onboarding)/generate');
           }}
-          className="w-full">
-          <Button.Text className="text-center text-lg">Generate</Button.Text>
+          wide>
+          <Button.Text>Generate</Button.Text>
         </Button>
         <View className="h-4"></View>
         <Button
           onPress={submitPhoto}
-          className={`${!canSubmit ? 'bg-slate-600' : ''} w-full`}
-          disabled={!canSubmit}>
-          <Button.Text className="text-center text-lg">
-            {' '}
-            {isUploading ? 'Uploading...' : 'Upload'}
-          </Button.Text>
+          disabled={!canSubmit}
+          wide>
+          <Button.Text> {isUploading ? 'Uploading...' : 'Upload'}</Button.Text>
         </Button>
       </View>
     </>

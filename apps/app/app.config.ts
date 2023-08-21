@@ -8,11 +8,11 @@ const defineConfig = (): ExpoConfig => ({
   owner: 'inner-child',
   orientation: 'portrait',
   icon: './assets/icon.png',
-  userInterfaceStyle: 'light',
+  userInterfaceStyle: 'dark',
   splash: {
     image: './assets/icon.png',
     resizeMode: 'contain',
-    backgroundColor: '#1F104A',
+    backgroundColor: '#F8F3EF',
   },
   updates: {
     fallbackToCacheTimeout: 0,
@@ -27,7 +27,7 @@ const defineConfig = (): ExpoConfig => ({
     package: 'com.innch.app',
     adaptiveIcon: {
       foregroundImage: './assets/icon.png',
-      backgroundColor: '#1F104A',
+      backgroundColor: '#F8F3EF',
     },
   },
   runtimeVersion: {

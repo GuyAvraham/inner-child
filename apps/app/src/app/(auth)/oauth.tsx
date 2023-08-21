@@ -1,16 +1,17 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
 import LogInButton from '~/components/LogInButton';
+import Text from '~/components/ui/Text';
 
 export default function OAuthScreen() {
   return (
     <>
       <View className="flex-1 justify-center px-6">
-        <Text className="text-lg">
+        <Text className="font-[Poppins] text-lg text-white">
           Some welcome image and text. Maybe even carousel 😏
         </Text>
       </View>
-      <View className="h-1/4 items-center justify-center">
+      <View className="items-center justify-center py-8">
         <LogInButton />
       </View>
     </>

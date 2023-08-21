@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, Text, TextInput, View } from 'react-native';
+import { FlatList, Pressable, TextInput, View } from 'react-native';
 import type { AVPlaybackStatus } from 'expo-av';
 import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
 
 import { api } from '~/utils/api';
-import Button from '~/components/Button';
+import Button from '~/components/ui/Button';
+import Text from '~/components/ui/Text';
 
 const useVideoResponse = (age: 'young' | 'old') => {
   const [videoPredictionId, setVideoPredictionId] = useState<string | null>(
@@ -203,17 +204,17 @@ export default function HomeScreen() {
           return (
             <View
               key={message.id}
-              className={`my-1 max-w-[200px] rounded-md p-2 ${
-                message.sender === 'user'
-                  ? 'self-end bg-blue-600'
-                  : 'bg-emerald-700'
-              }`}>
-              <Text
-                className={`text-white ${
-                  message.sender === 'user' ? 'text-right' : ''
-                }`}>
-                {message.text}
-              </Text>
+              style={{
+                padding: 12,
+                borderRadius: 20,
+                maxWidth: 300,
+                marginVertical: 4,
+                alignSelf:
+                  message.sender === 'assistant' ? 'flex-start' : 'flex-end',
+                backgroundColor:
+                  message.sender === 'user' ? '#4285F4' : '#ffffff30',
+              }}>
+              <Text>{message.text}</Text>
             </View>
           );
         }}
@@ -231,19 +232,16 @@ export default function HomeScreen() {
         <TextInput
           editable={conversationStatus === 'idle'}
           focusable={conversationStatus === 'idle'}
-          className="mb-4 w-full rounded-md border-2 p-3"
+          className="text-whit mb-4 w-full rounded-lg border-[1px] border-white p-4 text-white"
+          placeholderTextColor="#ffffff"
           value={message}
           onChangeText={setMessage}
           placeholder="Talk to yourself"
           multiline
         />
-        <View className="flex-row">
+        <View className="flex-row justify-between">
           <Button
-            className={`mr-1 flex-1 ${
-              conversationStatus === 'waiting' || message.trim().length === 0
-                ? 'bg-slate-700'
-                : ''
-            }`}
+            fill
             disabled={
               conversationStatus === 'waiting' || message.trim().length === 0
             }
@@ -252,10 +250,9 @@ export default function HomeScreen() {
               {isGettingText ? 'Sending...' : 'Send'}
             </Button.Text>
           </Button>
+          <View className="w-4"></View>
           <Button
-            className={`ml-1 flex-1 ${
-              messages?.length === 0 ? 'bg-slate-700' : ''
-            }`}
+            fill
             disabled={messages?.length === 0}
             onPress={handleClearConversation}>
             <Button.Text className="text-center text-lg">

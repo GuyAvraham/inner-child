@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@clerk/clerk-expo';
@@ -9,7 +9,8 @@ import { api, getBaseUrl } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import { isAndroid, isIos } from '~/config/variables';
 import useUserData from '~/hooks/useUserData';
-import Button from '../Button';
+import Button from '../ui/Button';
+import Text from '../ui/Text';
 
 function DEV_MENU() {
   const [isOpened, setIsOpened] = useState(false);
@@ -65,9 +66,9 @@ function DEV_MENU() {
   ]);
 
   return (
-    <View className={`z-50 px-4 ${isAndroid ? 'mt-4' : ''}`}>
+    <View className={`z-50 px-4 ${isAndroid ? 'mt-4' : ''} items-end`}>
       <Button
-        className="self-end border-2 border-white"
+        variant="small"
         onPress={() => {
           setIsOpened(true);
         }}>
@@ -77,15 +78,15 @@ function DEV_MENU() {
         <Portal>
           <SafeAreaView
             className={`absolute bottom-0 left-0 right-0 top-0 ${
-              isIos ? '-mt-2' : 'mt-2'
-            } flex bg-white px-4`}>
-            <View className="flex flex-row justify-between">
+              isIos ? '' : 'mt-2'
+            } flex bg-blue-700 px-4`}>
+            <View className="flex flex-row items-start justify-between">
               <View>
-                <Text className="text-xl">DEV Menu</Text>
+                <Text className="text-xl uppercase">DEV Menu</Text>
                 <Text>NODE_ENV: {process.env.NODE_ENV}</Text>
               </View>
               <Button
-                className="self-end"
+                variant="small"
                 onPress={() => {
                   setIsOpened(false);
                 }}>
@@ -107,10 +108,7 @@ function DEV_MENU() {
 
             <Button
               onPress={resetPhotos}
-              disabled={!user || !photos || photos?.length === 0}
-              className={
-                !user || !photos || photos?.length === 0 ? 'bg-slate-700' : ''
-              }>
+              disabled={!user || !photos || photos?.length === 0}>
               <Button.Text>
                 {resetting === 'photos'
                   ? 'Resetting photos...'
@@ -122,8 +120,7 @@ function DEV_MENU() {
 
             <Button
               onPress={resetAll}
-              disabled={!user}
-              className={!user ? 'bg-slate-700' : ''}>
+              disabled={!user}>
               <Button.Text>
                 {resetting === 'all' ? 'Resetting all...' : 'Reset all'}
               </Button.Text>

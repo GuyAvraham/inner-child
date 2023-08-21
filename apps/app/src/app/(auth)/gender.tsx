@@ -1,9 +1,10 @@
 import { useCallback } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useUser } from '@clerk/clerk-expo';
 
 import { generateToken } from '~/utils/token';
-import Button from '~/components/Button';
+import Button from '~/components/ui/Button';
+import Text from '~/components/ui/Text';
 
 export default function GenderScreen() {
   const { user } = useUser();
@@ -25,18 +26,22 @@ export default function GenderScreen() {
   return (
     <>
       <View className="flex-1 justify-center px-6">
-        <Text className="text-lg">We need your gender to properly operate</Text>
+        <Text className="font-[Poppins] text-lg text-white">
+          We need your gender to properly operate
+        </Text>
       </View>
-      <View className="h-1/4 flex-row items-center justify-center gap-4">
+
+      <View className="items-center justify-center py-8">
         <Button
           onPress={() => setUserGender('male')}
-          className="min-w-[100px] items-center">
-          <Button.Text className="text-lg">Male</Button.Text>
+          wide>
+          <Button.Text>Male</Button.Text>
         </Button>
+        <View className="h-4"></View>
         <Button
           onPress={() => setUserGender('female')}
-          className="min-w-[100px] items-center">
-          <Button.Text className="text-lg">Female</Button.Text>
+          wide>
+          <Button.Text>Female</Button.Text>
         </Button>
       </View>
     </>

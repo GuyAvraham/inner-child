@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 
-import Button from '~/components/Button';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
 import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
+import Button from '~/components/ui/Button';
+import Text from '~/components/ui/Text';
 import { currentPhotoAtom } from '~/atoms';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -30,7 +31,7 @@ export default function CurrentScreen() {
     <>
       <View className="flex-1 justify-center px-6">
         <SelectedPhoto source={photo} />
-        <Text className="mt-2 text-center italic text-slate-500">
+        <Text className="mt-2 text-center font-[Poppins-Italic]">
           Current Photo
         </Text>
       </View>
@@ -41,8 +42,8 @@ export default function CurrentScreen() {
         <View className="h-4"></View>
         <Button
           onPress={submitPhoto}
-          className={`${!canSubmit ? 'bg-slate-600' : ''} w-full`}
-          disabled={!canSubmit}>
+          disabled={!canSubmit}
+          wide>
           <Button.Text className="text-center text-lg">
             {isUploading ? 'Uploading...' : 'Upload'}
           </Button.Text>

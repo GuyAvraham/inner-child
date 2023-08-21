@@ -3,7 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useOAuth } from '@clerk/clerk-expo';
 
 import useErrorHandler from '~/hooks/useErrorHandler';
-import Button from './Button';
+import Button from './ui/Button';
 
 export const useWarmUpBrowser = () => {
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function LogInButton() {
 
   return (
     <Button onPress={onPress}>
-      <Button.Text className="text-lg">Continue with Google</Button.Text>
+      <Button.Text>Continue with Google</Button.Text>
     </Button>
   );
 }

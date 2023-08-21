@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 
 import { api } from '~/utils/api';
 import { blobToUri } from '~/utils/blob';
-import Button from '~/components/Button';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
+import Button from '~/components/ui/Button';
+import Text from '~/components/ui/Text';
 import {
   currentPhotoAtom,
   generateYoungAtom,
@@ -161,9 +162,6 @@ export default function GenerateScreen() {
   return (
     <>
       <ScrollView className="flex-1 px-6">
-        <Text className="text-md mb-4 text-lg">
-          {oldPhoto && youngPhoto ? 'Generated photos' : 'Generating photos...'}
-        </Text>
         <SelectedPhoto
           className="h-48 w-48"
           source={
@@ -184,16 +182,16 @@ export default function GenerateScreen() {
           source={oldPhoto ? oldPhoto : currentPhoto ?? currentPhotoDB?.uri}
           blurRadius={!oldPhoto ? 100 : 0}
         />
+        <Text className="text-md mb-4 font-[Poppins-Italic]">
+          {oldPhoto && youngPhoto
+            ? 'Generated photos'
+            : 'Generating photos (might take up to 20 seconds)...'}
+        </Text>
       </ScrollView>
       <View className="items-center justify-center">
         <Button
           onPress={submitPhoto}
-          className={`${
-            !canSubmitOldPhoto &&
-            (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)
-              ? 'bg-slate-600'
-              : ''
-          } w-full`}
+          wide
           disabled={
             !canSubmitOldPhoto &&
             (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)

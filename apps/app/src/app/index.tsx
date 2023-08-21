@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react';
-import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Redirect } from 'expo-router';
 
+import Text from '~/components/ui/Text';
 import useUserData from '~/hooks/useUserData';
 
 const onboardingMap: Record<string, ReactElement> = {
@@ -16,7 +16,7 @@ const Index = () => {
 
   if (!isLoaded)
     return (
-      <SafeAreaView className="flex h-full w-full items-center justify-center">
+      <SafeAreaView className="flex h-full w-full items-center justify-center font-[Poppins]">
         <Text>Loading...</Text>
       </SafeAreaView>
     );
