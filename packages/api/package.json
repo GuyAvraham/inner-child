@@ -11,23 +11,23 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.391.0",
-    "@aws-sdk/s3-request-presigner": "^3.391.0",
-    "@aws-sdk/signature-v4-crt": "^3.391.0",
+    "@aws-sdk/client-s3": "^3.398.0",
+    "@aws-sdk/s3-request-presigner": "^3.398.0",
+    "@aws-sdk/signature-v4-crt": "^3.398.0",
     "@innch/db": "^0.1.0",
     "@innch/utils": "^0.1.0",
-    "@trpc/client": "^10.37.1",
-    "@trpc/server": "^10.37.1",
-    "openai": "^4.0.0",
+    "@trpc/client": "^10.38.0",
+    "@trpc/server": "^10.38.0",
+    "openai": "^4.2.0",
     "radash": "^11.0.0",
     "replicate": "^0.16.1",
     "superjson": "1.13.1",
-    "zod": "^3.22.1"
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@innch/eslint-config": "^0.2.0",
     "eslint": "^8.47.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   },
   "eslintConfig": {
     "root": true,
