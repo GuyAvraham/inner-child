@@ -14,6 +14,7 @@ import {
   oldPhotoAtom,
   youngPhotoAtom,
 } from '~/atoms';
+import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import useUserData from '~/hooks/useUserData';
@@ -148,7 +149,9 @@ export default function GenerateScreen() {
       onboarded: 'finished',
     });
 
-    router.push('/');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    router.push(ROUTES.INDEX);
   }, [
     canSubmitOldPhoto,
     canSubmitYoungPhoto,

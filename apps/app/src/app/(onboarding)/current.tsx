@@ -8,6 +8,7 @@ import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { currentPhotoAtom } from '~/atoms';
+import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 
@@ -23,8 +24,9 @@ export default function CurrentScreen() {
 
   const submitPhoto = useCallback(async () => {
     await upload();
-
-    router.push('/(onboarding)/young');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    router.push(ROUTES.ONBOARDING.YOUNG);
   }, [router, upload]);
 
   return (

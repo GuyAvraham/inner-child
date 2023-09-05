@@ -8,6 +8,7 @@ import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { currentPhotoAtom, generateYoungAtom, youngPhotoAtom } from '~/atoms';
+import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 
@@ -26,7 +27,9 @@ export default function YoungScreen() {
   const submitPhoto = useCallback(async () => {
     await upload();
 
-    router.push('/(onboarding)/generate');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    router.push(ROUTES.ONBOARDING.GENERATE);
   }, [router, upload]);
 
   return (
@@ -46,7 +49,9 @@ export default function YoungScreen() {
         <Button
           onPress={() => {
             setGenerateYoung(true);
-            router.push('/(onboarding)/generate');
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            router.push(ROUTES.ONBOARDING.GENERATE);
           }}
           wide>
           <Button.Text>Generate</Button.Text>

@@ -7,6 +7,7 @@ import { Portal } from '@gorhom/portal';
 
 import { api, getBaseUrl } from '~/utils/api';
 import { generateToken } from '~/utils/token';
+import { ROUTES } from '~/config/routes';
 import { isAndroid, isIos } from '~/config/variables';
 import useUserData from '~/hooks/useUserData';
 import Button from '../ui/Button';
@@ -37,8 +38,9 @@ function DEV_MENU() {
       token: generateToken(),
       onboarded: 'current',
     });
-
-    router.replace('/');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    router.replace(ROUTES.INDEX);
 
     setResetting('idle');
     setIsOpened(false);
@@ -52,7 +54,9 @@ function DEV_MENU() {
     await user?.delete();
     // clear conversations
 
-    router.replace('/');
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    router.replace(ROUTES.INDEX);
 
     setResetting('idle');
     setIsOpened(false);
