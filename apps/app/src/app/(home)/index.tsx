@@ -9,19 +9,15 @@ import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 
 const useVideoResponse = (age: 'young' | 'old') => {
-  const [videoPredictionId, setVideoPredictionId] = useState<string | null>(
-    null,
-  );
+  const [videoPredictionId, setVideoPredictionId] = useState<string | null>(null);
 
   const utils = api.useContext();
 
-  const { mutateAsync: getVideo, isLoading: isPredictionLoading } =
-    api.conversation.video.useMutation();
-  const { data: videoURI, isLoading: isVideoLoading } =
-    api.conversation.waitForVideo.useQuery(
-      { predictionId: videoPredictionId! },
-      { enabled: !!videoPredictionId, refetchInterval: 2000 },
-    );
+  const { mutateAsync: getVideo, isLoading: isPredictionLoading } = api.conversation.video.useMutation();
+  const { data: videoURI, isLoading: isVideoLoading } = api.conversation.waitForVideo.useQuery(
+    { predictionId: videoPredictionId! },
+    { enabled: !!videoPredictionId, refetchInterval: 2000 },
+  );
 
   const triggerVideoGeneration = useCallback(
     async (text: string) => {
@@ -51,40 +47,26 @@ const useVideoResponse = (age: 'young' | 'old') => {
 };
 
 export default function HomeScreen() {
-  const [conversationStatus, setConversationStatus] = useState<
-    'idle' | 'waiting'
-  >('idle');
-  const [conversationAge, setConversationAge] = useState<'old' | 'young'>(
-    'young',
-  );
+  const [conversationStatus, setConversationStatus] = useState<'idle' | 'waiting'>('idle');
+  const [conversationAge, setConversationAge] = useState<'old' | 'young'>('young');
   const [message, setMessage] = useState<string>('');
 
   const utils = api.useContext();
 
-  const { data: youngPhoto, isLoading: isYoungLoading } =
-    api.photo.getByAge.useQuery({
-      age: 'young',
-    });
-  const { data: oldPhoto, isLoading: isOldLoading } =
-    api.photo.getByAge.useQuery({
-      age: 'old',
-    });
+  const { data: youngPhoto, isLoading: isYoungLoading } = api.photo.getByAge.useQuery({
+    age: 'young',
+  });
+  const { data: oldPhoto, isLoading: isOldLoading } = api.photo.getByAge.useQuery({
+    age: 'old',
+  });
 
-  const { data: messages, isLoading: areMessagesLoading } =
-    api.conversation.get.useQuery({
-      age: conversationAge,
-    });
-  const { mutateAsync: getText, isLoading: isGettingText } =
-    api.conversation.text.useMutation();
-  const { mutateAsync: clearConversation, isLoading: isClearingConversation } =
-    api.conversation.clear.useMutation();
+  const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
+    age: conversationAge,
+  });
+  const { mutateAsync: getText, isLoading: isGettingText } = api.conversation.text.useMutation();
+  const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
 
-  const {
-    video,
-    isLoading: isVideoLoading,
-    clearVideo,
-    triggerVideoGeneration,
-  } = useVideoResponse(conversationAge);
+  const { video, isLoading: isVideoLoading, clearVideo, triggerVideoGeneration } = useVideoResponse(conversationAge);
 
   const handleSendMessage = useCallback(async () => {
     if (!(message && message.trim().length > 0)) return;
@@ -97,13 +79,7 @@ export default function HomeScreen() {
     await triggerVideoGeneration(text);
 
     setConversationStatus('idle');
-  }, [
-    conversationAge,
-    getText,
-    message,
-    triggerVideoGeneration,
-    utils.conversation.get,
-  ]);
+  }, [conversationAge, getText, message, triggerVideoGeneration, utils.conversation.get]);
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) return;
@@ -114,8 +90,7 @@ export default function HomeScreen() {
 
   const handleVideoStatusUpdate = useCallback(
     async (status: AVPlaybackStatus) => {
-      if (status.isLoaded && status.positionMillis === status.durationMillis)
-        await clearVideo();
+      if (status.isLoaded && status.positionMillis === status.durationMillis) await clearVideo();
     },
     [clearVideo],
   );
@@ -130,7 +105,8 @@ export default function HomeScreen() {
           disabled={isVideoLoading}
           style={{
             zIndex: conversationAge === 'young' ? 1 : undefined,
-          }}>
+          }}
+        >
           {isYoungLoading ? (
             <View className="h-40 w-40 items-center justify-center">
               <Text>Loading...</Text>
@@ -166,7 +142,8 @@ export default function HomeScreen() {
           disabled={isVideoLoading}
           style={{
             zIndex: conversationAge === 'old' ? 1 : undefined,
-          }}>
+          }}
+        >
           {isOldLoading ? (
             <View className="h-40 w-40 items-center justify-center">
               <Text>Loading...</Text>
@@ -209,22 +186,17 @@ export default function HomeScreen() {
                 borderRadius: 20,
                 maxWidth: 300,
                 marginVertical: 4,
-                alignSelf:
-                  message.sender === 'assistant' ? 'flex-start' : 'flex-end',
-                backgroundColor:
-                  message.sender === 'user' ? '#4285F4' : '#ffffff30',
-              }}>
+                alignSelf: message.sender === 'assistant' ? 'flex-start' : 'flex-end',
+                backgroundColor: message.sender === 'user' ? '#4285F4' : '#ffffff30',
+              }}
+            >
               <Text>{message.text}</Text>
             </View>
           );
         }}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center">
-            <Text>
-              {areMessagesLoading
-                ? 'Loading previous messages...'
-                : 'No messages yet'}
-            </Text>
+            <Text>{areMessagesLoading ? 'Loading previous messages...' : 'No messages yet'}</Text>
           </View>
         }
       />
@@ -242,19 +214,13 @@ export default function HomeScreen() {
         <View className="flex-row justify-between">
           <Button
             fill
-            disabled={
-              conversationStatus === 'waiting' || message.trim().length === 0
-            }
-            onPress={handleSendMessage}>
-            <Button.Text className="text-center text-lg">
-              {isGettingText ? 'Sending...' : 'Send'}
-            </Button.Text>
+            disabled={conversationStatus === 'waiting' || message.trim().length === 0}
+            onPress={handleSendMessage}
+          >
+            <Button.Text className="text-center text-lg">{isGettingText ? 'Sending...' : 'Send'}</Button.Text>
           </Button>
           <View className="w-4"></View>
-          <Button
-            fill
-            disabled={messages?.length === 0}
-            onPress={handleClearConversation}>
+          <Button fill disabled={messages?.length === 0} onPress={handleClearConversation}>
             <Button.Text className="text-center text-lg">
               {isClearingConversation ? 'Clearing...' : 'Clear'}
             </Button.Text>

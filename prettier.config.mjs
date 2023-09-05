@@ -26,14 +26,16 @@ const config = {
   importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
   importOrderTypeScriptVersion: '4.4.0',
   arrowParens: 'always',
-  bracketSameLine: true,
-  bracketSpacing: true,
+  // bracketSameLine: true,
+  // bracketSpacing: true,
   endOfLine: 'lf',
   semi: true,
-  singleAttributePerLine: true,
+  // singleAttributePerLine: true,
   singleQuote: true,
   tabWidth: 2,
   trailingComma: 'all',
+  printWidth: 120,
+  jsxSingleQuote: false,
 };
 
 export default config;

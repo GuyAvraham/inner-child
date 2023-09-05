@@ -20,15 +20,7 @@ type ButtonProps = PressableProps & {
   transparent?: boolean;
 };
 
-function Button({
-  children,
-  wide,
-  disabled,
-  variant,
-  fill,
-  transparent,
-  ...props
-}: ButtonProps) {
+function Button({ children, wide, disabled, variant, fill, transparent, ...props }: ButtonProps) {
   const buttonBackgrounds = {
     normal: transparent ? 'transparent' : '#ffffff1a',
     pressed: '#ffffff33',
@@ -44,18 +36,11 @@ function Button({
         justifyContent: 'center',
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: pressed
-          ? '#ffffff80'
-          : transparent
-          ? '#ffffffff'
-          : '#ffffff33',
+        borderColor: pressed ? '#ffffff80' : transparent ? '#ffffffff' : '#ffffff33',
         borderRadius: variant === 'small' ? 6 : 10,
         paddingHorizontal: variant === 'small' ? 20 : 40,
         paddingVertical: variant === 'small' ? 10 : 15,
-        backgroundColor:
-          buttonBackgrounds[
-            pressed ? 'pressed' : disabled ? 'disabled' : 'normal'
-          ],
+        backgroundColor: buttonBackgrounds[pressed ? 'pressed' : disabled ? 'disabled' : 'normal'],
         width: wide ? '100%' : undefined,
         flex: fill ? 1 : undefined,
         opacity: disabled ? 0.5 : 1,

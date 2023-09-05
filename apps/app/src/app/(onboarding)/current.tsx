@@ -17,10 +17,7 @@ export default function CurrentScreen() {
 
   const router = useRouter();
 
-  const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto(
-    'current',
-    currentPhotoAtom,
-  );
+  const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto('current', currentPhotoAtom);
 
   const submitPhoto = useCallback(async () => {
     await upload();
@@ -33,22 +30,15 @@ export default function CurrentScreen() {
     <>
       <View className="flex-1 justify-center px-6">
         <SelectedPhoto source={photo} />
-        <Text className="mt-2 text-center font-[Poppins-Italic]">
-          Current Photo
-        </Text>
+        <Text className="mt-2 text-center font-[Poppins-Italic]">Current Photo</Text>
       </View>
       <View className="items-center justify-center">
         <SelectPhotoButton onSelect={(photo) => handlePhoto(photo.uri)} />
         <View className="h-4"></View>
         <TakePhotoButton onTake={(photo) => handlePhoto(photo.uri)} />
         <View className="h-4"></View>
-        <Button
-          onPress={submitPhoto}
-          disabled={!canSubmit}
-          wide>
-          <Button.Text className="text-center text-lg">
-            {isUploading ? 'Uploading...' : 'Upload'}
-          </Button.Text>
+        <Button onPress={submitPhoto} disabled={!canSubmit} wide>
+          <Button.Text className="text-center text-lg">{isUploading ? 'Uploading...' : 'Upload'}</Button.Text>
         </Button>
       </View>
     </>

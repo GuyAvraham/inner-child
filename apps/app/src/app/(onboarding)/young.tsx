@@ -18,10 +18,7 @@ export default function YoungScreen() {
   const router = useRouter();
 
   const currentPhoto = useAtomValue(currentPhotoAtom);
-  const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto(
-    'young',
-    youngPhotoAtom,
-  );
+  const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto('young', youngPhotoAtom);
   const setGenerateYoung = useSetAtom(generateYoungAtom);
 
   const submitPhoto = useCallback(async () => {
@@ -35,13 +32,8 @@ export default function YoungScreen() {
   return (
     <>
       <View className="flex-1 justify-center px-6">
-        <SelectedPhoto
-          source={photo ? photo : currentPhoto}
-          blurRadius={!photo ? 100 : 0}
-        />
-        <Text className="mt-2 text-center font-[Poppins-Italic]">
-          Child Photo
-        </Text>
+        <SelectedPhoto source={photo ? photo : currentPhoto} blurRadius={!photo ? 100 : 0} />
+        <Text className="mt-2 text-center font-[Poppins-Italic]">Child Photo</Text>
       </View>
       <View className="h-1/4 items-center justify-center">
         <SelectPhotoButton onSelect={(photo) => handlePhoto(photo.uri)} />
@@ -53,14 +45,12 @@ export default function YoungScreen() {
             // @ts-ignore
             router.push(ROUTES.ONBOARDING.GENERATE);
           }}
-          wide>
+          wide
+        >
           <Button.Text>Generate</Button.Text>
         </Button>
         <View className="h-4"></View>
-        <Button
-          onPress={submitPhoto}
-          disabled={!canSubmit}
-          wide>
+        <Button onPress={submitPhoto} disabled={!canSubmit} wide>
           <Button.Text> {isUploading ? 'Uploading...' : 'Upload'}</Button.Text>
         </Button>
       </View>

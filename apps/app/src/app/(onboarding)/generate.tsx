@@ -8,27 +8,14 @@ import { blobToUri } from '~/utils/blob';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
-import {
-  currentPhotoAtom,
-  generateYoungAtom,
-  oldPhotoAtom,
-  youngPhotoAtom,
-} from '~/atoms';
+import { currentPhotoAtom, generateYoungAtom, oldPhotoAtom, youngPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import useUserData from '~/hooks/useUserData';
 
-const useGenerateAgedPhotos = ({
-  old,
-  young,
-}: {
-  old: boolean;
-  young: boolean;
-}) => {
-  const [youngPredictionId, setYoungPredictionId] = useState<string | null>(
-    null,
-  );
+const useGenerateAgedPhotos = ({ old, young }: { old: boolean; young: boolean }) => {
+  const [youngPredictionId, setYoungPredictionId] = useState<string | null>(null);
   const [oldPredictionId, setOldPredictionId] = useState<string | null>(null);
 
   const [youngPhoto, setYoungPhoto] = useState<string | undefined>(undefined);
@@ -121,11 +108,10 @@ export default function GenerateScreen() {
   );
   const { updateUserData } = useUserData();
 
-  const { oldPhoto: generatedOldPhoto, youngPhoto: generatedYoungPhoto } =
-    useGenerateAgedPhotos({
-      old: !oldPhoto,
-      young: !generateYoung || !youngPhoto || !youngPhotoDB,
-    });
+  const { oldPhoto: generatedOldPhoto, youngPhoto: generatedYoungPhoto } = useGenerateAgedPhotos({
+    old: !oldPhoto,
+    young: !generateYoung || !youngPhoto || !youngPhotoDB,
+  });
 
   useEffect(() => {
     if (!generateYoung || !generatedYoungPhoto) return;
@@ -152,57 +138,34 @@ export default function GenerateScreen() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     router.push(ROUTES.INDEX);
-  }, [
-    canSubmitOldPhoto,
-    canSubmitYoungPhoto,
-    generateYoung,
-    router,
-    updateUserData,
-    uploadOldPhoto,
-    uploadYoungPhoto,
-  ]);
+  }, [canSubmitOldPhoto, canSubmitYoungPhoto, generateYoung, router, updateUserData, uploadOldPhoto, uploadYoungPhoto]);
 
   return (
     <>
       <ScrollView className="flex-1 px-6">
         <SelectedPhoto
           className="h-48 w-48"
-          source={
-            youngPhoto
-              ? youngPhoto
-              : youngPhotoDB
-              ? youngPhotoDB.uri
-              : currentPhoto ?? currentPhotoDB?.uri
-          }
+          source={youngPhoto ? youngPhoto : youngPhotoDB ? youngPhotoDB.uri : currentPhoto ?? currentPhotoDB?.uri}
           blurRadius={!youngPhoto && !youngPhotoDB ? 100 : 0}
         />
-        <SelectedPhoto
-          className="h-48 w-48"
-          source={currentPhoto ?? currentPhotoDB?.uri}
-        />
+        <SelectedPhoto className="h-48 w-48" source={currentPhoto ?? currentPhotoDB?.uri} />
         <SelectedPhoto
           className="h-48 w-48"
           source={oldPhoto ? oldPhoto : currentPhoto ?? currentPhotoDB?.uri}
           blurRadius={!oldPhoto ? 100 : 0}
         />
         <Text className="text-md mb-4 font-[Poppins-Italic]">
-          {oldPhoto && youngPhoto
-            ? 'Generated photos'
-            : 'Generating photos (might take up to 20 seconds)...'}
+          {oldPhoto && youngPhoto ? 'Generated photos' : 'Generating photos (might take up to 20 seconds)...'}
         </Text>
       </ScrollView>
       <View className="items-center justify-center">
         <Button
           onPress={submitPhoto}
           wide
-          disabled={
-            !canSubmitOldPhoto &&
-            (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)
-          }>
+          disabled={!canSubmitOldPhoto && (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)}
+        >
           <Button.Text className="text-center text-lg">
-            {isYoungPhotoUploading || isOldPhotoUploading
-              ? 'Uploading...'
-              : 'Upload'}
+            {isYoungPhotoUploading || isOldPhotoUploading ? 'Uploading...' : 'Upload'}
           </Button.Text>
         </Button>
       </View>
