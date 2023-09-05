@@ -49,10 +49,7 @@ const RootLayout = () => {
               source={require('../assets/bg.jpg')}
               style={{ flex: 1 }}>
               <PortalProvider>
-                <SafeAreaView
-                  style={{
-                    flex: 1,
-                  }}>
+                <SafeAreaView style={{ flex: 1 }}>
                   <DEV />
                   <View className={`${isIos ? '-mt-9' : '-mt-10'} flex-1`}>
                     <Slot />

@@ -13,11 +13,12 @@ const styles = StyleSheet.create({
   },
 });
 
-const buttonBackgrounds = {
-  normal: '#ffffff1a',
-  pressed: '#ffffff33',
-  disabled: '#ffffff09',
-} as const;
+type ButtonProps = PressableProps & {
+  wide?: boolean;
+  variant?: 'small';
+  fill?: boolean;
+  transparent?: boolean;
+};
 
 function Button({
   children,
@@ -25,14 +26,29 @@ function Button({
   disabled,
   variant,
   fill,
+  transparent,
   ...props
-}: PressableProps & { wide?: boolean; variant?: 'small'; fill?: boolean }) {
+}: ButtonProps) {
+  const buttonBackgrounds = {
+    normal: transparent ? 'transparent' : '#ffffff1a',
+    pressed: '#ffffff33',
+    disabled: '#ffffff09',
+  } as const;
+
   return (
     <Pressable
       style={({ pressed }) => ({
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: pressed ? '#ffffff80' : '#ffffff33',
+        borderColor: pressed
+          ? '#ffffff80'
+          : transparent
+          ? '#ffffffff'
+          : '#ffffff33',
         borderRadius: variant === 'small' ? 6 : 10,
         paddingHorizontal: variant === 'small' ? 20 : 40,
         paddingVertical: variant === 'small' ? 10 : 15,

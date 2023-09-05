@@ -95,6 +95,9 @@ importers:
       expo-updates:
         specifier: ~0.18.12
         version: 0.18.12(expo@49.0.8)
+      expo-web-browser:
+        specifier: ^12.3.2
+        version: 12.3.2(expo@49.0.8)
       jotai:
         specifier: ^2.4.0
         version: 2.4.0(@types/react@18.2.21)(react@18.2.0)
@@ -125,6 +128,9 @@ importers:
       superjson:
         specifier: 1.13.1
         version: 1.13.1
+      uuid:
+        specifier: 3.4.0
+        version: 3.4.0
     devDependencies:
       '@babel/core':
         specifier: ^7.22.11
