@@ -97,7 +97,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <View className="flex-row">
+      <View className="flex-row px-4">
         <Pressable
           onPress={() => {
             setConversationAge('young');
@@ -174,7 +174,7 @@ export default function HomeScreen() {
         </Pressable>
       </View>
       <FlatList
-        className="mb-4 flex-1"
+        className="mb-4 flex-1 px-4"
         data={messages}
         keyExtractor={(message) => message.id}
         renderItem={({ item: message }) => {
@@ -200,7 +200,7 @@ export default function HomeScreen() {
           </View>
         }
       />
-      <View>
+      <View className="px-4">
         <TextInput
           editable={conversationStatus === 'idle'}
           focusable={conversationStatus === 'idle'}

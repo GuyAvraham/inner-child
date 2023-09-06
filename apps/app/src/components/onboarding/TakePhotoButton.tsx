@@ -1,19 +1,18 @@
 import { useCallback } from 'react';
+import { View } from 'react-native';
 import type { ImagePickerAsset } from 'expo-image-picker';
-import {
-  launchCameraAsync,
-  MediaTypeOptions,
-  requestCameraPermissionsAsync,
-} from 'expo-image-picker';
+import { launchCameraAsync, MediaTypeOptions, requestCameraPermissionsAsync } from 'expo-image-picker';
 
 import useErrorHandler from '~/hooks/useErrorHandler';
+import { TakePhotoSVG } from '~/svg/takePhoto';
 import Button from '../ui/Button';
 
-export default function TakePhotoButton({
-  onTake,
-}: {
+interface TakePhotoButtonProps {
   onTake: (photo: ImagePickerAsset) => void;
-}) {
+  title?: string;
+}
+
+export default function TakePhotoButton({ onTake, title }: TakePhotoButtonProps) {
   const { handleError } = useErrorHandler();
 
   const selectPhoto = useCallback(async () => {
@@ -39,10 +38,10 @@ export default function TakePhotoButton({
   }, [handleError, onTake]);
 
   return (
-    <Button
-      onPress={selectPhoto}
-      wide>
-      <Button.Text>Take a Photo</Button.Text>
+    <Button onPress={selectPhoto} wide>
+      <Button.Text>{title ?? 'Take a photo'}</Button.Text>
+      <View className="w-2"></View>
+      <TakePhotoSVG />
     </Button>
   );
 }

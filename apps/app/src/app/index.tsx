@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View } from 'react-native';
 
 import { Redirect } from '~/components/common/Redirect';
 import Text from '~/components/ui/Text';
@@ -17,9 +17,9 @@ export default function Index() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex h-full w-full items-center justify-center font-[Poppins]">
-        <Text>Loading...</Text>
-      </SafeAreaView>
+      <View className="h-full items-center justify-center">
+        <Text className="font-[Poppins]">Loading...</Text>
+      </View>
     );
   }
 
