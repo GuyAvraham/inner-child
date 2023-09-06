@@ -32,7 +32,7 @@ export default function CurrentScreen() {
         <SelectedPhoto source={photo} />
         <Text className="mt-2 text-center font-[Poppins-Italic]">Current Photo</Text>
       </View>
-      <View className="items-center justify-center">
+      <View className="items-center justify-center px-4">
         <SelectPhotoButton onSelect={(photo) => handlePhoto(photo.uri)} />
         <View className="h-4"></View>
         <TakePhotoButton onTake={(photo) => handlePhoto(photo.uri)} />

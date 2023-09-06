@@ -5,9 +5,11 @@ import { useAtomValue } from 'jotai';
 
 import { api } from '~/utils/api';
 import { blobToUri } from '~/utils/blob';
+import { AnimatedProgress } from '~/components/AnimatedProgress';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
+import { WhiteCircle } from '~/components/ui/WhiteCircle';
 import { currentPhotoAtom, generateYoungAtom, oldPhotoAtom, youngPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
@@ -142,33 +144,51 @@ export default function GenerateScreen() {
 
   return (
     <>
-      <ScrollView className="flex-1 px-6">
-        <SelectedPhoto
-          className="h-48 w-48"
-          source={youngPhoto ? youngPhoto : youngPhotoDB ? youngPhotoDB.uri : currentPhoto ?? currentPhotoDB?.uri}
-          blurRadius={!youngPhoto && !youngPhotoDB ? 100 : 0}
-        />
-        <SelectedPhoto className="h-48 w-48" source={currentPhoto ?? currentPhotoDB?.uri} />
-        <SelectedPhoto
-          className="h-48 w-48"
-          source={oldPhoto ? oldPhoto : currentPhoto ?? currentPhotoDB?.uri}
-          blurRadius={!oldPhoto ? 100 : 0}
-        />
-        <Text className="text-md mb-4 font-[Poppins-Italic]">
-          {oldPhoto && youngPhoto ? 'Generated photos' : 'Generating photos (might take up to 20 seconds)...'}
-        </Text>
+      <ScrollView className="flex-1 px-4" contentContainerStyle={{ flexGrow: 1 }}>
+        <View className="flex-1 items-center justify-between">
+          {!oldPhoto && !youngPhoto && <Text className="font-[Poppins]">It might take up to 20 seconds...</Text>}
+          {!youngPhoto && !youngPhotoDB ? (
+            <>
+              <WhiteCircle>
+                <AnimatedProgress />
+              </WhiteCircle>
+              <Text className="font-[Poppins]">Generating your inner child image...</Text>
+            </>
+          ) : (
+            <WhiteCircle>
+              <SelectedPhoto className="h-28 w-28 rounded-full" source={youngPhoto} />
+            </WhiteCircle>
+          )}
+
+          <SelectedPhoto className="h-48 w-48" source={currentPhoto ?? currentPhotoDB?.uri} />
+
+          {!oldPhoto ? (
+            <>
+              <WhiteCircle>
+                <AnimatedProgress />
+              </WhiteCircle>
+              <Text className="font-[Poppins]">...and future-self image.</Text>
+            </>
+          ) : (
+            <WhiteCircle>
+              <SelectedPhoto className="h-28 w-28 rounded-full" source={oldPhoto} />
+            </WhiteCircle>
+          )}
+        </View>
       </ScrollView>
-      <View className="items-center justify-center">
-        <Button
-          onPress={submitPhoto}
-          wide
-          disabled={!canSubmitOldPhoto && (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)}
-        >
-          <Button.Text className="text-center text-lg">
-            {isYoungPhotoUploading || isOldPhotoUploading ? 'Uploading...' : 'Upload'}
-          </Button.Text>
-        </Button>
-      </View>
+      {youngPhoto && oldPhoto && (
+        <View className="mt-20 items-center justify-center px-4">
+          <Button
+            onPress={submitPhoto}
+            wide
+            disabled={!canSubmitOldPhoto && (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)}
+          >
+            <Button.Text className="text-center text-lg">
+              {isYoungPhotoUploading || isOldPhotoUploading ? 'Uploading...' : 'Upload'}
+            </Button.Text>
+          </Button>
+        </View>
+      )}
     </>
   );
 }
