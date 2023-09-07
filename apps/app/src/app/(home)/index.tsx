@@ -103,7 +103,7 @@ export default function HomeScreen() {
                 backgroundColor: message.sender === 'user' ? '#4285F4' : 'rgba(255, 255, 255, 0.19)',
               }}
             >
-              <Text className="font-[Poppins]">{message.text}</Text>
+              <Text>{message.text}</Text>
             </View>
           );
         }}

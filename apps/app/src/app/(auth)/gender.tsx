@@ -13,19 +13,14 @@ export default function GenderScreen() {
     async (gender: 'male' | 'female') => {
       if (!user) return;
 
-      await user.update({
-        unsafeMetadata: {
-          gender,
-          token: generateToken(),
-        },
-      });
+      await user.update({ unsafeMetadata: { gender, token: generateToken() } });
     },
     [user],
   );
 
   return (
     <View className="flex-1 justify-center px-4">
-      <Text className="font-[Poppins-Bold] text-4xl leading-[48px] text-white">
+      <Text className="font-[Poppins-Bold] text-4xl leading-[48px]">
         Our image engine needs to understand if you are more of a {'\n'}male or female?
       </Text>
 

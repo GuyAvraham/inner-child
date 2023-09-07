@@ -4,89 +4,27 @@ import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 
 import { api } from '~/utils/api';
-import { blobToUri } from '~/utils/blob';
 import { generateToken } from '~/utils/token';
 import { AnimatedProgress } from '~/components/AnimatedProgress';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { WhiteCircle } from '~/components/ui/WhiteCircle';
-import { currentPhotoAtom, oldPhotoAtom, useGenerateYoungAtom, youngPhotoAtom } from '~/atoms';
+import { currentPhotoAtom, oldPhotoAtom, youngPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
+import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import useUserData from '~/hooks/useUserData';
 import { ReplacePhotoSVG } from '~/svg/replacePhoto';
 import { UploadPhotoSVG } from '~/svg/uploadPhoto';
-
-const useGenerateAgedPhotos = ({ old, young }: { old: boolean; young: boolean }) => {
-  const [youngPredictionId, setYoungPredictionId] = useState<string | null>(null);
-  const [oldPredictionId, setOldPredictionId] = useState<string | null>(null);
-
-  const [youngPhoto, setYoungPhoto] = useState<string | undefined>(undefined);
-  const [oldPhoto, setOldPhoto] = useState<string | undefined>(undefined);
-
-  const { mutateAsync: generateAged } = api.photo.generateAged.useMutation();
-
-  const { data: youngPhotoURI } = api.photo.wait.useQuery(
-    {
-      predictionId: youngPredictionId!,
-    },
-    { enabled: young && !!youngPredictionId, refetchInterval: 2000 },
-  );
-  const { data: oldPhotoURI } = api.photo.wait.useQuery(
-    {
-      predictionId: oldPredictionId!,
-    },
-    { enabled: old && !!oldPredictionId, refetchInterval: 2000 },
-  );
-
-  const fetchPhoto = useCallback(async (photoUrl: string) => {
-    const blob = await (await fetch(photoUrl)).blob();
-
-    return await blobToUri(blob);
-  }, []);
-
-  useEffect(() => {
-    if (!youngPhotoURI) return;
-
-    void fetchPhoto(youngPhotoURI).then((data) => {
-      setYoungPhoto(data);
-    });
-  }, [fetchPhoto, youngPhotoURI]);
-
-  useEffect(() => {
-    if (!oldPhotoURI) return;
-
-    void fetchPhoto(oldPhotoURI).then((data) => {
-      setOldPhoto(data);
-    });
-  }, [fetchPhoto, oldPhotoURI]);
-
-  const generate = useCallback(async () => {
-    if (young) {
-      const youngPredictionId = await generateAged({ age: 'young' });
-      setYoungPredictionId(youngPredictionId.id);
-    }
-
-    const oldPredictionId = await generateAged({ age: 'old' });
-    setOldPredictionId(oldPredictionId.id);
-  }, [generateAged, young]);
-
-  useEffect(() => {
-    void generate();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return { youngPhoto, oldPhoto };
-};
+import { Age, Onboarded } from '~/types';
 
 export default function GenerateScreen() {
-  useOnboardedScreen('generate');
+  useOnboardedScreen(Onboarded.Generate);
+  const utils = api.useContext();
   const [isReplacing, setIsReplacing] = useState(false);
   const router = useRouter();
-  const [generateYoung] = useGenerateYoungAtom();
-
   const currentPhoto = useAtomValue(currentPhotoAtom);
   const {
     photo: youngPhoto,
@@ -94,40 +32,29 @@ export default function GenerateScreen() {
     handlePhoto: handleYoungPhoto,
     isUploading: isYoungPhotoUploading,
     upload: uploadYoungPhoto,
-  } = useHandlePhoto('young', youngPhotoAtom);
+  } = useHandlePhoto(Age.Young, youngPhotoAtom);
   const {
     photo: oldPhoto,
     canSubmit: canSubmitOldPhoto,
     handlePhoto: handleOldPhoto,
     isUploading: isOldPhotoUploading,
     upload: uploadOldPhoto,
-  } = useHandlePhoto('old', oldPhotoAtom);
-  const { data: currentPhotoDB } = api.photo.getByAge.useQuery({
-    age: 'current',
-  });
-  const { data: youngPhotoDB } = api.photo.getByAge.useQuery(
-    {
-      age: 'young',
-    },
-    { enabled: !generateYoung },
-  );
+  } = useHandlePhoto(Age.Old, oldPhotoAtom);
+  const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { updateUserData } = useUserData();
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  const utils = api.useContext();
   const { oldPhoto: generatedOldPhoto, youngPhoto: generatedYoungPhoto } = useGenerateAgedPhotos({
     old: !oldPhoto,
-    young: !generateYoung || !youngPhoto || !youngPhotoDB,
+    young: !youngPhoto,
   });
 
   useEffect(() => {
-    if (!generateYoung || !generatedYoungPhoto) return;
-
+    if (!generatedYoungPhoto) return;
     void handleYoungPhoto(generatedYoungPhoto);
-  }, [generateYoung, generatedYoungPhoto, handleYoungPhoto]);
+  }, [generatedYoungPhoto, handleYoungPhoto]);
 
   useEffect(() => {
     if (!generatedOldPhoto) return;
-
     void handleOldPhoto(generatedOldPhoto);
   }, [generatedOldPhoto, handleOldPhoto]);
 
@@ -135,48 +62,39 @@ export default function GenerateScreen() {
     setIsReplacing(true);
     await deleteAllPhotos();
     await utils.photo.invalidate();
-    await updateUserData({
-      token: generateToken(),
-      onboarded: 'current',
-    });
+    await updateUserData({ token: generateToken(), onboarded: Onboarded.Current });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     router.replace(ROUTES.ONBOARDING.CURRENT);
   }, [router, updateUserData, utils.photo, deleteAllPhotos]);
 
   const submitPhoto = useCallback(async () => {
-    if (!canSubmitOldPhoto && (generateYoung || !canSubmitYoungPhoto)) return;
+    if (!canSubmitOldPhoto && !canSubmitYoungPhoto) return;
 
-    await uploadOldPhoto();
-    if (generateYoung) await uploadYoungPhoto();
-
-    await updateUserData({
-      onboarded: 'finished',
-    });
+    await Promise.allSettled([uploadOldPhoto(), uploadYoungPhoto()]);
+    await updateUserData({ onboarded: Onboarded.Finished });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     router.push(ROUTES.INDEX);
-  }, [canSubmitOldPhoto, canSubmitYoungPhoto, generateYoung, router, updateUserData, uploadOldPhoto, uploadYoungPhoto]);
+  }, [canSubmitOldPhoto, canSubmitYoungPhoto, router, updateUserData, uploadOldPhoto, uploadYoungPhoto]);
 
   return (
     <>
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 items-center justify-between">
-          {!oldPhoto && !youngPhoto && (
-            <Text className="self-start font-[Poppins]">It might take up to 20 seconds...</Text>
-          )}
+          {(!oldPhoto || !youngPhoto) && <Text className="self-start">It might take up to 20 seconds...</Text>}
 
-          {!youngPhoto && !youngPhotoDB ? (
+          {!youngPhoto ? (
             <>
               <WhiteCircle>
                 <AnimatedProgress />
               </WhiteCircle>
-              <Text className="font-[Poppins]">Generating your inner child image...</Text>
+              <Text>Generating your inner child image...</Text>
             </>
           ) : (
             <WhiteCircle>
-              <SelectedPhoto className="h-28 w-28 rounded-full" source={youngPhoto ?? youngPhotoDB?.uri} />
+              <SelectedPhoto className="h-28 w-28 rounded-full" source={youngPhoto} />
             </WhiteCircle>
           )}
 
@@ -187,7 +105,7 @@ export default function GenerateScreen() {
               <WhiteCircle>
                 <AnimatedProgress />
               </WhiteCircle>
-              <Text className="font-[Poppins]">...and future-self image.</Text>
+              <Text>...and future-self image.</Text>
             </>
           ) : (
             <WhiteCircle>
@@ -199,12 +117,7 @@ export default function GenerateScreen() {
 
       {youngPhoto && oldPhoto && (
         <View className="mt-20 items-center justify-center px-4">
-          <Button
-            onPress={submitPhoto}
-            wide
-            blue
-            disabled={!canSubmitOldPhoto && (!youngPhotoDB || !generateYoung || !canSubmitYoungPhoto)}
-          >
+          <Button onPress={submitPhoto} wide blue disabled={!canSubmitOldPhoto || !canSubmitYoungPhoto}>
             <Button.Text className="text-center text-lg">
               {isYoungPhotoUploading || isOldPhotoUploading ? 'Uploading...' : 'Upload these photos'}
             </Button.Text>

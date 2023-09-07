@@ -10,6 +10,7 @@ import { generateToken } from '~/utils/token';
 import { ROUTES } from '~/config/routes';
 import { isAndroid, isIos } from '~/config/variables';
 import useUserData from '~/hooks/useUserData';
+import { Onboarded } from '~/types';
 import Button from '../ui/Button';
 import Text from '../ui/Text';
 
@@ -34,11 +35,11 @@ function DEV_MENU() {
     await utils.photo.invalidate();
     await updateUserData({
       token: generateToken(),
-      onboarded: 'current',
+      onboarded: Onboarded.Current,
     });
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    router.replace(ROUTES.INDEX);
+    router.replace(ROUTES.ONBOARDING.CURRENT);
 
     setResetting('idle');
     setIsOpened(false);

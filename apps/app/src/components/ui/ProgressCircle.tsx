@@ -32,7 +32,7 @@ export function ProgressCircle({ value }: ProgressCircleProps) {
           },
         }}
       />
-      <Text className="absolute font-[Poppins] text-lg">{Number(correctValue * 100).toFixed(0)}%</Text>
+      <Text className="absolute text-lg">{Number(correctValue * 100).toFixed(0)}%</Text>
     </View>
   );
 }

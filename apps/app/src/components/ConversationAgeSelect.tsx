@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import type { AVPlaybackStatus } from 'expo-av';
 import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
@@ -9,6 +9,7 @@ import { blobToUri, uriToBlob } from '~/utils/blob';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import { ChangeAgeVG } from '~/svg/changeAge';
 import { Age } from '~/types';
+import { AnimatedProgress } from './AnimatedProgress';
 
 interface ConversationAgeSelectProps {
   age: Age;
@@ -27,13 +28,14 @@ export function ConversationAgeSelect({ age, setAge }: ConversationAgeSelectProp
   const [old, setOld] = useState<string>('');
 
   useEffect(() => {
-    if (youngPhoto?.uri) {
-      void uriToBlob(youngPhoto.uri).then((blob) => blobToUri(blob).then((uri) => setYoung(uri)));
-    }
-    if (oldPhoto?.uri) {
-      void uriToBlob(oldPhoto.uri).then((blob) => blobToUri(blob).then((uri) => setOld(uri)));
-    }
-  }, [youngPhoto, oldPhoto]);
+    if (!youngPhoto?.uri) return;
+    void uriToBlob(youngPhoto.uri).then(blobToUri).then(setYoung);
+  }, [youngPhoto?.uri]);
+
+  useEffect(() => {
+    if (!oldPhoto?.uri) return;
+    void uriToBlob(oldPhoto.uri).then(blobToUri).then(setOld);
+  }, [oldPhoto?.uri]);
 
   const handleVideoStatusUpdate = useCallback(
     async (status: AVPlaybackStatus) => {
@@ -54,8 +56,8 @@ export function ConversationAgeSelect({ age, setAge }: ConversationAgeSelectProp
     <View className="relative flex-row justify-center">
       <View className="rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-2">
         {isLoading ? (
-          <View className="m-2 h-40 w-40 items-center justify-center">
-            <Text className="text-lg text-white">Loading...</Text>
+          <View className="h-40 w-40 items-center justify-center">
+            <AnimatedProgress fast />
           </View>
         ) : video ? (
           <Video

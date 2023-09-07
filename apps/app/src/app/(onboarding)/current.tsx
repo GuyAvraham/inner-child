@@ -8,25 +8,24 @@ import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
 import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
-import { currentPhotoAtom, useGenerateYoungAtom } from '~/atoms';
+import { currentPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import { TakePhotoSVG } from '~/svg/takePhoto';
+import { Onboarded } from '~/types';
 
 export default function CurrentScreen() {
-  useOnboardedScreen('current');
+  useOnboardedScreen(Onboarded.Current);
   const router = useRouter();
   const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto('current', currentPhotoAtom);
-  const [, setGenerateYoung] = useGenerateYoungAtom();
 
   const submitPhoto = useCallback(async () => {
     await upload();
-    setGenerateYoung(true);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     router.push(ROUTES.ONBOARDING.GENERATE);
-  }, [router, upload, setGenerateYoung]);
+  }, [router, upload]);
 
   if (!photo) {
     return (
