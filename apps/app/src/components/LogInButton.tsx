@@ -30,9 +30,7 @@ export default function LogInButton() {
   }, [handleError, startOAuthFlow]);
 
   return (
-    <Button
-      transparent
-      onPress={onPress}>
+    <Button transparent onPress={onPress}>
       <GoogleSVG />
       <View className="w-3" />
       <Button.Text>Continue with Google</Button.Text>
