@@ -2,14 +2,13 @@ import { useCallback } from 'react';
 import { View } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useSetAtom } from 'jotai';
 
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
 import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
-import { currentPhotoAtom, generateYoungAtom } from '~/atoms';
+import { currentPhotoAtom, useGenerateYoungAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -19,7 +18,7 @@ export default function CurrentScreen() {
   useOnboardedScreen('current');
   const router = useRouter();
   const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto('current', currentPhotoAtom);
-  const setGenerateYoung = useSetAtom(generateYoungAtom);
+  const [, setGenerateYoung] = useGenerateYoungAtom();
 
   const submitPhoto = useCallback(async () => {
     await upload();

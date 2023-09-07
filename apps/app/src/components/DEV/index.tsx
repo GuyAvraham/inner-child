@@ -15,9 +15,7 @@ import Text from '../ui/Text';
 
 function DEV_MENU() {
   const [isOpened, setIsOpened] = useState(false);
-  const [resetting, setResetting] = useState<
-    'all' | 'photos' | 'conversations' | 'idle'
-  >('idle');
+  const [resetting, setResetting] = useState<'all' | 'photos' | 'conversations' | 'idle'>('idle');
 
   const { isSignedIn } = useAuth();
   const { data, user, updateUserData } = useUserData();
@@ -60,14 +58,7 @@ function DEV_MENU() {
 
     setResetting('idle');
     setIsOpened(false);
-  }, [
-    deleteAllPhotos,
-    photos?.length,
-    router,
-    user,
-    utils.photo,
-    utils.upload,
-  ]);
+  }, [deleteAllPhotos, photos?.length, router, user, utils.photo, utils.upload]);
 
   return (
     <View className={`z-50 px-4 ${isAndroid ? 'mt-4' : ''} items-end`}>
@@ -75,15 +66,15 @@ function DEV_MENU() {
         variant="small"
         onPress={() => {
           setIsOpened(true);
-        }}>
+        }}
+      >
         <Button.Text>DEV</Button.Text>
       </Button>
       {isOpened ? (
         <Portal>
           <SafeAreaView
-            className={`absolute bottom-0 left-0 right-0 top-0 ${
-              isIos ? '' : 'mt-2'
-            } flex bg-blue-700 px-4`}>
+            className={`absolute bottom-0 left-0 right-0 top-0 ${isIos ? '' : 'mt-2'} flex bg-blue-700 px-4`}
+          >
             <View className="flex flex-row items-start justify-between">
               <View>
                 <Text className="text-xl uppercase">DEV Menu</Text>
@@ -93,41 +84,29 @@ function DEV_MENU() {
                 variant="small"
                 onPress={() => {
                   setIsOpened(false);
-                }}>
+                }}
+              >
                 <Button.Text>Close</Button.Text>
               </Button>
             </View>
             <View className="my-2"></View>
             <Text>Platform: {Platform.OS}</Text>
             <Text>API URL: {getBaseUrl()}</Text>
-            <Text>
-              EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY:{' '}
-              {process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
-            </Text>
+            <Text>EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY: {process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}</Text>
             <Text>User ID: {user?.id}</Text>
             <Text>Onboarding: {data.onboarded as string}</Text>
             <Text>Gender: {data.gender as string}</Text>
 
             <View className="my-2"></View>
 
-            <Button
-              onPress={resetPhotos}
-              disabled={!user || !photos || photos?.length === 0}>
-              <Button.Text>
-                {resetting === 'photos'
-                  ? 'Resetting photos...'
-                  : 'Reset photos'}
-              </Button.Text>
+            <Button onPress={resetPhotos} disabled={!user || !photos || photos?.length === 0}>
+              <Button.Text>{resetting === 'photos' ? 'Resetting photos...' : 'Reset photos'}</Button.Text>
             </Button>
 
             <View className="my-1"></View>
 
-            <Button
-              onPress={resetAll}
-              disabled={!user}>
-              <Button.Text>
-                {resetting === 'all' ? 'Resetting all...' : 'Reset all'}
-              </Button.Text>
+            <Button onPress={resetAll} disabled={!user}>
+              <Button.Text>{resetting === 'all' ? 'Resetting all...' : 'Reset all'}</Button.Text>
             </Button>
           </SafeAreaView>
         </Portal>

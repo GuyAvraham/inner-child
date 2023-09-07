@@ -11,7 +11,7 @@ import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { WhiteCircle } from '~/components/ui/WhiteCircle';
-import { currentPhotoAtom, generateYoungAtom, oldPhotoAtom, youngPhotoAtom } from '~/atoms';
+import { currentPhotoAtom, oldPhotoAtom, useGenerateYoungAtom, youngPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -85,7 +85,7 @@ export default function GenerateScreen() {
   useOnboardedScreen('generate');
   const [isReplacing, setIsReplacing] = useState(false);
   const router = useRouter();
-  const generateYoung = useAtomValue(generateYoungAtom);
+  const [generateYoung] = useGenerateYoungAtom();
 
   const currentPhoto = useAtomValue(currentPhotoAtom);
   const {
