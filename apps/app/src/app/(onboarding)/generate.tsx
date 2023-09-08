@@ -105,7 +105,7 @@ export default function GenerateScreen() {
               <WhiteCircle>
                 <AnimatedProgress />
               </WhiteCircle>
-              <Text>...and future-self image.</Text>
+              <Text className="mb-4">...and future-self image.</Text>
             </>
           ) : (
             <WhiteCircle>
@@ -116,7 +116,7 @@ export default function GenerateScreen() {
       </ScrollView>
 
       {youngPhoto && oldPhoto && (
-        <View className="mt-20 items-center justify-center px-4">
+        <View className="mb-4 mt-10 items-center justify-center px-4">
           <Button onPress={submitPhoto} wide blue disabled={!canSubmitOldPhoto || !canSubmitYoungPhoto}>
             <Button.Text className="text-center text-lg">
               {isYoungPhotoUploading || isOldPhotoUploading ? 'Uploading...' : 'Upload these photos'}

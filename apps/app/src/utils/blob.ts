@@ -8,6 +8,19 @@ export const blobToUri = async (blob: Blob) => {
   });
 };
 
-export const uriToBlob = async (uri: string) => {
-  return await (await fetch(uri)).blob();
+export const uriToBlob = (uri: string): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      // return the blob
+      resolve(xhr.response as Blob);
+    };
+    xhr.onerror = function () {
+      reject(new Error('uriToBlob failed'));
+    };
+    xhr.responseType = 'blob';
+    xhr.open('GET', uri, true);
+
+    xhr.send(null);
+  });
 };

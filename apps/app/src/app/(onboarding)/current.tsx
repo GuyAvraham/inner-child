@@ -50,7 +50,7 @@ export default function CurrentScreen() {
           <Image source={photo} className="h-[100%] w-[100%] rounded-lg" />
         </View>
       </View>
-      <View className="items-center justify-center px-4">
+      <View className="mb-4 items-center justify-center px-4">
         <SelectPhotoButton title="Select another photo" onSelect={(photo) => handlePhoto(photo.uri)} />
         <View className="h-4"></View>
         <TakePhotoButton title="Take another photo" onTake={(photo) => handlePhoto(photo.uri)} />
