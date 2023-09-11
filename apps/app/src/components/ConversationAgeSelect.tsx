@@ -3,9 +3,11 @@ import { TouchableOpacity, View } from 'react-native';
 import type { AVPlaybackStatus } from 'expo-av';
 import { ResizeMode, Video } from 'expo-av';
 import { Image } from 'expo-image';
+import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
+import { useKeyboardVisible } from '~/hooks/useKeyboardVisible';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import { ChangeAgeVG } from '~/svg/changeAge';
 import { Age } from '~/types';
@@ -26,6 +28,7 @@ export function ConversationAgeSelect({ age, setAge }: ConversationAgeSelectProp
   const { video, clearVideo } = useVideoResponse(age);
   const [young, setYoung] = useState<string>('');
   const [old, setOld] = useState<string>('');
+  const isKeyboardVisible = useKeyboardVisible();
 
   useEffect(() => {
     if (!youngPhoto?.uri) return;
@@ -70,7 +73,11 @@ export function ConversationAgeSelect({ age, setAge }: ConversationAgeSelectProp
             onPlaybackStatusUpdate={handleVideoStatusUpdate}
           />
         ) : (
-          <Image source={{ uri: imageUri }} alt="" className="m-2 h-40 w-40 rounded-full" />
+          <Image
+            source={{ uri: imageUri }}
+            alt=""
+            className={clsx('m-2 h-40 w-40 rounded-full', isKeyboardVisible && 'h-20 w-20')}
+          />
         )}
       </View>
 

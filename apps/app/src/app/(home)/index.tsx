@@ -1,9 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Dimensions, FlatList, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Dimensions, FlatList, KeyboardAvoidingView, TextInput, TouchableOpacity, View } from 'react-native';
+import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { ConversationAgeSelect } from '~/components/ConversationAgeSelect';
+import { Message } from '~/components/ui/Message';
 import Text from '~/components/ui/Text';
+import { useKeyboardVisible } from '~/hooks/useKeyboardVisible';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import { CloseSVG } from '~/svg/close';
 import { OptionsSVG } from '~/svg/options';
@@ -12,6 +15,7 @@ import { SendMessageSVG } from '~/svg/sendMessage';
 import { Age } from '~/types';
 
 export default function HomeScreen() {
+  const flatListRef = useRef<FlatList>(null);
   const utils = api.useContext();
   const [conversationStatus, setConversationStatus] = useState<'idle' | 'waiting'>('idle');
   const [conversationAge, setConversationAge] = useState(Age.Young);
@@ -23,6 +27,12 @@ export default function HomeScreen() {
   const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
   const [isOpenedOptions, setIsOpenedOptions] = useState(false);
   const { triggerVideoGeneration } = useVideoResponse(conversationAge);
+  const keyboardVisible = useKeyboardVisible();
+  const scrollListToEnd = useCallback(() => {
+    setTimeout(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  }, []);
 
   const handleSendMessage = useCallback(async () => {
     if (!(message && message.trim().length > 0)) return;
@@ -71,10 +81,12 @@ export default function HomeScreen() {
     }
 
     return list;
-  }, [messages, conversationStatus, message]);
+  }, [messages, conversationStatus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(scrollListToEnd, [messages, scrollListToEnd]);
 
   return (
-    <>
+    <KeyboardAvoidingView className="flex-1" behavior="padding">
       <View className="relative mb-8 mt-10 items-center">
         <Text className="font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
@@ -87,26 +99,17 @@ export default function HomeScreen() {
         <ConversationAgeSelect age={conversationAge} setAge={setConversationAge} />
       </View>
       <FlatList
+        ref={flatListRef}
+        onContentSizeChange={scrollListToEnd}
+        onLayout={scrollListToEnd}
         className="mb-4 flex-1 px-4"
         data={visibleMessages}
-        keyExtractor={(message) => message.id}
-        renderItem={({ item: message }) => {
-          return (
-            <View
-              key={message.id}
-              style={{
-                padding: 12,
-                borderRadius: 20,
-                maxWidth: 300,
-                marginBottom: 16,
-                alignSelf: message.sender === 'assistant' ? 'flex-start' : 'flex-end',
-                backgroundColor: message.sender === 'user' ? '#4285F4' : 'rgba(255, 255, 255, 0.19)',
-              }}
-            >
-              <Text>{message.text}</Text>
-            </View>
-          );
-        }}
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        keyExtractor={(message) => message.id as string}
+        renderItem={({ item: { id, text, sender } }) => (
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          <Message key={id} text={text} isUserMessage={sender === 'user'} />
+        )}
         ListEmptyComponent={
           <View className="mt-20 items-center">
             <Text className="font-[Poppins-Bold] text-base text-white/40">
@@ -115,7 +118,12 @@ export default function HomeScreen() {
           </View>
         }
       />
-      <View className="m-4 mt-0 flex-row items-center rounded-lg border-[1px] border-white/20 bg-red-500 bg-white/10">
+      <View
+        className={clsx(
+          'm-4 mt-0 flex-row items-center rounded-lg border-[1px] border-white/20 bg-white/10',
+          keyboardVisible && 'mb-20',
+        )}
+      >
         <TextInput
           editable={conversationStatus === 'idle'}
           focusable={conversationStatus === 'idle'}
@@ -159,6 +167,6 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       )}
-    </>
+    </KeyboardAvoidingView>
   );
 }

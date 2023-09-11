@@ -23,6 +23,7 @@
     "@trpc/client": "^10.38.0",
     "@trpc/react-query": "^10.38.0",
     "@trpc/server": "^10.38.0",
+    "clsx": "^2.0.0",
     "expo": "^49.0.8",
     "expo-asset": "~8.10.1",
     "expo-av": "~13.4.1",
