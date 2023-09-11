@@ -38,21 +38,16 @@ const RootLayout = () => {
   return (
     <ClerkProvider
       publishableKey={
-        process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ??
-        raise('No EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY found')
+        process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY ?? raise('No EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY found')
       }
-      tokenCache={tokenCache}>
+      tokenCache={tokenCache}
+    >
       <TRPCProvider>
         <ProtectedProvider>
           <SafeAreaProvider>
-            <ImageBackground
-              source={require('../assets/bg.jpg')}
-              style={{ flex: 1 }}>
+            <ImageBackground source={require('../assets/bg1.png')} style={{ flex: 1 }}>
               <PortalProvider>
-                <SafeAreaView
-                  style={{
-                    flex: 1,
-                  }}>
+                <SafeAreaView style={{ flex: 1 }}>
                   <DEV />
                   <View className={`${isIos ? '-mt-9' : '-mt-10'} flex-1`}>
                     <Slot />

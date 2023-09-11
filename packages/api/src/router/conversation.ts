@@ -2,76 +2,53 @@ import { z } from 'zod';
 
 import { raise } from '@innch/utils';
 
+import { prompts } from '../prompts';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationRoute = createTRPCRouter({
-  get: protectedProcedure
-    .input(z.object({ age: z.enum(['young', 'old']) }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.message.findMany({
-        orderBy: {
-          createdAt: 'asc',
-        },
-        where: {
-          conversation: {
-            age: input.age,
-            userId: ctx.session.userId,
-          },
-        },
-      });
-    }),
+  get: protectedProcedure.input(z.object({ age: z.enum(['young', 'old']) })).query(async ({ ctx, input }) => {
+    return ctx.db.message.findMany({
+      orderBy: { createdAt: 'asc' },
+      where: { conversation: { age: input.age, userId: ctx.session.userId } },
+    });
+  }),
   text: protectedProcedure
     .input(z.object({ message: z.string(), age: z.enum(['young', 'old']) }))
     .mutation(async ({ ctx, input }) => {
-      let conversation = await ctx.db.conversation.findFirst({
-        where: {
-          userId: ctx.session.userId,
-          age: input.age,
-        },
-      });
+      const { age } = input;
+      const { userId } = ctx.session;
 
-      if (!conversation)
-        conversation = await ctx.db.conversation.create({
-          data: {
-            age: input.age,
-            userId: ctx.session.userId,
-          },
-        });
+      const conversation =
+        (await ctx.db.conversation.findFirst({ where: { age, userId } })) ??
+        (await ctx.db.conversation.create({ data: { age, userId } }));
+      const conversationId = conversation.id;
 
-      await ctx.db.message.create({
-        data: {
-          sender: 'user',
-          text: input.message,
-          conversationId: conversation.id,
-        },
-      });
+      await ctx.db.message.create({ data: { sender: 'user', text: input.message, conversationId } });
 
       const messages = await ctx.db.message.findMany({
-        where: {
-          conversation: {
-            age: input.age,
-            userId: ctx.session.userId,
-          },
-        },
-        orderBy: {
-          createdAt: 'asc',
-        },
+        where: { conversation: { age, userId } },
+        orderBy: { createdAt: 'asc' },
       });
 
       const response = await ctx.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
-        messages: messages.map((message) => ({
-          role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
-          content: message.text,
-        })),
+        messages: [
+          {
+            role: 'system',
+            content: prompts[age],
+          },
+          ...messages.map((message) => ({
+            role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
+            content: message.text,
+          })),
+        ],
       });
 
       return ctx.db.message.create({
         data: {
-          conversationId: conversation.id,
+          conversationId,
           sender: 'assistant',
-          text:
-            response.choices[0]?.message?.content ?? raise('Bad chat response'),
+          text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
         },
       });
     }),
@@ -80,24 +57,17 @@ export const conversationRoute = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         const photo = await ctx.db.photo.findFirst({
-          where: {
-            age: input.age,
-            userId: ctx.session.userId,
-          },
+          where: { age: input.age, userId: ctx.session.userId },
         });
 
-        const url = await ctx.s3.getPresignedUrl(
-          `${ctx.session.userId}/${photo?.key ?? raise('No photo found')}`,
-        );
+        const url = await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo?.key ?? raise('No photo found')}`);
 
         const options = {
           method: 'POST',
           headers: {
             accept: 'application/json',
             'content-type': 'application/json',
-            authorization: `Basic ${
-              process.env.DID_API_TOKEN ?? raise('No DID_API_TOKEN env var')
-            }`,
+            authorization: `Basic ${process.env.DID_API_TOKEN ?? raise('No DID_API_TOKEN env var')}`,
           },
           body: JSON.stringify({
             source_url: url,
@@ -112,9 +82,7 @@ export const conversationRoute = createTRPCRouter({
           }),
         };
 
-        const talk = (await (
-          await fetch('https://api.d-id.com/talks', options)
-        ).json()) as { id: string };
+        const talk = (await (await fetch('https://api.d-id.com/talks', options)).json()) as { id: string };
 
         return talk.id;
       } catch (error) {
@@ -129,15 +97,11 @@ export const conversationRoute = createTRPCRouter({
         method: 'GET',
         headers: {
           accept: 'application/json',
-          authorization: `Basic ${
-            process.env.DID_API_TOKEN ?? raise('No DID_API_TOKEN env var')
-          }`,
+          authorization: `Basic ${process.env.DID_API_TOKEN ?? raise('No DID_API_TOKEN env var')}`,
         },
       };
 
-      const talk = (await (
-        await fetch(`https://api.d-id.com/talks/${predictionId}`, options)
-      ).json()) as {
+      const talk = (await (await fetch(`https://api.d-id.com/talks/${predictionId}`, options)).json()) as {
         status: 'started' | 'done';
         result_url?: string;
       };
@@ -146,13 +110,7 @@ export const conversationRoute = createTRPCRouter({
 
       return talk.result_url;
     }),
-  clear: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input: { id } }) => {
-      return ctx.db.message.deleteMany({
-        where: {
-          conversationId: id,
-        },
-      });
-    }),
+  clear: protectedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input: { id } }) => {
+    return ctx.db.message.deleteMany({ where: { conversationId: id } });
+  }),
 });

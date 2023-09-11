@@ -13,37 +13,26 @@ export default function GenderScreen() {
     async (gender: 'male' | 'female') => {
       if (!user) return;
 
-      await user.update({
-        unsafeMetadata: {
-          gender,
-          token: generateToken(),
-        },
-      });
+      await user.update({ unsafeMetadata: { gender, token: generateToken() } });
     },
     [user],
   );
 
   return (
-    <>
-      <View className="flex-1 justify-center px-6">
-        <Text className="font-[Poppins] text-lg text-white">
-          We need your gender to properly operate
-        </Text>
-      </View>
+    <View className="flex-1 justify-center px-4">
+      <Text className="font-[Poppins-Bold] text-4xl leading-[48px]">
+        Our image engine needs to understand if you are more of a {'\n'}male or female?
+      </Text>
 
-      <View className="items-center justify-center py-8">
-        <Button
-          onPress={() => setUserGender('male')}
-          wide>
+      <View className="mb-8 mt-auto">
+        <Button onPress={() => setUserGender('male')} wide>
           <Button.Text>Male</Button.Text>
         </Button>
         <View className="h-4"></View>
-        <Button
-          onPress={() => setUserGender('female')}
-          wide>
+        <Button onPress={() => setUserGender('female')} wide>
           <Button.Text>Female</Button.Text>
         </Button>
       </View>
-    </>
+    </View>
   );
 }

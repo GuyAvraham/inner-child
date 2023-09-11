@@ -6,19 +6,10 @@ import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const photoRoute = createTRPCRouter({
   create: protectedProcedure
-    .input(
-      z.object({
-        age: z.enum(['young', 'current', 'old']),
-        key: z.string(),
-      }),
-    )
+    .input(z.object({ age: z.enum(['young', 'current', 'old']), key: z.string() }))
     .mutation(async ({ ctx, input: { age, key } }) => {
       const createdPhoto = await ctx.db.photo.create({
-        data: {
-          age,
-          key,
-          userId: ctx.session.userId,
-        },
+        data: { age, key, userId: ctx.session.userId },
       });
 
       return {
@@ -27,17 +18,10 @@ export const photoRoute = createTRPCRouter({
       };
     }),
   generateAged: protectedProcedure
-    .input(
-      z.object({
-        age: z.enum(['young', 'old']),
-      }),
-    )
+    .input(z.object({ age: z.enum(['young', 'old']) }))
     .mutation(async ({ ctx, input: { age } }) => {
       const photo = await ctx.db.photo.findFirst({
-        where: {
-          userId: ctx.session.userId,
-          age: 'current',
-        },
+        where: { userId: ctx.session.userId, age: 'current' },
       });
 
       if (!photo)
@@ -46,13 +30,10 @@ export const photoRoute = createTRPCRouter({
           code: 'NOT_FOUND',
         });
 
-      const photoURL = await ctx.s3.getPresignedUrl(
-        `${ctx.session.userId}/${photo.key}`,
-      );
+      const photoURL = await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo.key}`);
 
       return ctx.replicate.predictions.create({
-        version:
-          '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
+        version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
         input: {
           image: photoURL,
           target_age: { young: '0', old: '80' }[age],
@@ -81,22 +62,13 @@ export const photoRoute = createTRPCRouter({
     }));
   }),
   getByAge: protectedProcedure
-    .input(
-      z.object({
-        age: z.enum(['young', 'current', 'old']),
-      }),
-    )
+    .input(z.object({ age: z.enum(['young', 'current', 'old']) }))
     .query(async ({ ctx, input: { age } }) => {
       const photo = await ctx.db.photo.findFirst({
-        where: {
-          age,
-          userId: ctx.session.userId,
-        },
+        where: { age, userId: ctx.session.userId },
       });
 
-      if (!photo) {
-        return null;
-      }
+      if (!photo) return null;
 
       return {
         ...photo,
@@ -105,9 +77,7 @@ export const photoRoute = createTRPCRouter({
     }),
   deleteAll: protectedProcedure.mutation(async ({ ctx }) => {
     const photos = await ctx.db.photo.findMany({
-      where: {
-        userId: ctx.session.userId,
-      },
+      where: { userId: ctx.session.userId },
     });
 
     await ctx.s3.deleteFiles(photos.map((photo) => photo.key));

@@ -13,39 +13,48 @@ const styles = StyleSheet.create({
   },
 });
 
-const buttonBackgrounds = {
-  normal: '#ffffff1a',
-  pressed: '#ffffff33',
-  disabled: '#ffffff09',
-} as const;
+type ButtonProps = PressableProps & {
+  wide?: boolean;
+  variant?: 'small';
+  fill?: boolean;
+  transparent?: boolean;
+  blue?: boolean;
+};
 
-function Button({
-  children,
-  wide,
-  disabled,
-  variant,
-  fill,
-  ...props
-}: PressableProps & { wide?: boolean; variant?: 'small'; fill?: boolean }) {
+function Button({ children, wide, blue, disabled, variant, fill, transparent, ...props }: ButtonProps) {
+  const buttonBackgrounds = {
+    normal: blue ? 'rgba(66, 133, 244, 0.92)' : transparent ? 'transparent' : '#ffffff1a',
+    pressed: '#ffffff33',
+    disabled: '#ffffff09',
+  } as const;
+
   return (
     <Pressable
       style={({ pressed }) => ({
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'row',
+        justifyContent: 'center',
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: pressed ? '#ffffff80' : '#ffffff33',
+        borderColor: pressed
+          ? '#ffffff80'
+          : blue
+          ? 'rgba(255, 255, 255, 0.2)'
+          : transparent
+          ? '#ffffffff'
+          : '#ffffff33',
         borderRadius: variant === 'small' ? 6 : 10,
         paddingHorizontal: variant === 'small' ? 20 : 40,
         paddingVertical: variant === 'small' ? 10 : 15,
-        backgroundColor:
-          buttonBackgrounds[
-            pressed ? 'pressed' : disabled ? 'disabled' : 'normal'
-          ],
+        backgroundColor: buttonBackgrounds[pressed ? 'pressed' : disabled ? 'disabled' : 'normal'],
         width: wide ? '100%' : undefined,
         flex: fill ? 1 : undefined,
         opacity: disabled ? 0.5 : 1,
       })}
       disabled={disabled}
-      {...props}>
+      {...props}
+    >
       {children}
     </Pressable>
   );
@@ -53,9 +62,7 @@ function Button({
 
 function T({ children, icon, ...props }: TextProps & { icon?: string }) {
   return (
-    <Text
-      {...props}
-      style={styles.text}>
+    <Text {...props} style={styles.text}>
       {icon ? icon : null}
       {children}
     </Text>

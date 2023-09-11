@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 
+import type { Onboarded } from '~/types';
 import useUserData from './useUserData';
 
-const useOnboardedScreen = (
-  onboarded: 'current' | 'young' | 'generate' | 'finished',
-) => {
+const useOnboardedScreen = (onboarded: Onboarded) => {
   const { updateUserData } = useUserData();
 
   useEffect(() => {

@@ -5,11 +5,9 @@ import { useAtom } from 'jotai';
 import { api } from '~/utils/api';
 import { uriToBlob } from '~/utils/blob';
 import { uploadToS3 } from '~/utils/uploadToS3';
+import type { Age } from '~/types';
 
-const useHandlePhoto = (
-  age: 'current' | 'young' | 'old',
-  photoAtom: ReturnType<typeof atom<string | undefined>>,
-) => {
+const useHandlePhoto = (age: Age | 'current', photoAtom: ReturnType<typeof atom<string | undefined>>) => {
   const [photo, setPhoto] = useAtom(photoAtom);
 
   const [key, setKey] = useState<string>();
@@ -31,9 +29,7 @@ const useHandlePhoto = (
 
       try {
         const photoBlob = await uriToBlob(photo);
-        const key = `${age}-${Date.now()}.${
-          photoBlob?.type.split('/').at(1) ?? 'jpeg'
-        }`;
+        const key = `${age}-${Date.now()}.${photoBlob?.type.split('/').at(1) ?? 'jpeg'}`;
 
         const url = await getUploadURL({ key });
 

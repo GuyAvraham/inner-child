@@ -1,19 +1,18 @@
 import { useCallback } from 'react';
+import { View } from 'react-native';
 import type { ImagePickerAsset } from 'expo-image-picker';
-import {
-  launchImageLibraryAsync,
-  MediaTypeOptions,
-  requestMediaLibraryPermissionsAsync,
-} from 'expo-image-picker';
+import { launchImageLibraryAsync, MediaTypeOptions, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
 
 import useErrorHandler from '~/hooks/useErrorHandler';
+import { SelectPhotoSVG } from '~/svg/selectPhoto';
 import Button from '../ui/Button';
 
-export default function SelectPhotoButton({
-  onSelect,
-}: {
+interface SelectPhotoButtonProps {
   onSelect: (photo: ImagePickerAsset) => void;
-}) {
+  title?: string;
+}
+
+export default function SelectPhotoButton({ onSelect, title }: SelectPhotoButtonProps) {
   const { handleError } = useErrorHandler();
 
   const selectPhoto = useCallback(async () => {
@@ -39,10 +38,10 @@ export default function SelectPhotoButton({
   }, [handleError, onSelect]);
 
   return (
-    <Button
-      onPress={selectPhoto}
-      wide>
-      <Button.Text>Select a Photo</Button.Text>
+    <Button onPress={selectPhoto} wide>
+      <Button.Text>{title ?? 'Select a photo'}</Button.Text>
+      <View className="w-2"></View>
+      <SelectPhotoSVG />
     </Button>
   );
 }
