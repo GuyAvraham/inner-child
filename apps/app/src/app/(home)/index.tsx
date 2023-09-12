@@ -73,7 +73,7 @@ export default function HomeScreen() {
       list.push({
         id: 'typing',
         sender: 'assistant',
-        text: 'Typing...',
+        text: 'Typing',
         conversationId: 'string1',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -96,7 +96,11 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
       <View className="mb-5">
-        <ConversationAgeSelect age={conversationAge} setAge={setConversationAge} />
+        <ConversationAgeSelect
+          age={conversationAge}
+          setAge={setConversationAge}
+          disabled={conversationStatus === 'waiting' || isGettingText}
+        />
       </View>
       <FlatList
         ref={flatListRef}
@@ -108,7 +112,7 @@ export default function HomeScreen() {
         keyExtractor={(message) => message.id as string}
         renderItem={({ item: { id, text, sender } }) => (
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          <Message key={id} text={text} isUserMessage={sender === 'user'} />
+          <Message key={id} text={text} isUserMessage={sender === 'user'} withAnimation={id === 'typing'} />
         )}
         ListEmptyComponent={
           <View className="mt-20 items-center">

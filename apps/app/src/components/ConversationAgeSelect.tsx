@@ -16,9 +16,10 @@ import { AnimatedProgress } from './AnimatedProgress';
 interface ConversationAgeSelectProps {
   age: Age;
   setAge: (age: Age) => void;
+  disabled?: boolean;
 }
 
-export function ConversationAgeSelect({ age, setAge }: ConversationAgeSelectProps) {
+export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAgeSelectProps) {
   const { data: youngPhoto, isLoading: isYoungLoading } = api.photo.getByAge.useQuery({
     age: Age.Young,
   });
@@ -82,9 +83,11 @@ export function ConversationAgeSelect({ age, setAge }: ConversationAgeSelectProp
       </View>
 
       <View className="absolute right-3 flex-row items-center">
-        <TouchableOpacity onPress={handleChangeAge}>
-          <ChangeAgeVG />
-        </TouchableOpacity>
+        {!disabled && (
+          <TouchableOpacity onPress={handleChangeAge}>
+            <ChangeAgeVG />
+          </TouchableOpacity>
+        )}
         <Image source={{ uri: secondaryImageUri }} alt="" className="h-10 w-10 rounded-full" />
       </View>
     </View>
