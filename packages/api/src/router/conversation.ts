@@ -30,18 +30,14 @@ export const conversationRoute = createTRPCRouter({
         orderBy: { createdAt: 'asc' },
       });
 
+      const mappedMessages = messages.map((message) => ({
+        role: message.sender,
+        content: message.text,
+      }));
+
       const response = await ctx.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
-        messages: [
-          // {
-          //   role: 'system',
-          //   content: prompts[age].trim(),
-          // },
-          ...messages.map((message) => ({
-            role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
-            content: message.text,
-          })),
-        ],
+        messages: mappedMessages,
       });
 
       return ctx.db.message.create({
