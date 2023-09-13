@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 import { raise } from '@innch/utils';
 
-import { openai } from '../openai';
 import { prompts } from '../prompts';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
@@ -43,7 +42,7 @@ export const conversationRoute = createTRPCRouter({
         content: prompts[age].trim(),
       });
 
-      const response = await openai.chat.completions.create({
+      const response = await ctx.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: inputMessages,
       });
