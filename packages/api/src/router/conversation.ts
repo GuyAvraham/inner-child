@@ -17,8 +17,10 @@ export const conversationRoute = createTRPCRouter({
     .input(z.object({ message: z.string(), age: z.enum(['young', 'old']) }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { age, message } = input;
-        const { userId } = ctx.session;
+        // const { age, message } = input;
+        const age = input.age;
+        const message = input.message;
+        const userId = ctx.session.userId;
 
         let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
         if (!conversation) {
