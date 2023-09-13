@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { raise } from '@innch/utils';
 
-import { prompts } from '../prompts';
+// import { prompts } from '../prompts';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationRoute = createTRPCRouter({
@@ -33,10 +33,10 @@ export const conversationRoute = createTRPCRouter({
       const response = await ctx.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
         messages: [
-          {
-            role: 'system',
-            content: prompts[age].trim(),
-          },
+          // {
+          //   role: 'system',
+          //   content: prompts[age].trim(),
+          // },
           ...messages.map((message) => ({
             role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
             content: message.text,
