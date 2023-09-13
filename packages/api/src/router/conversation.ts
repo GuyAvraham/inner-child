@@ -35,7 +35,7 @@ export const conversationRoute = createTRPCRouter({
         messages: [
           {
             role: 'system',
-            content: prompts[age],
+            content: prompts[age].trim(),
           },
           ...messages.map((message) => ({
             role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',

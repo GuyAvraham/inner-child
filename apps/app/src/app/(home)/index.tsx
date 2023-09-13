@@ -23,7 +23,12 @@ export default function HomeScreen() {
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
   });
-  const { mutateAsync: getText, isLoading: isGettingText } = api.conversation.text.useMutation();
+  const { mutateAsync: getText, isLoading: isGettingText } = api.conversation.text.useMutation({
+    onError(error) {
+      console.error(error);
+      setConversationStatus('idle');
+    },
+  });
   const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
   const [isOpenedOptions, setIsOpenedOptions] = useState(false);
   const { triggerVideoGeneration } = useVideoResponse(conversationAge);
