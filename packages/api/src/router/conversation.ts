@@ -33,27 +33,27 @@ export const conversationRoute = createTRPCRouter({
         orderBy: { createdAt: 'asc' },
       });
 
-      // const response = await ctx.openai.chat.completions.create({
-      //   model: 'gpt-3.5-turbo',
-      //   messages: [
-      //     {
-      //       role: 'system',
-      //       content: prompts[age].trim(),
-      //     },
-      //     ...messages.map((message) => ({
-      //       role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
-      //       content: message.text,
-      //     })),
-      //   ],
-      // });
+      const response = await ctx.openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: prompts[age].trim(),
+          },
+          ...messages.map((message) => ({
+            role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
+            content: message.text,
+          })),
+        ],
+      });
 
-      // const gptMessage = response.choices[0]?.message?.content;
-      // if (!gptMessage) {
-      //   throw new TRPCError({
-      //     message: `Problem with OpenAI request: No Message`,
-      //     code: 'INTERNAL_SERVER_ERROR',
-      //   });
-      // }
+      const gptMessage = response.choices[0]?.message?.content;
+      if (!gptMessage) {
+        throw new TRPCError({
+          message: `Problem with OpenAI request: No Message`,
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
 
       return ctx.db.message.create({
         data: { conversationId, sender: 'assistant', text: message },
