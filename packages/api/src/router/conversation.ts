@@ -16,22 +16,22 @@ export const conversationRoute = createTRPCRouter({
   text: protectedProcedure
     .input(z.object({ message: z.string(), age: z.enum(['young', 'old']) }))
     .mutation(async ({ ctx, input }) => {
-      const { age } = input;
-      const { userId } = ctx.session;
-
-      const conversation =
-        (await ctx.db.conversation.findFirst({ where: { age, userId } })) ??
-        (await ctx.db.conversation.create({ data: { age, userId } }));
-      const conversationId = conversation.id;
-
-      await ctx.db.message.create({ data: { sender: 'user', text: input.message.trim(), conversationId } });
-
-      const messages = await ctx.db.message.findMany({
-        where: { conversation: { age, userId } },
-        orderBy: { createdAt: 'asc' },
-      });
-
       try {
+        const { age } = input;
+        const { userId } = ctx.session;
+
+        const conversation =
+          (await ctx.db.conversation.findFirst({ where: { age, userId } })) ??
+          (await ctx.db.conversation.create({ data: { age, userId } }));
+        const conversationId = conversation.id;
+
+        await ctx.db.message.create({ data: { sender: 'user', text: input.message.trim(), conversationId } });
+
+        const messages = await ctx.db.message.findMany({
+          where: { conversation: { age, userId } },
+          orderBy: { createdAt: 'asc' },
+        });
+
         const response = await ctx.openai.chat.completions.create({
           model: 'gpt-3.5-turbo',
           messages: [
