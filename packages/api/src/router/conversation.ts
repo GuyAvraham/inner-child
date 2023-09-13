@@ -21,7 +21,9 @@ export const conversationRoute = createTRPCRouter({
         const { userId } = ctx.session;
 
         let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
-        if (!conversation) conversation = await ctx.db.conversation.create({ data: { age, userId } });
+        if (!conversation) {
+          conversation = await ctx.db.conversation.create({ data: { age, userId } });
+        }
         const conversationId = conversation.id;
 
         await ctx.db.message.create({ data: { sender: 'user', text: message.trim(), conversationId } });
@@ -49,8 +51,7 @@ export const conversationRoute = createTRPCRouter({
           data: {
             conversationId,
             sender: 'assistant',
-            // text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
-            text: message.trim(),
+            text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
           },
         });
       } catch (error) {
