@@ -20,9 +20,8 @@ export const conversationRoute = createTRPCRouter({
         const { age, message } = input;
         const { userId } = ctx.session;
 
-        const conversation =
-          (await ctx.db.conversation.findFirst({ where: { age, userId } })) ??
-          (await ctx.db.conversation.create({ data: { age, userId } }));
+        let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
+        if (!conversation) conversation = await ctx.db.conversation.create({ data: { age, userId } });
         const conversationId = conversation.id;
 
         await ctx.db.message.create({ data: { sender: 'user', text: message.trim(), conversationId } });
