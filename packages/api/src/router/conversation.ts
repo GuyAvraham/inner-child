@@ -19,7 +19,7 @@ export const conversationRoute = createTRPCRouter({
       try {
         // const { age, message } = input;
         const age = input.age;
-        const message = input.message;
+        const message = input.message.trim();
         const userId = ctx.session.userId;
 
         let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
@@ -28,7 +28,7 @@ export const conversationRoute = createTRPCRouter({
         }
         const conversationId = conversation.id;
 
-        await ctx.db.message.create({ data: { sender: 'user', text: message.trim(), conversationId } });
+        await ctx.db.message.create({ data: { sender: 'user', text: message, conversationId } });
 
         const messages = await ctx.db.message.findMany({
           where: { conversation: { age, userId } },
@@ -44,17 +44,21 @@ export const conversationRoute = createTRPCRouter({
             },
             ...messages.map((message) => ({
               role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
-              content: message.text.trim(),
+              content: message.text,
             })),
           ],
         });
 
+        const gptMessage = response.choices[0]?.message?.content;
+        if (!gptMessage) {
+          throw new TRPCError({
+            message: `Problem with OpenAI request: No Message`,
+            code: 'INTERNAL_SERVER_ERROR',
+          });
+        }
+
         return ctx.db.message.create({
-          data: {
-            conversationId,
-            sender: 'assistant',
-            text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
-          },
+          data: { conversationId, sender: 'assistant', text: message },
         });
       } catch (error) {
         throw new TRPCError({
