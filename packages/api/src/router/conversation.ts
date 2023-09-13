@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { raise } from '@innch/utils';
@@ -30,27 +31,34 @@ export const conversationRoute = createTRPCRouter({
         orderBy: { createdAt: 'asc' },
       });
 
-      const response = await ctx.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'system',
-            content: prompts[age].trim(),
-          },
-          ...messages.map((message) => ({
-            role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
-            content: message.text.trim(),
-          })),
-        ],
-      });
+      try {
+        const response = await ctx.openai.chat.completions.create({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            {
+              role: 'system',
+              content: prompts[age].trim(),
+            },
+            ...messages.map((message) => ({
+              role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
+              content: message.text.trim(),
+            })),
+          ],
+        });
 
-      return ctx.db.message.create({
-        data: {
-          conversationId,
-          sender: 'assistant',
-          text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
-        },
-      });
+        return ctx.db.message.create({
+          data: {
+            conversationId,
+            sender: 'assistant',
+            text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
+          },
+        });
+      } catch (error) {
+        throw new TRPCError({
+          message: `Problem with OpenAI request: ${String(error)}`,
+          code: 'INTERNAL_SERVER_ERROR',
+        });
+      }
     }),
   video: protectedProcedure
     .input(z.object({ text: z.string(), age: z.enum(['old', 'young']) }))
