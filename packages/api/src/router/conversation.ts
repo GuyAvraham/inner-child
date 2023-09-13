@@ -16,56 +16,48 @@ export const conversationRoute = createTRPCRouter({
   text: protectedProcedure
     .input(z.object({ message: z.string(), age: z.enum(['young', 'old']) }))
     .mutation(async ({ ctx, input }) => {
-      try {
-        // const { age, message } = input;
-        const age = input.age;
-        const message = input.message.trim();
-        const userId = ctx.session.userId;
+      const age = input.age;
+      const message = input.message.trim();
+      const userId = ctx.session.userId;
 
-        let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
-        if (!conversation) {
-          conversation = await ctx.db.conversation.create({ data: { age, userId } });
-        }
-        const conversationId = conversation.id;
+      let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
+      if (!conversation) {
+        conversation = await ctx.db.conversation.create({ data: { age, userId } });
+      }
+      const conversationId = conversation.id;
 
-        await ctx.db.message.create({ data: { sender: 'user', text: message, conversationId } });
+      await ctx.db.message.create({ data: { sender: 'user', text: message, conversationId } });
 
-        const messages = await ctx.db.message.findMany({
-          where: { conversation: { age, userId } },
-          orderBy: { createdAt: 'asc' },
-        });
+      const messages = await ctx.db.message.findMany({
+        where: { conversationId },
+        orderBy: { createdAt: 'asc' },
+      });
 
-        const response = await ctx.openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: prompts[age].trim(),
-            },
-            ...messages.map((message) => ({
-              role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
-              content: message.text,
-            })),
-          ],
-        });
+      const response = await ctx.openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: prompts[age].trim(),
+          },
+          ...messages.map((message) => ({
+            role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
+            content: message.text,
+          })),
+        ],
+      });
 
-        const gptMessage = response.choices[0]?.message?.content;
-        if (!gptMessage) {
-          throw new TRPCError({
-            message: `Problem with OpenAI request: No Message`,
-            code: 'INTERNAL_SERVER_ERROR',
-          });
-        }
-
-        return ctx.db.message.create({
-          data: { conversationId, sender: 'assistant', text: message },
-        });
-      } catch (error) {
+      const gptMessage = response.choices[0]?.message?.content;
+      if (!gptMessage) {
         throw new TRPCError({
-          message: `Problem with OpenAI request: ${String(error)}`,
+          message: `Problem with OpenAI request: No Message`,
           code: 'INTERNAL_SERVER_ERROR',
         });
       }
+
+      return ctx.db.message.create({
+        data: { conversationId, sender: 'assistant', text: gptMessage },
+      });
     }),
   video: protectedProcedure
     .input(z.object({ text: z.string(), age: z.enum(['old', 'young']) }))
