@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { raise } from '@innch/utils';
 
-// import { prompts } from '../prompts';
+import { prompts } from '../prompts';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationRoute = createTRPCRouter({
@@ -23,21 +23,25 @@ export const conversationRoute = createTRPCRouter({
         (await ctx.db.conversation.create({ data: { age, userId } }));
       const conversationId = conversation.id;
 
-      await ctx.db.message.create({ data: { sender: 'user', text: input.message, conversationId } });
+      await ctx.db.message.create({ data: { sender: 'user', text: input.message.trim(), conversationId } });
 
       const messages = await ctx.db.message.findMany({
         where: { conversation: { age, userId } },
         orderBy: { createdAt: 'asc' },
       });
 
-      const mappedMessages = messages.map((message) => ({
-        role: message.sender,
-        content: message.text,
-      }));
-
       const response = await ctx.openai.chat.completions.create({
         model: 'gpt-3.5-turbo',
-        messages: mappedMessages,
+        messages: [
+          {
+            role: 'system',
+            content: prompts[age].trim(),
+          },
+          ...messages.map((message) => ({
+            role: message.sender.toLocaleLowerCase() as 'user' | 'assistant',
+            content: message.text.trim(),
+          })),
+        ],
       });
 
       return ctx.db.message.create({
