@@ -17,7 +17,7 @@ export const conversationRoute = createTRPCRouter({
     .input(z.object({ message: z.string(), age: z.enum(['young', 'old']) }))
     .mutation(async ({ ctx, input }) => {
       try {
-        const { age } = input;
+        const { age, message } = input;
         const { userId } = ctx.session;
 
         const conversation =
@@ -25,7 +25,7 @@ export const conversationRoute = createTRPCRouter({
           (await ctx.db.conversation.create({ data: { age, userId } }));
         const conversationId = conversation.id;
 
-        await ctx.db.message.create({ data: { sender: 'user', text: input.message.trim(), conversationId } });
+        await ctx.db.message.create({ data: { sender: 'user', text: message.trim(), conversationId } });
 
         const messages = await ctx.db.message.findMany({
           where: { conversation: { age, userId } },
@@ -50,7 +50,8 @@ export const conversationRoute = createTRPCRouter({
           data: {
             conversationId,
             sender: 'assistant',
-            text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
+            // text: response.choices[0]?.message?.content ?? raise('Bad chat response'),
+            text: message.trim(),
           },
         });
       } catch (error) {
