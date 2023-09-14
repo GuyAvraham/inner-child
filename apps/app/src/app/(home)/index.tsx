@@ -3,6 +3,7 @@ import { Dimensions, FlatList, KeyboardAvoidingView, TextInput, TouchableOpacity
 import clsx from 'clsx';
 
 import { api } from '~/utils/api';
+import { prompts } from '~/utils/prompts';
 import { ConversationAgeSelect } from '~/components/ConversationAgeSelect';
 import { Message } from '~/components/ui/Message';
 import Text from '~/components/ui/Text';
@@ -12,21 +13,22 @@ import { CloseSVG } from '~/svg/close';
 import { OptionsSVG } from '~/svg/options';
 import { RefreshChatSVG } from '~/svg/refreshChat';
 import { SendMessageSVG } from '~/svg/sendMessage';
-import { Age } from '~/types';
+import { Age, ConversationStatus, Role } from '~/types';
 
 export default function HomeScreen() {
   const flatListRef = useRef<FlatList>(null);
   const utils = api.useContext();
-  const [conversationStatus, setConversationStatus] = useState<'idle' | 'waiting'>('idle');
+  const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Young);
   const [message, setMessage] = useState<string>('');
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
   });
-  const { mutateAsync: getText, isLoading: isGettingText } = api.conversation.text.useMutation({
+  const { mutateAsync: saveMessage, isLoading: isGettingText } = api.conversation.saveMessage.useMutation();
+  const { mutateAsync: sendMessageToOpenAI } = api.conversation.sendMessageToOpenAI.useMutation({
     onError(error) {
       console.error(error);
-      setConversationStatus('idle');
+      setConversationStatus(ConversationStatus.Idle);
     },
   });
   const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
@@ -40,17 +42,35 @@ export default function HomeScreen() {
   }, []);
 
   const handleSendMessage = useCallback(async () => {
-    if (!(message && message.trim().length > 0)) return;
+    if (!(message && message.trim().length > 0) || !messages) return;
 
-    setConversationStatus('waiting');
-    const { text } = await getText({ age: conversationAge, message });
-    void utils.conversation.get.invalidate();
+    setConversationStatus(ConversationStatus.Waiting);
+
+    const messagesForSending = messages.map((message) => ({
+      role: message.sender as Role,
+      content: message.text,
+    }));
+    messagesForSending.unshift({ role: Role.System, content: prompts[conversationAge] });
+    messagesForSending.push({ role: Role.User, content: message.trim() });
+    const responseMessage = await sendMessageToOpenAI(messagesForSending);
+    await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
+    if (responseMessage) {
+      await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
+      void triggerVideoGeneration(responseMessage);
+    }
+
+    await utils.conversation.get.invalidate();
     setMessage('');
-
-    await triggerVideoGeneration(text);
-
-    setConversationStatus('idle');
-  }, [conversationAge, getText, message, triggerVideoGeneration, utils.conversation.get]);
+    setConversationStatus(ConversationStatus.Idle);
+  }, [
+    conversationAge,
+    message,
+    triggerVideoGeneration,
+    utils.conversation.get,
+    saveMessage,
+    sendMessageToOpenAI,
+    messages,
+  ]);
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {
@@ -63,13 +83,14 @@ export default function HomeScreen() {
     setIsOpenedOptions(false);
   }, [clearConversation, messages, utils.conversation]);
 
-  const isSendDisabled = conversationStatus === 'waiting' || isGettingText || message.trim().length === 0;
+  const isSendDisabled =
+    conversationStatus === ConversationStatus.Waiting || isGettingText || message.trim().length === 0;
   const visibleMessages = useMemo(() => {
     const list = messages?.slice() ?? [];
-    if (conversationStatus === 'waiting' && message) {
+    if (conversationStatus === ConversationStatus.Waiting && message) {
       list.push({
         id: 'newMessage',
-        sender: 'user',
+        sender: Role.User,
         text: message,
         conversationId: 'string1',
         createdAt: new Date(),
@@ -77,7 +98,7 @@ export default function HomeScreen() {
       });
       list.push({
         id: 'typing',
-        sender: 'assistant',
+        sender: Role.Assistant,
         text: 'Typing',
         conversationId: 'string1',
         createdAt: new Date(),
@@ -104,7 +125,7 @@ export default function HomeScreen() {
         <ConversationAgeSelect
           age={conversationAge}
           setAge={setConversationAge}
-          disabled={conversationStatus === 'waiting' || isGettingText}
+          disabled={conversationStatus === ConversationStatus.Waiting || isGettingText}
         />
       </View>
       <FlatList
@@ -117,7 +138,7 @@ export default function HomeScreen() {
         keyExtractor={(message) => message.id as string}
         renderItem={({ item: { id, text, sender } }) => (
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          <Message key={id} text={text} isUserMessage={sender === 'user'} withAnimation={id === 'typing'} />
+          <Message key={id} text={text} isUserMessage={sender === Role.User} withAnimation={id === 'typing'} />
         )}
         ListEmptyComponent={
           <View className="mt-20 items-center">
@@ -134,8 +155,8 @@ export default function HomeScreen() {
         )}
       >
         <TextInput
-          editable={conversationStatus === 'idle'}
-          focusable={conversationStatus === 'idle'}
+          editable={conversationStatus === ConversationStatus.Idle}
+          focusable={conversationStatus === ConversationStatus.Idle}
           className="flex-1 p-4 text-white"
           value={message}
           onChangeText={setMessage}

@@ -1,9 +1,8 @@
-import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { raise } from '@innch/utils';
 
-import { prompts } from '../prompts';
+import type { OpenAIResponse } from '../openai';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const conversationRoute = createTRPCRouter({
@@ -13,51 +12,34 @@ export const conversationRoute = createTRPCRouter({
       where: { conversation: { age: input.age, userId: ctx.session.userId } },
     });
   }),
-  text: protectedProcedure
-    .input(z.object({ message: z.string(), age: z.enum(['young', 'old']) }))
-    .mutation(async ({ ctx, input }) => {
-      const age = input.age;
-      const message = input.message.trim();
-      const userId = ctx.session.userId;
+  sendMessageToOpenAI: protectedProcedure
+    .input(z.array(z.object({ content: z.string(), role: z.enum(['user', 'assistant', 'system']) })))
+    .mutation(async ({ input }) => {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: input }),
+      });
+      const json = (await response.json()) as OpenAIResponse;
 
-      let conversation = await ctx.db.conversation.findFirst({ where: { age, userId } });
-      if (!conversation) {
-        conversation = await ctx.db.conversation.create({ data: { age, userId } });
-      }
+      return json.choices[0]?.message?.content ?? null;
+    }),
+  saveMessage: protectedProcedure
+    .input(z.object({ message: z.string(), age: z.enum(['young', 'old']), sender: z.enum(['user', 'assistant']) }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx.session;
+      const { age, sender, message } = input;
+      const text = message.trim();
+
+      const conversation =
+        (await ctx.db.conversation.findFirst({ where: { age, userId } })) ??
+        (await ctx.db.conversation.create({ data: { age, userId } }));
       const conversationId = conversation.id;
 
-      await ctx.db.message.create({ data: { sender: 'user', text: message, conversationId } });
-
-      const messages = await ctx.db.message.findMany({
-        where: { conversationId },
-        orderBy: { createdAt: 'asc' },
-      });
-
-      const inputMessages = messages.map((message) => ({
-        role: message.sender.toLocaleLowerCase() as 'user' | 'assistant' | 'system',
-        content: message.text,
-      }));
-      inputMessages.unshift({
-        role: 'system',
-        content: prompts[age].trim(),
-      });
-
-      const response = await ctx.openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: inputMessages,
-      });
-
-      const gptMessage = response.choices[0]?.message?.content;
-      if (!gptMessage) {
-        throw new TRPCError({
-          message: `Problem with OpenAI request: No Message`,
-          code: 'INTERNAL_SERVER_ERROR',
-        });
-      }
-
-      return ctx.db.message.create({
-        data: { conversationId, sender: 'assistant', text: inputMessages.map((m) => m.content).join('\n') },
-      });
+      return await ctx.db.message.create({ data: { sender, text, conversationId } });
     }),
   video: protectedProcedure
     .input(z.object({ text: z.string(), age: z.enum(['old', 'young']) }))
