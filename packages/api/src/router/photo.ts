@@ -18,8 +18,8 @@ export const photoRoute = createTRPCRouter({
       };
     }),
   generateAged: protectedProcedure
-    .input(z.object({ age: z.enum(['young', 'old']) }))
-    .mutation(async ({ ctx, input: { age } }) => {
+    .input(z.object({ age: z.enum(['young', 'old']), gender: z.enum(['male', 'female']) }))
+    .mutation(async ({ ctx, input: { age, gender } }) => {
       const photo = await ctx.db.photo.findFirst({
         where: { userId: ctx.session.userId, age: 'current' },
       });
@@ -32,24 +32,74 @@ export const photoRoute = createTRPCRouter({
 
       const photoURL = await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo.key}`);
 
-      return ctx.replicate.predictions.create({
-        version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
-        // deliberate v3
-        // version: '1851b62340ae657f05f8b8c8a020e3f9a46efde9fe80f273eef026c0003252ac',
-        input: {
-          image: photoURL,
-          target_age: { young: '0', old: '80' }[age],
-        },
-      });
+      return Promise.allSettled([
+        ctx.replicate.predictions.create({
+          version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
+          input: {
+            image: photoURL,
+            target_age: { young: '0', old: '80' }[age],
+          },
+        }),
+        ctx.replicate.predictions.create({
+          // deliberate v3
+          version: '1851b62340ae657f05f8b8c8a020e3f9a46efde9fe80f273eef026c0003252ac',
+          input: {
+            image: photoURL,
+            prompt: `${gender}, ${age === 'old' ? '70' : '5'} years old, ${
+              age === 'young' ? 'child' : '((gray hair:1.5))'
+            }, photo`,
+            negative_prompt: `${
+              age === 'young' ? '(beard, mustache, whisker:1.3),' : ''
+            } [deformed | disfigured], poorly drawn, [bad : wrong] anatomy, [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry`,
+            prompt_strength: 0.5,
+          },
+        }),
+        ctx.replicate.predictions.create({
+          // mixinmax1990/realisitic-vision-v3-image-to-image
+          version: '6eb633a82ab3e7a4417d0af2e84e24b4b419c76f86f6e837824d02ae6845dc81',
+          input: {
+            image: photoURL,
+            prompt: `${gender}, ${age === 'old' ? '70' : '5'} years old, ${
+              age === 'young' ? 'child' : '((gray hair:1.5))'
+            }, photo`,
+            negative_prompt: `${
+              age === 'young' ? '(beard, mustache, whisker:1.3),' : ''
+            } [deformed | disfigured], poorly drawn, [bad : wrong] anatomy, [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry`,
+            prompt_strength: 0.5,
+          },
+        }),
+        ctx.replicate.predictions.create({
+          version: '02d575aeefff93cc32262e65c2784e00bf1af37071a6b6202adf62285c71f559',
+          input: {
+            image: photoURL,
+            prompt: `${gender}, ${age === 'old' ? '70' : '5'} years old, ${
+              age === 'young' ? 'child' : '((gray hair:1.5))'
+            }, photo`,
+            negative_prompt: `${
+              age === 'young' ? '(beard, mustache, whisker:1.3),' : ''
+            } [deformed | disfigured], poorly drawn, [bad : wrong] anatomy, [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry`,
+            prompt_strength: 0.5,
+          },
+        }),
+      ]);
     }),
   wait: protectedProcedure
     .input(z.object({ predictionId: z.string() }))
-    .query(async ({ ctx, input: { predictionId } }) => {
+    .mutation(async ({ ctx, input: { predictionId } }) => {
       const prediction = await ctx.replicate.predictions.get(predictionId);
 
+      // console.log(prediction);
       if (prediction.status !== 'succeeded') return null;
 
-      return prediction.output as string;
+      if (Array.isArray(prediction.output) && typeof prediction.output[0] === 'string') {
+        return prediction.output[0];
+      }
+
+      if (typeof prediction.output === 'string') {
+        return prediction.output;
+      }
+
+      return null;
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const photos = await ctx.db.photo.findMany({

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ScrollView, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import clsx from 'clsx';
 import { useAtomValue } from 'jotai';
 
 import { api } from '~/utils/api';
@@ -16,6 +17,7 @@ import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import useUserData from '~/hooks/useUserData';
+import { NextSVG } from '~/svg/next';
 import { ReplacePhotoSVG } from '~/svg/replacePhoto';
 import { UploadPhotoSVG } from '~/svg/uploadPhoto';
 import { Age, Onboarded } from '~/types';
@@ -43,10 +45,24 @@ export default function GenerateScreen() {
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { updateUserData } = useUserData();
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  const { oldPhoto: generatedOldPhoto, youngPhoto: generatedYoungPhoto } = useGenerateAgedPhotos({
-    old: !oldPhoto,
-    young: !youngPhoto,
-  });
+  const { oldPhotos: generatedOldPhotos, youngPhotos: generatedYoungPhotos } = useGenerateAgedPhotos();
+  const [youngIndex, setYoungIndex] = useState(0);
+  const [oldIndex, setOldIndex] = useState(0);
+  const generatedYoungPhoto = useMemo(() => generatedYoungPhotos[youngIndex], [generatedYoungPhotos, youngIndex]);
+  const generatedOldPhoto = useMemo(() => generatedOldPhotos[oldIndex], [generatedOldPhotos, oldIndex]);
+
+  const pressPrevYoungIndex = useCallback(() => {
+    setYoungIndex((prev) => Math.max(0, prev - 1));
+  }, []);
+  const pressNextYoungIndex = useCallback(() => {
+    setYoungIndex((prev) => Math.min(generatedYoungPhotos.length - 1, prev + 1));
+  }, [generatedYoungPhotos]);
+  const pressPrevOldIndex = useCallback(() => {
+    setOldIndex((prev) => Math.max(0, prev - 1));
+  }, []);
+  const pressNextOldIndex = useCallback(() => {
+    setOldIndex((prev) => Math.min(generatedOldPhotos.length - 1, prev + 1));
+  }, [generatedOldPhotos]);
 
   useEffect(() => {
     if (!generatedYoungPhoto) return;
@@ -79,39 +95,77 @@ export default function GenerateScreen() {
     router.push(ROUTES.INDEX);
   }, [canSubmitOldPhoto, canSubmitYoungPhoto, router, updateUserData, uploadOldPhoto, uploadYoungPhoto]);
 
+  const isPrevYoungDisabled = useMemo(() => !generatedYoungPhotos[youngIndex - 1], [generatedYoungPhotos, youngIndex]);
+  const isNextYoungDisabled = useMemo(() => !generatedYoungPhotos[youngIndex + 1], [generatedYoungPhotos, youngIndex]);
+  const isPrevOldDisabled = useMemo(() => !generatedOldPhotos[oldIndex - 1], [generatedOldPhotos, oldIndex]);
+  const isNextOldDisabled = useMemo(() => !generatedOldPhotos[oldIndex + 1], [generatedOldPhotos, oldIndex]);
+  const allYoungGenerated = useMemo(() => generatedYoungPhotos.every((photo) => photo), [generatedYoungPhotos]);
+  const allOldGenerated = useMemo(() => generatedOldPhotos.every((photo) => photo), [generatedOldPhotos]);
+
   return (
     <>
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 items-center justify-between">
           {(!oldPhoto || !youngPhoto) && <Text className="self-start">It might take up to 20 seconds...</Text>}
 
-          {!youngPhoto ? (
-            <>
-              <WhiteCircle>
-                <AnimatedProgress />
-              </WhiteCircle>
-              <Text>Generating your inner child image...</Text>
-            </>
-          ) : (
-            <WhiteCircle>
+          <TouchableOpacity
+            className={clsx('absolute left-4 top-[64]', isPrevYoungDisabled && 'opacity-20')}
+            onPress={pressPrevYoungIndex}
+            disabled={isPrevYoungDisabled}
+          >
+            <NextSVG rotate />
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={clsx('absolute right-4 top-[64]', isNextYoungDisabled && 'opacity-20')}
+            onPress={pressNextYoungIndex}
+            disabled={isNextYoungDisabled}
+          >
+            <NextSVG />
+          </TouchableOpacity>
+          <WhiteCircle>
+            {!youngPhoto ? (
+              <AnimatedProgress />
+            ) : (
               <SelectedPhoto className="h-28 w-28 rounded-full" source={youngPhoto} />
-            </WhiteCircle>
+            )}
+          </WhiteCircle>
+          {(!youngPhoto || !allYoungGenerated) && (
+            <Text>
+              Generating your inner child images...{' '}
+              <Text>
+                ({generatedYoungPhotos.filter(Boolean).length} of {generatedYoungPhotos.length})
+              </Text>
+            </Text>
           )}
 
           <SelectedPhoto wrapped className="rounded-full" source={currentPhoto ?? currentPhotoDB?.uri} />
 
-          {!oldPhoto ? (
-            <>
-              <WhiteCircle>
-                <AnimatedProgress />
-              </WhiteCircle>
-              <Text className="mb-4">...and future-self image.</Text>
-            </>
-          ) : (
-            <WhiteCircle>
-              <SelectedPhoto className="h-28 w-28 rounded-full" source={oldPhoto} />
-            </WhiteCircle>
+          <WhiteCircle>
+            {!oldPhoto ? <AnimatedProgress /> : <SelectedPhoto className="h-28 w-28 rounded-full" source={oldPhoto} />}
+          </WhiteCircle>
+          {(!oldPhoto || !allOldGenerated) && (
+            <Text className="mb-4">
+              ...and future-self images.{' '}
+              <Text>
+                ({generatedOldPhotos.filter(Boolean).length} of {generatedYoungPhotos.length})
+              </Text>
+            </Text>
           )}
+
+          <TouchableOpacity
+            className={clsx('absolute bottom-[64] left-4', isPrevOldDisabled && 'opacity-20')}
+            onPress={pressPrevOldIndex}
+            disabled={isPrevOldDisabled}
+          >
+            <NextSVG rotate />
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={clsx('absolute bottom-[64] right-4', isNextOldDisabled && 'opacity-20')}
+            onPress={pressNextOldIndex}
+            disabled={isNextOldDisabled}
+          >
+            <NextSVG />
+          </TouchableOpacity>
         </View>
       </ScrollView>
 
