@@ -22,6 +22,8 @@ export default function HomeScreen() {
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Young);
   const [isWaitingInitialMessage, setIsWaitingInitialMessage] = useState(false);
+  const [initialMessage, setInitialMessage] = useState<string | null>(null);
+  const [lastGPTResponse, setLastGPTResponse] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
@@ -57,6 +59,7 @@ export default function HomeScreen() {
     const responseMessage = await sendMessageToOpenAI(messagesForSending);
     await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
     if (responseMessage) {
+      setLastGPTResponse(responseMessage);
       await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
       void triggerVideoGeneration(responseMessage);
     }
@@ -76,11 +79,13 @@ export default function HomeScreen() {
 
   useEffect(() => {
     void (async () => {
+      setInitialMessage(null);
       if (!areMessagesLoading && messages?.length === 0) {
         setIsWaitingInitialMessage(true);
         const responseMessage = await sendMessageToOpenAI([{ role: Role.System, content: prompts[conversationAge] }]);
         console.log(responseMessage);
         if (responseMessage) {
+          setInitialMessage(responseMessage);
           await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
@@ -104,7 +109,10 @@ export default function HomeScreen() {
     conversationStatus === ConversationStatus.Waiting || isGettingText || message.trim().length === 0;
   const visibleMessages = useMemo(() => {
     const list = messages?.slice() ?? [];
+
+    // optimistic UI messages
     if (conversationStatus === ConversationStatus.Waiting && message) {
+      // fast showing user message
       list.push({
         id: 'newMessage',
         sender: Role.User,
@@ -113,10 +121,37 @@ export default function HomeScreen() {
         createdAt: new Date(),
         updatedAt: new Date(),
       });
+      if (lastGPTResponse) {
+        // fast showing last GRP response message
+        list.push({
+          id: 'lastGPTResponse',
+          sender: Role.Assistant,
+          text: lastGPTResponse,
+          conversationId: 'string1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      } else {
+        // showing typing message
+        list.push({
+          id: 'typing',
+          sender: Role.Assistant,
+          text: 'Typing',
+          conversationId: 'string1',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    } else {
+      // clear if we loaded all messages from server
+      setLastGPTResponse(null);
+    }
+    if (initialMessage && list.length === 0) {
+      // fast showing initial message
       list.push({
-        id: 'typing',
+        id: 'initialMessage',
         sender: Role.Assistant,
-        text: 'Typing',
+        text: initialMessage,
         conversationId: 'string1',
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -124,7 +159,7 @@ export default function HomeScreen() {
     }
 
     return list;
-  }, [messages, conversationStatus]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [messages, conversationStatus, initialMessage, lastGPTResponse]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(scrollListToEnd, [messages, scrollListToEnd]);
 
