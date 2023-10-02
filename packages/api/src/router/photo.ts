@@ -88,7 +88,8 @@ export const photoRoute = createTRPCRouter({
     .mutation(async ({ ctx, input: { predictionId } }) => {
       const prediction = await ctx.replicate.predictions.get(predictionId);
 
-      // console.log(prediction);
+      console.log(prediction);
+
       if (prediction.status !== 'succeeded') return null;
 
       if (Array.isArray(prediction.output) && typeof prediction.output[0] === 'string') {
