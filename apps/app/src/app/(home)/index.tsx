@@ -110,6 +110,12 @@ export default function HomeScreen() {
   const visibleMessages = useMemo(() => {
     const list = messages?.slice() ?? [];
 
+    const commonProps = {
+      conversationId: 'conversationId',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
     // optimistic UI messages
     if (conversationStatus === ConversationStatus.Waiting && message) {
       // fast showing user message
@@ -117,9 +123,7 @@ export default function HomeScreen() {
         id: 'newMessage',
         sender: Role.User,
         text: message,
-        conversationId: 'string1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        ...commonProps,
       });
       if (lastGPTResponse) {
         // fast showing last GRP response message
@@ -127,9 +131,7 @@ export default function HomeScreen() {
           id: 'lastGPTResponse',
           sender: Role.Assistant,
           text: lastGPTResponse,
-          conversationId: 'string1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          ...commonProps,
         });
       } else {
         // showing typing message
@@ -137,9 +139,7 @@ export default function HomeScreen() {
           id: 'typing',
           sender: Role.Assistant,
           text: 'Typing',
-          conversationId: 'string1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          ...commonProps,
         });
       }
     } else {
@@ -152,9 +152,7 @@ export default function HomeScreen() {
         id: 'initialMessage',
         sender: Role.Assistant,
         text: initialMessage,
-        conversationId: 'string1',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        ...commonProps,
       });
     }
 
