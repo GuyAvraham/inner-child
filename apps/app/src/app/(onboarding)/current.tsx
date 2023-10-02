@@ -57,7 +57,7 @@ export default function CurrentScreen() {
         <View className="h-4"></View>
         <Button blue onPress={submitPhoto} disabled={!canSubmit} wide>
           <Button.Text className="text-center text-lg">
-            {isUploading ? 'Uploading...' : 'Upload this photo'}
+            {isUploading ? 'Uploading...' : 'Ok, Upload this photo'}
           </Button.Text>
           <View className="w-2"></View>
           <TakePhotoSVG />
