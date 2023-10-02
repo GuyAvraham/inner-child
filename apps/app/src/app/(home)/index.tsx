@@ -4,6 +4,7 @@ import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { prompts } from '~/utils/prompts';
+import { AnimatedProgress } from '~/components/AnimatedProgress';
 import { ConversationAgeSelect } from '~/components/ConversationAgeSelect';
 import { Message } from '~/components/ui/Message';
 import Text from '~/components/ui/Text';
@@ -20,6 +21,7 @@ export default function HomeScreen() {
   const utils = api.useContext();
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Young);
+  const [isWaitingInitialMessage, setIsWaitingInitialMessage] = useState(false);
   const [message, setMessage] = useState<string>('');
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
@@ -71,6 +73,21 @@ export default function HomeScreen() {
     sendMessageToOpenAI,
     messages,
   ]);
+
+  useEffect(() => {
+    void (async () => {
+      if (!areMessagesLoading && messages?.length === 0) {
+        setIsWaitingInitialMessage(true);
+        const responseMessage = await sendMessageToOpenAI([{ role: Role.System, content: prompts[conversationAge] }]);
+        console.log(responseMessage);
+        if (responseMessage) {
+          await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
+          await utils.conversation.get.invalidate();
+          setIsWaitingInitialMessage(false);
+        }
+      }
+    })();
+  }, [areMessagesLoading, messages, conversationAge]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {
@@ -142,9 +159,13 @@ export default function HomeScreen() {
         )}
         ListEmptyComponent={
           <View className="mt-20 items-center">
-            <Text className="font-[Poppins-Bold] text-base text-white/40">
-              {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
-            </Text>
+            {isWaitingInitialMessage ? (
+              <AnimatedProgress fast />
+            ) : (
+              <Text className="font-[Poppins-Bold] text-base text-white/40">
+                {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
+              </Text>
+            )}
           </View>
         }
       />
