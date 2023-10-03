@@ -7,6 +7,7 @@ import { AnimatedProgress } from '~/components/AnimatedProgress';
 import { ConversationAgeSelect } from '~/components/ConversationAgeSelect';
 import { Message } from '~/components/ui/Message';
 import Text from '~/components/ui/Text';
+import { isIos } from '~/config/variables';
 import { useKeyboardVisible } from '~/hooks/useKeyboardVisible';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import { CloseSVG } from '~/svg/close';
@@ -163,7 +164,7 @@ export default function HomeScreen() {
   useEffect(scrollListToEnd, [messages, scrollListToEnd]);
 
   return (
-    <KeyboardAvoidingView className="flex-1" behavior="padding">
+    <KeyboardAvoidingView className="flex-1" behavior={isIos ? 'padding' : 'height'}>
       <View className="relative mb-8 mt-10 items-center">
         <Text className="font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
@@ -206,7 +207,7 @@ export default function HomeScreen() {
       <View
         className={clsx(
           'm-4 mt-0 flex-row items-center rounded-lg border-[1px] border-white/20 bg-white/10',
-          keyboardVisible && 'mb-20',
+          keyboardVisible && isIos && 'mb-20',
         )}
       >
         <TextInput
