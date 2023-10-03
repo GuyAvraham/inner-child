@@ -234,7 +234,7 @@ export default function HomeScreen() {
             width: Dimensions.get('window').width,
           }}
         >
-          <View className="z-40 flex-row justify-end p-6">
+          <View className="z-40 flex-row justify-end p-6 pt-14">
             <TouchableOpacity onPress={() => setIsOpenedOptions(false)}>
               <CloseSVG />
             </TouchableOpacity>
