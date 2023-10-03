@@ -12,6 +12,9 @@ export const conversationRoute = createTRPCRouter({
       where: { conversation: { age: input.age, userId: ctx.session.userId } },
     });
   }),
+  getPrompts: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.contentful.getPrompts();
+  }),
   sendMessageToOpenAI: protectedProcedure
     .input(z.array(z.object({ content: z.string(), role: z.enum(['user', 'assistant', 'system']) })))
     .mutation(async ({ input }) => {

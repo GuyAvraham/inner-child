@@ -1,8 +1,5 @@
 import type { NextRequest } from 'next/server';
-import type {
-  SignedInAuthObject,
-  SignedOutAuthObject,
-} from '@clerk/nextjs/api';
+import type { SignedInAuthObject, SignedOutAuthObject } from '@clerk/nextjs/api';
 import { getAuth } from '@clerk/nextjs/server';
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
@@ -10,7 +7,7 @@ import { ZodError } from 'zod';
 
 import { db } from '@innch/db';
 
-import { openai } from './openai';
+import { contentful } from './contentful';
 import { replicate } from './replicate';
 import { s3 } from './s3';
 
@@ -22,7 +19,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     db,
-    openai,
+    contentful,
     replicate,
     s3,
   };
@@ -46,8 +43,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
       ...shape,
       data: {
         ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
+        zodError: error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
     };
   },

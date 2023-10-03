@@ -3,7 +3,6 @@ import { Dimensions, FlatList, KeyboardAvoidingView, TextInput, TouchableOpacity
 import clsx from 'clsx';
 
 import { api } from '~/utils/api';
-import { prompts } from '~/utils/prompts';
 import { AnimatedProgress } from '~/components/AnimatedProgress';
 import { ConversationAgeSelect } from '~/components/ConversationAgeSelect';
 import { Message } from '~/components/ui/Message';
@@ -29,6 +28,7 @@ export default function HomeScreen() {
     age: conversationAge,
   });
   const { mutateAsync: saveMessage, isLoading: isGettingText } = api.conversation.saveMessage.useMutation();
+  const { data: prompts } = api.conversation.getPrompts.useQuery();
   const { mutateAsync: sendMessageToOpenAI } = api.conversation.sendMessageToOpenAI.useMutation({
     onError(error) {
       console.error(error);
@@ -46,7 +46,7 @@ export default function HomeScreen() {
   }, []);
 
   const handleSendMessage = useCallback(async () => {
-    if (!(message && message.trim().length > 0) || !messages) return;
+    if (!(message && message.trim().length > 0) || !messages || !prompts) return;
 
     setConversationStatus(ConversationStatus.Waiting);
 
@@ -75,12 +75,13 @@ export default function HomeScreen() {
     saveMessage,
     sendMessageToOpenAI,
     messages,
+    prompts,
   ]);
 
   useEffect(() => {
     void (async () => {
       setInitialMessage(null);
-      if (!areMessagesLoading && messages?.length === 0) {
+      if (!areMessagesLoading && messages?.length === 0 && prompts) {
         setIsWaitingInitialMessage(true);
         const responseMessage = await sendMessageToOpenAI([{ role: Role.System, content: prompts[conversationAge] }]);
         console.log(responseMessage);
@@ -92,7 +93,7 @@ export default function HomeScreen() {
         }
       }
     })();
-  }, [areMessagesLoading, messages, conversationAge]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [areMessagesLoading, messages, conversationAge, prompts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {
