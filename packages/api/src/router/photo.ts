@@ -13,9 +13,11 @@ export const photoRoute = createTRPCRouter({
       try {
         const url = process.env.GUESS_THE_NAME_GAME_URL;
         if (!url) return { error: 'No game url' };
+        const xApiKey = process.env.GUESS_THE_NAME_X_API_KEY;
+        if (!xApiKey) return { error: 'No game x api key' };
         const res = await fetch(`${url}/api/get-photos?email=${email}`, {
           headers: {
-            'server-origin': 'inner-child-app',
+            'x-api-key': xApiKey,
           },
         });
         return (await res.json()) as { photos?: string[]; error: string | null };
