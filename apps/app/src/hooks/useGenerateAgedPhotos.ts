@@ -7,7 +7,7 @@ import useUserData from './useUserData';
 const refetchInterval = 4000;
 
 export const useGenerateAgedPhotos = () => {
-  const { data } = useUserData();
+  const { data, user: userData } = useUserData();
 
   const [youngPredictionIds, setYoungPredictionIds] = useState<string[]>([]);
   const [oldPredictionIds, setOldPredictionIds] = useState<string[]>([]);
@@ -17,6 +17,9 @@ export const useGenerateAgedPhotos = () => {
 
   const { mutateAsync: generateAged } = api.photo.generateAged.useMutation();
   const { mutateAsync: waitPhoto } = api.photo.wait.useMutation();
+  const { data: dataFromGame } = api.photo.getPhotosFromGame.useQuery({
+    email: userData?.emailAddresses[0]?.emailAddress ?? '',
+  });
 
   const generate = useCallback(() => {
     const gender = data.gender as 'male' | 'female';
@@ -82,5 +85,13 @@ export const useGenerateAgedPhotos = () => {
     };
   }, [oldPredictionIds, oldPhotos, waitPhoto]);
 
-  return useMemo(() => ({ youngPhotos, oldPhotos }), [youngPhotos, oldPhotos]);
+  return useMemo(() => {
+    let photos = youngPhotos.slice();
+
+    if (dataFromGame?.photos) {
+      photos = [...dataFromGame.photos, ...youngPhotos];
+    }
+
+    return { youngPhotos: photos, oldPhotos };
+  }, [youngPhotos, oldPhotos, dataFromGame]);
 };

@@ -5,6 +5,20 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../trpc';
 
 export const photoRoute = createTRPCRouter({
+  getPhotosFromGame: protectedProcedure
+    .input(z.object({ email: z.string().optional() }))
+    .query(async ({ input: { email } }) => {
+      if (!email) return { error: 'No email' };
+
+      try {
+        const url = process.env.GUESS_THE_NAME_GAME_URL;
+        if (!url) return { error: 'No game url' };
+        const res = await fetch(`${url}/api/get-photos?email=${email}`);
+        return (await res.json()) as { photos?: string[]; error: string | null };
+      } catch (error) {
+        return { error: String(error) };
+      }
+    }),
   create: protectedProcedure
     .input(z.object({ age: z.enum(['young', 'current', 'old']), key: z.string() }))
     .mutation(async ({ ctx, input: { age, key } }) => {
