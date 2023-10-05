@@ -89,12 +89,13 @@ export default function HomeScreen() {
         if (responseMessage) {
           setInitialMessage(responseMessage);
           await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
+          void triggerVideoGeneration(responseMessage);
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
         }
       }
     })();
-  }, [areMessagesLoading, messages, conversationAge, prompts]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [areMessagesLoading, messages, conversationAge, prompts, triggerVideoGeneration]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {

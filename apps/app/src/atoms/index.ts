@@ -6,3 +6,6 @@ export const oldPhotoAtom = atom<string | undefined>(undefined);
 
 const videoPredictionIdAtom = atom<string | null>(null);
 export const useVideoPredictionIdAtom = () => useAtom(videoPredictionIdAtom);
+
+const videoUriAtom = atom<string | null>(null);
+export const useVideoUriAtom = () => useAtom(videoUriAtom);

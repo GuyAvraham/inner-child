@@ -50,7 +50,8 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
 
   const handleChangeAge = useCallback(() => {
     setAge(age === Age.Young ? Age.Old : Age.Young);
-  }, [age, setAge]);
+    if (video) void clearVideo();
+  }, [age, setAge, clearVideo, video]);
 
   const imageUri = age === Age.Young ? young : old;
   const secondaryImageUri = age === Age.Young ? old : young;

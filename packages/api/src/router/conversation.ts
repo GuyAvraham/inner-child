@@ -45,14 +45,26 @@ export const conversationRoute = createTRPCRouter({
       return await ctx.db.message.create({ data: { sender, text, conversationId } });
     }),
   video: protectedProcedure
-    .input(z.object({ text: z.string(), age: z.enum(['old', 'young']) }))
-    .mutation(async ({ ctx, input }) => {
+    .input(z.object({ text: z.string(), age: z.enum(['old', 'young']), gender: z.enum(['male', 'female']) }))
+    .mutation(async ({ ctx, input: { text, age, gender } }) => {
       try {
         const photo = await ctx.db.photo.findFirst({
-          where: { age: input.age, userId: ctx.session.userId },
+          where: { age, userId: ctx.session.userId },
         });
 
         const url = await ctx.s3.getPresignedUrl(`${ctx.session.userId}/${photo?.key ?? raise('No photo found')}`);
+
+        // voice gallery: https://speech.microsoft.com/portal/voicegallery
+        const voices = {
+          male: {
+            young: 'en-US-GuyNeural',
+            old: 'en-US-DavisNeural',
+          },
+          female: {
+            young: 'en-US-AnaNeural',
+            old: 'en-US-CoraNeural',
+          },
+        };
 
         const options = {
           method: 'POST',
@@ -65,9 +77,9 @@ export const conversationRoute = createTRPCRouter({
             source_url: url,
             script: {
               type: 'text',
-              input: input.text,
+              input: text,
               subtitles: 'false',
-              provider: { type: 'microsoft', voice_id: 'en-US-JennyNeural' },
+              provider: { type: 'microsoft', voice_id: voices[gender][age] },
               ssml: 'false',
             },
             config: { fluent: 'false', pad_audio: '0.0' },
