@@ -43,7 +43,9 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
 
   const handleVideoStatusUpdate = useCallback(
     async (status: AVPlaybackStatus) => {
-      if (status.isLoaded && status.positionMillis === status.durationMillis) await clearVideo();
+      if (status.isLoaded && (status.durationMillis ?? 0) - status.positionMillis < 1000) {
+        await clearVideo();
+      }
     },
     [clearVideo],
   );
