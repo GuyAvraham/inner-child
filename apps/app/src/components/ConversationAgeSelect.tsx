@@ -70,6 +70,8 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
           <Video
             className="m-2 h-40 w-40 rounded-full"
             source={{ uri: video }}
+            posterSource={{ uri: imageUri }}
+            usePoster
             shouldPlay={true}
             isMuted={false}
             volume={1}
