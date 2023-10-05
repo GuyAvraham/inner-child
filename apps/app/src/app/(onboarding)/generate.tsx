@@ -95,10 +95,13 @@ export default function GenerateScreen() {
     router.push(ROUTES.INDEX);
   }, [canSubmitOldPhoto, canSubmitYoungPhoto, router, updateUserData, uploadOldPhoto, uploadYoungPhoto]);
 
-  const isPrevYoungDisabled = useMemo(() => !generatedYoungPhotos[youngIndex - 1], [generatedYoungPhotos, youngIndex]);
-  const isNextYoungDisabled = useMemo(() => !generatedYoungPhotos[youngIndex + 1], [generatedYoungPhotos, youngIndex]);
-  const isPrevOldDisabled = useMemo(() => !generatedOldPhotos[oldIndex - 1], [generatedOldPhotos, oldIndex]);
-  const isNextOldDisabled = useMemo(() => !generatedOldPhotos[oldIndex + 1], [generatedOldPhotos, oldIndex]);
+  const isPrevYoungDisabled = useMemo(() => youngIndex === 0, [youngIndex]);
+  const isNextYoungDisabled = useMemo(
+    () => youngIndex + 1 === generatedYoungPhotos.length,
+    [generatedYoungPhotos, youngIndex],
+  );
+  const isPrevOldDisabled = useMemo(() => oldIndex === 0, [oldIndex]);
+  const isNextOldDisabled = useMemo(() => oldIndex + 1 === generatedOldPhotos.length, [generatedOldPhotos, oldIndex]);
   const allYoungGenerated = useMemo(() => generatedYoungPhotos.every((photo) => photo), [generatedYoungPhotos]);
   const allOldGenerated = useMemo(() => generatedOldPhotos.every((photo) => photo), [generatedOldPhotos]);
 
@@ -123,7 +126,7 @@ export default function GenerateScreen() {
             <NextSVG />
           </TouchableOpacity>
           <WhiteCircle>
-            {!youngPhoto ? (
+            {!generatedYoungPhoto ? (
               <AnimatedProgress />
             ) : (
               <SelectedPhoto className="h-28 w-28 rounded-full" source={youngPhoto} />
@@ -138,16 +141,20 @@ export default function GenerateScreen() {
             </Text>
           )}
 
-          <SelectedPhoto wrapped className="rounded-full" source={currentPhoto ?? currentPhotoDB?.uri} />
+          <SelectedPhoto wrapped className="my-4 rounded-full" source={currentPhoto ?? currentPhotoDB?.uri} />
 
           <WhiteCircle>
-            {!oldPhoto ? <AnimatedProgress /> : <SelectedPhoto className="h-28 w-28 rounded-full" source={oldPhoto} />}
+            {!generatedOldPhoto ? (
+              <AnimatedProgress />
+            ) : (
+              <SelectedPhoto className="h-28 w-28 rounded-full" source={oldPhoto} />
+            )}
           </WhiteCircle>
           {(!oldPhoto || !allOldGenerated) && (
             <Text className="mb-4">
               ...and future-self images.{' '}
               <Text>
-                ({generatedOldPhotos.filter(Boolean).length} of {generatedYoungPhotos.length})
+                ({generatedOldPhotos.filter(Boolean).length} of {generatedOldPhotos.length})
               </Text>
             </Text>
           )}
