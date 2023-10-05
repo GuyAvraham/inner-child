@@ -62,22 +62,12 @@ export default function HomeScreen() {
     if (responseMessage) {
       setLastGPTResponse(responseMessage);
       await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
-      void triggerVideoGeneration(responseMessage);
     }
 
     await utils.conversation.get.invalidate();
     setMessage('');
     setConversationStatus(ConversationStatus.Idle);
-  }, [
-    conversationAge,
-    message,
-    triggerVideoGeneration,
-    utils.conversation.get,
-    saveMessage,
-    sendMessageToOpenAI,
-    messages,
-    prompts,
-  ]);
+  }, [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts]);
 
   useEffect(() => {
     void (async () => {
