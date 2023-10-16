@@ -26,10 +26,6 @@
       },
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ",
-        "EXPO_PUBLIC_API_URL": "https://inner-child-server-one.vercel.app"
       }
     },
     "production": {
