@@ -17,15 +17,20 @@
       "channel": "development"
     },
     "preview": {
-      "extends": "base",
       "distribution": "internal",
+      "channel": "preview",
+      "node": "18.17.0",
       "ios": {
-        "simulator": true
+        "simulator": true,
+        "resourceClass": "m-medium"
       },
       "android": {
         "buildType": "apk"
       },
-      "channel": "preview"
+      "env": {
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ",
+        "EXPO_PUBLIC_API_URL": "https://inner-child-server-one.vercel.app"
+      }
     },
     "production": {
       "extends": "base",

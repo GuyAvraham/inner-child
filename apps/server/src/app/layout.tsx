@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Inner Child',
     description: 'Get in touch with your inner self',
-    url: 'https://inner-child-server.vercel.app',
+    url: 'https://inner-child-server-one.vercel.app',
     siteName: 'Inner Child',
   },
   twitter: {
@@ -34,9 +34,7 @@ export default function Layout(props: { children: React.ReactNode }) {
     <ClerkProvider>
       <html lang="en">
         <body className={['font-sans', fontSans.variable].join(' ')}>
-          <TRPCReactProvider headers={headers()}>
-            {props.children}
-          </TRPCReactProvider>
+          <TRPCReactProvider headers={headers()}>{props.children}</TRPCReactProvider>
         </body>
       </html>
     </ClerkProvider>
