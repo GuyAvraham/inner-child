@@ -1,18 +1,18 @@
 import type { ExpoConfig } from '@expo/config';
 
 const defineConfig = (): ExpoConfig => ({
-  name: 'inner-child',
-  slug: 'innch',
-  scheme: 'innch',
+  name: 'Tamagochi Inner Child',
+  slug: 'tamagochi-inner-child',
+  scheme: 'tamagochi-inner-child',
   version: '1.0.0',
   owner: 'inner-child',
   orientation: 'portrait',
-  icon: './assets/icon.png',
+  icon: './assets/inner-child-logo.png',
   userInterfaceStyle: 'dark',
   splash: {
-    image: './assets/icon.png',
+    image: './assets/splash.png',
     resizeMode: 'contain',
-    backgroundColor: '#F8F3EF',
+    backgroundColor: 'rgb(66,133,244)',
   },
   updates: {
     fallbackToCacheTimeout: 0,
@@ -21,13 +21,13 @@ const defineConfig = (): ExpoConfig => ({
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.innch.app',
+    bundleIdentifier: 'com.tamagochi.inner.child.app',
   },
   android: {
-    package: 'com.innch.app',
+    package: 'com.tamagochi.inner.child.app',
     adaptiveIcon: {
-      foregroundImage: './assets/icon.png',
-      backgroundColor: '#F8F3EF',
+      foregroundImage: './assets/inner-child-logo.png',
+      backgroundColor: 'rgb(66,133,244)',
     },
   },
   runtimeVersion: {

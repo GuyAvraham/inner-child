@@ -84,6 +84,14 @@ export default function GenerateScreen() {
     router.replace(ROUTES.ONBOARDING.CURRENT);
   }, [router, updateUserData, utils.photo, deleteAllPhotos]);
 
+  useEffect(() => {
+    if (currentPhotoDB === null) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      router.replace(ROUTES.ONBOARDING.CURRENT);
+    }
+  }, [currentPhotoDB, router]);
+
   const submitPhoto = useCallback(async () => {
     if (!canSubmitOldPhoto && !canSubmitYoungPhoto) return;
 
