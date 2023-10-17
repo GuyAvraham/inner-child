@@ -18,7 +18,7 @@ const defineConfig = (): ExpoConfig => ({
   splash: {
     image: './assets/splash.png',
     resizeMode: 'contain',
-    backgroundColor: 'rgb(66,133,244)',
+    backgroundColor: '#4285F4',
   },
   updates: {
     fallbackToCacheTimeout: 0,
@@ -35,7 +35,7 @@ const defineConfig = (): ExpoConfig => ({
     versionCode: buildNumber,
     adaptiveIcon: {
       foregroundImage: './assets/splash.png',
-      backgroundColor: 'rgb(66,133,244)',
+      backgroundColor: '#4285F4',
     },
   },
   runtimeVersion: {
