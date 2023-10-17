@@ -13,7 +13,9 @@
     "type-check": "tsc --noEmit",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "eas:update": "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ EXPO_PUBLIC_API_URL=https://inner-child-server-one.vercel.app eas update"
+    "eas:update": "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_b3B0aW1hbC1zbmFwcGVyLTYwLmNsZXJrLmFjY291bnRzLmRldiQ EXPO_PUBLIC_API_URL=https://inner-child-server-one.vercel.app eas update",
+    "eas:build": "eas build --profile development",
+    "eas:build:production": "eas build"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^0.18.17",

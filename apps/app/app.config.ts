@@ -1,13 +1,19 @@
 import type { ExpoConfig } from '@expo/config';
 
+const owner = 'inner-child';
+const projectId = 'b0cd7774-1f25-4469-a2ed-21ae8e40206f';
+const bundleId = 'com.tamagochi.inner.child.app';
+
+const buildNumber = 1;
+
 const defineConfig = (): ExpoConfig => ({
-  name: 'Tamagochi Inner Child',
-  slug: 'tamagochi-inner-child',
+  name: 'Inner Child',
+  slug: 'innch',
   scheme: 'tamagochi-inner-child',
   version: '1.0.0',
-  owner: 'inner-child',
+  owner,
   orientation: 'portrait',
-  icon: './assets/inner-child-logo.png',
+  icon: './assets/splash.png',
   userInterfaceStyle: 'dark',
   splash: {
     image: './assets/splash.png',
@@ -16,17 +22,19 @@ const defineConfig = (): ExpoConfig => ({
   },
   updates: {
     fallbackToCacheTimeout: 0,
-    url: 'https://u.expo.dev/b0cd7774-1f25-4469-a2ed-21ae8e40206f',
+    url: `https://u.expo.dev/${projectId}`,
   },
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.tamagochi.inner.child.app',
+    bundleIdentifier: bundleId,
+    buildNumber: String(buildNumber),
   },
   android: {
-    package: 'com.tamagochi.inner.child.app',
+    package: bundleId,
+    versionCode: buildNumber,
     adaptiveIcon: {
-      foregroundImage: './assets/inner-child-logo.png',
+      foregroundImage: './assets/splash.png',
       backgroundColor: 'rgb(66,133,244)',
     },
   },
@@ -35,7 +43,7 @@ const defineConfig = (): ExpoConfig => ({
   },
   extra: {
     eas: {
-      projectId: 'b0cd7774-1f25-4469-a2ed-21ae8e40206f',
+      projectId,
     },
   },
   experiments: {
