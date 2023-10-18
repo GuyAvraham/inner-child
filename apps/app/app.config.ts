@@ -6,6 +6,8 @@ const bundleId = 'com.tamagochi.inner.child.app';
 
 const buildNumber = 1;
 
+const icon = './assets/logo.png';
+
 const defineConfig = (): ExpoConfig => ({
   name: 'Inner Child',
   slug: 'innch',
@@ -13,7 +15,7 @@ const defineConfig = (): ExpoConfig => ({
   version: '1.0.0',
   owner,
   orientation: 'portrait',
-  icon: './assets/splash.png',
+  icon,
   userInterfaceStyle: 'dark',
   splash: {
     image: './assets/splash.png',
@@ -34,7 +36,7 @@ const defineConfig = (): ExpoConfig => ({
     package: bundleId,
     versionCode: buildNumber,
     adaptiveIcon: {
-      foregroundImage: './assets/splash.png',
+      foregroundImage: icon,
       backgroundColor: '#4285F4',
     },
   },
