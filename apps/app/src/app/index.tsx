@@ -9,7 +9,8 @@ import { Onboarded } from '~/types';
 
 const onboardingMap: Record<string, ReactElement> = {
   current: <Redirect href={ROUTES.ONBOARDING.CURRENT} />,
-  generate: <Redirect href={ROUTES.ONBOARDING.GENERATE} />,
+  generateYoung: <Redirect href={ROUTES.ONBOARDING.GENERATE_YOUNG} />,
+  generateOld: <Redirect href={ROUTES.ONBOARDING.GENERATE_OLD} />,
 };
 
 export default function Index() {

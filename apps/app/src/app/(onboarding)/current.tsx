@@ -1,8 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { View } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 
+import { api } from '~/utils/api';
 import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
 import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
 import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
@@ -19,13 +20,22 @@ export default function CurrentScreen() {
   useOnboardedScreen(Onboarded.Current);
   const router = useRouter();
   const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto('current', currentPhotoAtom);
+  const { data: currentPhoto } = api.photo.getByAge.useQuery({ age: 'current' });
 
   const submitPhoto = useCallback(async () => {
     await upload();
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    router.push(ROUTES.ONBOARDING.GENERATE);
+    router.push(ROUTES.ONBOARDING.GENERATE_YOUNG);
   }, [router, upload]);
+
+  useEffect(() => {
+    if (currentPhoto) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      router.push(ROUTES.ONBOARDING.GENERATE_YOUNG);
+    }
+  }, [currentPhoto, router]);
 
   if (!photo) {
     return (

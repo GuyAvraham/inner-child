@@ -1,6 +1,8 @@
 import { atom, useAtom } from 'jotai';
 
 export const currentPhotoAtom = atom<string | undefined>(undefined);
+export const useCurrentPhotoAtom = () => useAtom(currentPhotoAtom);
+
 export const youngPhotoAtom = atom<string | undefined>(undefined);
 export const oldPhotoAtom = atom<string | undefined>(undefined);
 

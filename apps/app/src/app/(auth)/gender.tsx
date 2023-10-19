@@ -20,7 +20,7 @@ export default function GenderScreen() {
 
   return (
     <View className="flex-1 justify-center px-4">
-      <Text className="font-[Poppins-Bold] text-4xl leading-[48px]">
+      <Text className="my-auto font-[Poppins-Bold] text-4xl leading-[48px]">
         Our image engine needs to understand if you are more of a {'\n'}male or female?
       </Text>
 

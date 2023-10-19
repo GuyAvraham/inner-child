@@ -15,6 +15,7 @@ export const useGenerateAgedPhotos = () => {
   const [youngPhotos, setYoungPhotos] = useState<(string | null)[]>([]);
   const [oldPhotos, setOldPhotos] = useState<(string | null)[]>([]);
 
+  const { data: currentPhoto } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: generateAged } = api.photo.generateAged.useMutation();
   const { mutateAsync: waitPhoto } = api.photo.wait.useMutation();
   const { data: dataFromGame } = api.photo.getPhotosFromGame.useQuery({
@@ -37,7 +38,11 @@ export const useGenerateAgedPhotos = () => {
     });
   }, [generateAged, data.gender]);
 
-  useEffect(generate, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (currentPhoto) {
+      void generate();
+    }
+  }, [currentPhoto, generate]);
 
   useEffect(() => {
     if (youngPhotos.length && youngPhotos.every((item) => typeof item === 'string')) {
@@ -50,6 +55,10 @@ export const useGenerateAgedPhotos = () => {
         const results = [] as (string | null)[];
         for await (const predictionId of youngPredictionIds) {
           const result = await waitPhoto({ predictionId });
+          if (typeof result === 'number') {
+            setYoungPredictionIds((prev) => prev.filter((item) => item !== predictionId));
+            continue;
+          }
           results.push(result);
         }
 
@@ -73,6 +82,10 @@ export const useGenerateAgedPhotos = () => {
         const results = [] as (string | null)[];
         for await (const predictionId of oldPredictionIds) {
           const result = await waitPhoto({ predictionId });
+          if (typeof result === 'number') {
+            setOldPredictionIds((prev) => prev.filter((item) => item !== predictionId));
+            continue;
+          }
           results.push(result);
         }
 

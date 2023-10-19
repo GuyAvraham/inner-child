@@ -9,6 +9,7 @@ export const ROUTES = {
   },
   ONBOARDING: {
     CURRENT: '/(onboarding)/current',
-    GENERATE: '/(onboarding)/generate',
+    GENERATE_YOUNG: '/(onboarding)/generateYoung',
+    GENERATE_OLD: '/(onboarding)/generateOld',
   },
 };

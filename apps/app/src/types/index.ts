@@ -5,7 +5,8 @@ export enum Age {
 
 export enum Onboarded {
   Current = 'current',
-  Generate = 'generate',
+  GenerateYoung = 'generateYoung',
+  GenerateOld = 'generateOld',
   Finished = 'finished',
 }
 
