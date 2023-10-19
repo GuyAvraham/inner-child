@@ -110,6 +110,8 @@ export const photoRoute = createTRPCRouter({
 
       console.log(prediction);
 
+      if (prediction.status === 'failed') return 500;
+
       if (prediction.status !== 'succeeded') return null;
 
       if (Array.isArray(prediction.output) && typeof prediction.output[0] === 'string') {
