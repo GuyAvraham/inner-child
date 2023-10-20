@@ -81,7 +81,7 @@ export default function GenerateOldScreen() {
             <TouchableOpacity
               className="absolute -bottom-4 -right-4 rounded-full bg-white/20 p-[6]"
               onPress={replacePhotos}
-              disabled={isReplacing}
+              disabled={isReplacing || isOldPhotoUploading}
             >
               <ReplacePhotoSVG />
             </TouchableOpacity>
@@ -96,7 +96,7 @@ export default function GenerateOldScreen() {
       </ScrollView>
 
       <View className="mb-4 mt-10 items-center justify-center px-4">
-        <Button onPress={submitPhoto} wide blue disabled={!canSubmitOldPhoto}>
+        <Button onPress={submitPhoto} wide blue disabled={!canSubmitOldPhoto || isOldPhotoUploading}>
           <Button.Text className="text-center text-lg">{isOldPhotoUploading ? 'Saving...' : 'Continue'}</Button.Text>
           <View className="w-2"></View>
           <NextSVG />

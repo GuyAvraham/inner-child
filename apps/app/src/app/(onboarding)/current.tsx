@@ -22,20 +22,22 @@ export default function CurrentScreen() {
   const { photo, handlePhoto, upload, canSubmit, isUploading } = useHandlePhoto('current', currentPhotoAtom);
   const { data: currentPhoto } = api.photo.getByAge.useQuery({ age: 'current' });
 
-  const submitPhoto = useCallback(async () => {
-    await upload();
+  const navigateToGenerateYoung = useCallback(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    router.push(ROUTES.ONBOARDING.GENERATE_YOUNG);
-  }, [router, upload]);
+    router.replace(ROUTES.ONBOARDING.GENERATE_YOUNG);
+  }, [router]);
+
+  const submitPhoto = useCallback(async () => {
+    await upload();
+    navigateToGenerateYoung();
+  }, [navigateToGenerateYoung, upload]);
 
   useEffect(() => {
     if (currentPhoto) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      router.push(ROUTES.ONBOARDING.GENERATE_YOUNG);
+      navigateToGenerateYoung();
     }
-  }, [currentPhoto, router]);
+  }, [navigateToGenerateYoung, currentPhoto]);
 
   if (!photo) {
     return (

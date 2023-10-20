@@ -1,26 +1,29 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, LayoutAnimation } from 'react-native';
+
+import { isIos } from '~/config/variables';
 
 export function useAnimationValue(fast?: boolean) {
   const [progressTime, setProgressTime] = useState(0);
-  const animationValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const timeouts = [] as NodeJS.Timeout[];
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+    const animationValue = new Animated.Value(0);
+    const useNativeDriver = isIos;
 
     if (fast) {
       Animated.timing(animationValue, {
         toValue: 0.99,
         duration: 2000,
-        useNativeDriver: true,
+        useNativeDriver,
       }).start();
     } else {
       setTimeout(() => {
         Animated.timing(animationValue, {
           toValue: 0.15,
           duration: 1000,
-          useNativeDriver: true,
+          useNativeDriver,
         }).start();
       }, 1000);
 
@@ -28,7 +31,7 @@ export function useAnimationValue(fast?: boolean) {
         Animated.timing(animationValue, {
           toValue: 0.36,
           duration: 2500,
-          useNativeDriver: true,
+          useNativeDriver,
         }).start();
       }, 5000);
 
@@ -36,7 +39,7 @@ export function useAnimationValue(fast?: boolean) {
         Animated.timing(animationValue, {
           toValue: 0.62,
           duration: 2000,
-          useNativeDriver: true,
+          useNativeDriver,
         }).start();
       }, 12000);
 
@@ -44,7 +47,7 @@ export function useAnimationValue(fast?: boolean) {
         Animated.timing(animationValue, {
           toValue: 0.87,
           duration: 1000,
-          useNativeDriver: true,
+          useNativeDriver,
         }).start();
       }, 19000);
 
@@ -52,7 +55,7 @@ export function useAnimationValue(fast?: boolean) {
         Animated.timing(animationValue, {
           toValue: 0.99,
           duration: 1000,
-          useNativeDriver: true,
+          useNativeDriver,
         }).start();
       }, 25000);
     }
@@ -65,7 +68,7 @@ export function useAnimationValue(fast?: boolean) {
       timeouts.forEach((timeout) => clearTimeout(timeout));
       animationValue.removeAllListeners();
     };
-  }, [animationValue, fast]);
+  }, [fast]);
 
   return progressTime;
 }

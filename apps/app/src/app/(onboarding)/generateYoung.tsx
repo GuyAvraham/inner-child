@@ -81,7 +81,7 @@ export default function GenerateYoungScreen() {
             <TouchableOpacity
               className="absolute -bottom-4 -right-4 rounded-full bg-white/20 p-[6]"
               onPress={replacePhotos}
-              disabled={isReplacing}
+              disabled={isReplacing || isYoungPhotoUploading}
             >
               <ReplacePhotoSVG />
             </TouchableOpacity>
@@ -96,7 +96,7 @@ export default function GenerateYoungScreen() {
       </ScrollView>
 
       <View className="mb-4 mt-10 items-center justify-center px-4">
-        <Button onPress={submitPhoto} wide blue disabled={!canSubmitYoungPhoto}>
+        <Button onPress={submitPhoto} wide blue disabled={!canSubmitYoungPhoto || isYoungPhotoUploading}>
           <Button.Text className="text-center text-lg">{isYoungPhotoUploading ? 'Saving...' : 'Continue'}</Button.Text>
           <View className="w-2"></View>
           <NextSVG />
