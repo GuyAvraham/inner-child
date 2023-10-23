@@ -34,7 +34,7 @@ export default function GenerateYoungScreen() {
   const { updateUserData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  const { youngPhotos: generatedPhotos } = useGenerationPhotos();
+  const { youngPhotos: generatedPhotos, presetCount } = useGenerationPhotos();
 
   const replacePhotos = useCallback(async () => {
     setIsReplacing(true);
@@ -90,7 +90,12 @@ export default function GenerateYoungScreen() {
 
           <View className="w-full">
             <Text className="self-start">AI generated child photos: </Text>
-            <PhotoSelect photos={generatedPhotos} onPhotoSelect={handleYoungPhoto} chooseFromGallery />
+            <PhotoSelect
+              presetCount={presetCount}
+              photos={generatedPhotos}
+              onPhotoSelect={handleYoungPhoto}
+              chooseFromGallery
+            />
           </View>
         </View>
       </ScrollView>

@@ -105,6 +105,6 @@ export const useGenerateAgedPhotos = () => {
       photos = [...dataFromGame.photos, ...youngPhotos];
     }
 
-    return { youngPhotos: photos, oldPhotos };
+    return { youngPhotos: photos, oldPhotos, presetCount: dataFromGame?.photos?.length ?? 0 };
   }, [youngPhotos, oldPhotos, dataFromGame]);
 };

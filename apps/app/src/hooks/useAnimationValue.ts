@@ -3,7 +3,7 @@ import { Animated, LayoutAnimation } from 'react-native';
 
 import { isIos } from '~/config/variables';
 
-export function useAnimationValue(fast?: boolean) {
+export function useAnimationValue(fast?: boolean, duration?: number) {
   const [progressTime, setProgressTime] = useState(0);
 
   useEffect(() => {
@@ -12,10 +12,10 @@ export function useAnimationValue(fast?: boolean) {
     const animationValue = new Animated.Value(0);
     const useNativeDriver = isIos;
 
-    if (fast) {
+    if (!!duration || fast) {
       Animated.timing(animationValue, {
         toValue: 0.99,
-        duration: 2000,
+        duration: duration ? duration * 1000 : 2000,
         useNativeDriver,
       }).start();
     } else {
@@ -68,7 +68,7 @@ export function useAnimationValue(fast?: boolean) {
       timeouts.forEach((timeout) => clearTimeout(timeout));
       animationValue.removeAllListeners();
     };
-  }, [fast]);
+  }, [fast, duration]);
 
   return progressTime;
 }
