@@ -42,7 +42,7 @@ export default function CurrentScreen() {
   if (!photo) {
     return (
       <View className="mx-4 my-auto rounded-2xl border border-white/20 bg-white/10 p-4">
-        <SelectedPhoto source={photo} wrapped className="rounded-full" />
+        <SelectedPhoto wrapped className="rounded-full" />
         <Text className="mt-4 font-[Poppins-Bold] text-2xl">
           You can now upload your present face photo, and we will generate your {'\n'}inner-child and your {'\n'}
           future-self photos

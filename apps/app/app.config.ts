@@ -1,14 +1,14 @@
 import type { ExpoConfig } from '@expo/config';
 
 const owner = 'inner-child';
-const projectId = 'b0cd7774-1f25-4469-a2ed-21ae8e40206f';
-const bundleId = 'com.tamagochi.inner.child.app';
+const projectId = '681adfac-b237-4a20-b8a2-1abe99128a38';
+const bundleId = 'com.guyavraham.innerchild';
 
 const buildNumber = 1;
 
 const defineConfig = (): ExpoConfig => ({
   name: 'Inner Child',
-  slug: 'innch',
+  slug: 'inner-child',
   scheme: 'tamagochi-inner-child',
   version: '1.0.0',
   owner,
