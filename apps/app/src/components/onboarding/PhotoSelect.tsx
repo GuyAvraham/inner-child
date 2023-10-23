@@ -62,7 +62,7 @@ export function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery, presetCo
             {photo ? (
               <SelectedPhoto source={photo} className="h-full w-full rounded-full" />
             ) : (
-              <View className="relative -top-0.5" style={{ transform: [{ scale: 0.8 }] }}>
+              <View className="relative -top-1" style={{ transform: [{ scale: 0.8 }] }}>
                 <AnimatedProgress duration={duration[index - presetCount] ?? undefined} />
               </View>
             )}

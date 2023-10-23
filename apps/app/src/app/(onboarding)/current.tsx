@@ -67,7 +67,7 @@ export default function CurrentScreen() {
         <View className="h-4"></View>
         <TakePhotoButton title="Take another photo" onTake={(photo) => handlePhoto(photo.uri)} />
         <View className="h-4"></View>
-        <Button blue onPress={submitPhoto} disabled={!canSubmit} wide>
+        <Button blue onPress={submitPhoto} disabled={!canSubmit || isUploading} wide>
           <Button.Text className="text-center text-lg">
             {isUploading ? 'Uploading...' : 'Ok, Upload this photo'}
           </Button.Text>

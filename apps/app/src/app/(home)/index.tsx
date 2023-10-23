@@ -184,9 +184,9 @@ export default function HomeScreen() {
           <Message key={id} text={text} isUserMessage={sender === Role.User} withAnimation={id === 'typing'} />
         )}
         ListEmptyComponent={
-          <View className="mt-20 items-center">
+          <View className={clsx('items-center', !keyboardVisible && 'mt-20', keyboardVisible && 'mt-2')}>
             {isWaitingInitialMessage ? (
-              <AnimatedProgress fast />
+              <AnimatedProgress />
             ) : (
               <Text className="font-[Poppins-Bold] text-base text-white/40">
                 {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
