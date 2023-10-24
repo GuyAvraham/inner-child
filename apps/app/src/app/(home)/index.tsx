@@ -186,7 +186,7 @@ export default function HomeScreen() {
         ListEmptyComponent={
           <View className={clsx('items-center', !keyboardVisible && 'mt-20', keyboardVisible && 'mt-2')}>
             {isWaitingInitialMessage ? (
-              <AnimatedProgress />
+              <AnimatedProgress fast />
             ) : (
               <Text className="font-[Poppins-Bold] text-base text-white/40">
                 {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
