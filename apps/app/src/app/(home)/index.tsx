@@ -9,6 +9,7 @@ import { Message } from '~/components/ui/Message';
 import Text from '~/components/ui/Text';
 import { isIos } from '~/config/variables';
 import { useKeyboardVisible } from '~/hooks/useKeyboardVisible';
+import useUserData from '~/hooks/useUserData';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import { CloseSVG } from '~/svg/close';
 import { OptionsSVG } from '~/svg/options';
@@ -18,6 +19,7 @@ import { Age, ConversationStatus, Role } from '~/types';
 
 export default function HomeScreen() {
   const flatListRef = useRef<FlatList>(null);
+  const { user } = useUserData();
   const utils = api.useContext();
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Young);
@@ -25,6 +27,7 @@ export default function HomeScreen() {
   const [initialMessage, setInitialMessage] = useState<string | null>(null);
   const [lastGPTResponse, setLastGPTResponse] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
+  const { mutateAsync: deleteVideo } = api.video.deleteByAge.useMutation();
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
   });
@@ -74,7 +77,11 @@ export default function HomeScreen() {
       setInitialMessage(null);
       if (!areMessagesLoading && messages?.length === 0 && prompts) {
         setIsWaitingInitialMessage(true);
-        const responseMessage = await sendMessageToOpenAI([{ role: Role.System, content: prompts[conversationAge] }]);
+        const splitter = '<user_name>';
+        const userName = user?.firstName ?? '';
+        const responseMessage = await sendMessageToOpenAI([
+          { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
+        ]);
         console.log(responseMessage);
         if (responseMessage) {
           setInitialMessage(responseMessage);
@@ -93,10 +100,12 @@ export default function HomeScreen() {
       return;
     }
 
+    await deleteVideo({ age: conversationAge });
     await clearConversation({ id: messages[0].conversationId });
     await utils.conversation.invalidate();
+    await utils.video.invalidate();
     setIsOpenedOptions(false);
-  }, [clearConversation, messages, utils.conversation]);
+  }, [clearConversation, messages, utils.conversation, conversationAge]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isSendDisabled =
     conversationStatus === ConversationStatus.Waiting || isGettingText || message.trim().length === 0;

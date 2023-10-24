@@ -11,3 +11,6 @@ export const useVideoPredictionIdAtom = () => useAtom(videoPredictionIdAtom);
 
 const videoUriAtom = atom<string | null>(null);
 export const useVideoUriAtom = () => useAtom(videoUriAtom);
+
+const videoLoadingAtom = atom<boolean>(false);
+export const useVideoLoadingAtom = () => useAtom(videoLoadingAtom);

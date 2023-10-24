@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 
 import { api } from '~/utils/api';
-import { useVideoPredictionIdAtom, useVideoUriAtom } from '~/atoms';
+import { useVideoLoadingAtom, useVideoPredictionIdAtom, useVideoUriAtom } from '~/atoms';
 import type { Age } from '~/types';
 import useUserData from './useUserData';
 
@@ -10,6 +10,7 @@ export const useVideoResponse = (age: Age) => {
   const utils = api.useContext();
   const [videoPredictionId, setVideoPredictionId] = useVideoPredictionIdAtom();
   const [videoURI, setVideoURI] = useVideoUriAtom();
+  const [isLoading, setIsLoading] = useVideoLoadingAtom();
   const { mutateAsync: getVideo, isLoading: isPredictionLoading } = api.conversation.video.useMutation();
   const { data: videoURIData, isLoading: isVideoLoading } = api.conversation.waitForVideo.useQuery(
     { predictionId: videoPredictionId! },
@@ -18,27 +19,31 @@ export const useVideoResponse = (age: Age) => {
 
   useEffect(() => {
     setVideoURI(videoURIData ?? null);
-  }, [videoURIData, setVideoURI]);
+    if (videoURIData) setIsLoading(false);
+  }, [videoURIData, setVideoURI, setIsLoading]);
 
   const triggerVideoGeneration = useCallback(
     async (text: string) => {
       setVideoPredictionId(null);
+      setIsLoading(true);
       const gender = data.gender as 'male' | 'female';
       const predictionId = await getVideo({ age, text, gender });
       setVideoPredictionId(predictionId);
     },
-    [age, getVideo, setVideoPredictionId, data?.gender],
+    [age, getVideo, setVideoPredictionId, setIsLoading, data?.gender],
   );
 
   const clearVideo = useCallback(async () => {
     setVideoPredictionId(null);
     setVideoURI(null);
+    setIsLoading(false);
     await utils.conversation.waitForVideo.invalidate();
-  }, [utils.conversation.waitForVideo, setVideoPredictionId, setVideoURI]);
+  }, [utils.conversation.waitForVideo, setVideoPredictionId, setVideoURI, setIsLoading]);
 
   return {
     video: videoURI,
-    isLoading: isPredictionLoading || (!!videoPredictionId && isVideoLoading),
+    isLoading:
+      isLoading || isPredictionLoading || (!!videoPredictionId && isVideoLoading) || (!!videoPredictionId && !videoURI),
     triggerVideoGeneration,
     clearVideo,
   };
