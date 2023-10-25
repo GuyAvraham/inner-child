@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { raise } from '@innch/utils';
@@ -86,12 +87,24 @@ export const conversationRoute = createTRPCRouter({
           }),
         };
 
-        const talk = (await (await fetch('https://api.d-id.com/talks', options)).json()) as { id: string };
+        const talk = (await (await fetch('https://api.d-id.com/talks', options)).json()) as {
+          id?: string;
+          kind: string;
+          description: string;
+        };
+
+        if (!talk.id) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: `${talk.kind}: ${talk.description}`,
+          });
+        }
 
         return talk.id;
       } catch (error) {
-        console.error(error);
-        return null;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        throw new TRPCError(error);
       }
     }),
   waitForVideo: protectedProcedure

@@ -11,7 +11,12 @@ export const useVideoResponse = (age: Age) => {
   const [videoPredictionId, setVideoPredictionId] = useVideoPredictionIdAtom();
   const [videoURI, setVideoURI] = useVideoUriAtom();
   const [isLoading, setIsLoading] = useVideoLoadingAtom();
-  const { mutateAsync: getVideo, isLoading: isPredictionLoading } = api.conversation.video.useMutation();
+  const { mutateAsync: getVideo, isLoading: isPredictionLoading } = api.conversation.video.useMutation({
+    onError(error) {
+      setIsLoading(false);
+      alert(`Video Generation Error: ${error.message}`);
+    },
+  });
   const { data: videoURIData, isLoading: isVideoLoading } = api.conversation.waitForVideo.useQuery(
     { predictionId: videoPredictionId! },
     { enabled: !!videoPredictionId && !videoURI, refetchInterval: 2000 },
@@ -27,8 +32,8 @@ export const useVideoResponse = (age: Age) => {
       setVideoPredictionId(null);
       setIsLoading(true);
       const gender = data.gender as 'male' | 'female';
-      const predictionId = await getVideo({ age, text, gender });
-      setVideoPredictionId(predictionId);
+      const predictionId = await getVideo({ age, text, gender }).catch(console.error);
+      setVideoPredictionId(predictionId ?? null);
     },
     [age, getVideo, setVideoPredictionId, setIsLoading, data?.gender],
   );

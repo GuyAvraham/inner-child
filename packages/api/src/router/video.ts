@@ -38,7 +38,8 @@ export const videoRoute = createTRPCRouter({
 
       if (!video) return null;
 
-      await ctx.s3.deleteFiles([video.key]);
+      const s3Key = `${ctx.session.userId}/${video.key}`;
+      await ctx.s3.deleteFiles([s3Key]);
 
       return ctx.db.video.delete({ where: { id: video.id } });
     }),

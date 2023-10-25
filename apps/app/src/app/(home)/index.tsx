@@ -53,12 +53,13 @@ export default function HomeScreen() {
     if (!(message && message.trim().length > 0) || !messages || !prompts) return;
 
     setConversationStatus(ConversationStatus.Waiting);
-
+    const splitter = '<user_name>';
+    const userName = user?.firstName ?? '';
     const messagesForSending = messages.map((message) => ({
       role: message.sender as Role,
       content: message.text,
     }));
-    messagesForSending.unshift({ role: Role.System, content: prompts[conversationAge] });
+    messagesForSending.unshift({ role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) });
     messagesForSending.push({ role: Role.User, content: message.trim() });
     const responseMessage = await sendMessageToOpenAI(messagesForSending);
     await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
@@ -70,7 +71,7 @@ export default function HomeScreen() {
     await utils.conversation.get.invalidate();
     setMessage('');
     setConversationStatus(ConversationStatus.Idle);
-  }, [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts]);
+  }, [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     void (async () => {

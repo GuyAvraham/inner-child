@@ -155,7 +155,8 @@ export const photoRoute = createTRPCRouter({
       where: { userId: ctx.session.userId },
     });
 
-    await ctx.s3.deleteFiles(photos.map((photo) => photo.key));
+    const s3Keys = photos.map((photo) => `${ctx.session.userId}/${photo.key}`);
+    await ctx.s3.deleteFiles(s3Keys);
 
     return ctx.db.photo.deleteMany({
       where: { id: { in: photos.map((photo) => photo.id) } },

@@ -62,7 +62,13 @@ export const useGenerateAgedPhotos = () => {
           results.push(result);
         }
 
-        setYoungPhotos(results);
+        setYoungPhotos((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(results)) {
+            return prev;
+          }
+
+          return results;
+        });
       })();
     }, refetchInterval);
 
@@ -89,7 +95,13 @@ export const useGenerateAgedPhotos = () => {
           results.push(result);
         }
 
-        setOldPhotos(results);
+        setOldPhotos((prev) => {
+          if (JSON.stringify(prev) === JSON.stringify(results)) {
+            return prev;
+          }
+
+          return results;
+        });
       })();
     }, refetchInterval);
 
