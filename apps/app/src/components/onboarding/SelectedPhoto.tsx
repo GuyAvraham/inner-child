@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { View } from 'react-native';
 import type { ImageProps } from 'expo-image';
 import { Image } from 'expo-image';
@@ -11,7 +12,7 @@ interface SelectedPhotoProps extends ImageProps {
   wrapped?: boolean;
 }
 
-export default function SelectedPhoto({ source, className, wrapped, ...props }: SelectedPhotoProps) {
+export const SelectedPhoto = memo(function SelectedPhoto({ source, className, wrapped, ...props }: SelectedPhotoProps) {
   let content = <AnimatedProgress fast />;
   if (source) {
     content = <Image className={`h-28 w-28 self-center ${className}`} source={source} {...props} />;
@@ -28,4 +29,4 @@ export default function SelectedPhoto({ source, className, wrapped, ...props }: 
   }
 
   return content;
-}
+});

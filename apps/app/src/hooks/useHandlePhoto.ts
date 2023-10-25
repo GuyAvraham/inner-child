@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { atom } from 'jotai';
 import { useAtom } from 'jotai';
 
@@ -58,13 +58,16 @@ const useHandlePhoto = (age: Age | 'current', photoAtom: ReturnType<typeof atom<
     setIsUploading(false);
   }, [age, blob, key, saveMetadata, url, utils.photo]);
 
-  return {
-    photo,
-    handlePhoto,
-    upload,
-    canSubmit: Boolean(url && blob),
-    isUploading,
-  };
+  return useMemo(
+    () => ({
+      photo,
+      handlePhoto,
+      upload,
+      canSubmit: Boolean(url && blob),
+      isUploading,
+    }),
+    [photo, handlePhoto, upload, url, blob, isUploading],
+  );
 };
 
 export default useHandlePhoto;

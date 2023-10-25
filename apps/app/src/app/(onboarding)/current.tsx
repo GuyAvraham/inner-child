@@ -4,7 +4,7 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 
 import { api } from '~/utils/api';
-import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
+import { SelectedPhoto } from '~/components/onboarding/SelectedPhoto';
 import SelectPhotoButton from '~/components/onboarding/SelectPhotoButton';
 import TakePhotoButton from '~/components/onboarding/TakePhotoButton';
 import Button from '~/components/ui/Button';

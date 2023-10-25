@@ -6,7 +6,7 @@ import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import { useGenerationPhotos } from '~/components/onboarding/GenerationPhotosContext';
 import { PhotoSelect } from '~/components/onboarding/PhotoSelect';
-import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
+import { SelectedPhoto } from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { useCurrentPhotoAtom, youngPhotoAtom } from '~/atoms';
@@ -34,7 +34,7 @@ export default function GenerateYoungScreen() {
   const { updateUserData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  const { youngPhotos: generatedPhotos, presetCount } = useGenerationPhotos();
+  const { youngPhotos: generatedPhotos } = useGenerationPhotos();
 
   const replacePhotos = useCallback(async () => {
     setIsReplacing(true);
@@ -90,12 +90,7 @@ export default function GenerateYoungScreen() {
 
           <View className="w-full">
             <Text className="self-start">AI generated child photos: </Text>
-            <PhotoSelect
-              presetCount={presetCount}
-              photos={generatedPhotos}
-              onPhotoSelect={handleYoungPhoto}
-              chooseFromGallery
-            />
+            <PhotoSelect photos={generatedPhotos} onPhotoSelect={handleYoungPhoto} chooseFromGallery />
           </View>
         </View>
       </ScrollView>

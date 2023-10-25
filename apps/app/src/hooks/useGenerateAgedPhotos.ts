@@ -42,7 +42,7 @@ export const useGenerateAgedPhotos = () => {
     if (currentPhoto) {
       void generate();
     }
-  }, [currentPhoto, generate]);
+  }, [currentPhoto]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (youngPhotos.length && youngPhotos.every((item) => typeof item === 'string')) {
@@ -110,13 +110,15 @@ export const useGenerateAgedPhotos = () => {
     };
   }, [oldPredictionIds, oldPhotos, waitPhoto]);
 
-  return useMemo(() => {
+  const photos = useMemo(() => {
     let photos = youngPhotos.slice();
 
     if (dataFromGame?.photos) {
-      photos = [...dataFromGame.photos, ...youngPhotos];
+      photos = [...youngPhotos, ...dataFromGame.photos];
     }
 
-    return { youngPhotos: photos, oldPhotos, presetCount: dataFromGame?.photos?.length ?? 0 };
+    return { youngPhotos: photos, oldPhotos };
   }, [youngPhotos, oldPhotos, dataFromGame]);
+
+  return photos;
 };

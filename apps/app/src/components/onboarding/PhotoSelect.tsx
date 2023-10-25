@@ -1,17 +1,16 @@
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import clsx from 'clsx';
 
 import { SelectedSVG } from '~/svg/selected';
 import { AnimatedProgress } from '../AnimatedProgress';
 import { ChoosePhoto } from './ChoosePhoto';
-import SelectedPhoto from './SelectedPhoto';
+import { SelectedPhoto } from './SelectedPhoto';
 
 interface PhotoSelectProps {
   photos: (string | null)[];
   onPhotoSelect: (photo: string) => void;
   chooseFromGallery?: boolean;
-  presetCount?: number;
 }
 
 const duration: Record<number, number> = {
@@ -21,19 +20,11 @@ const duration: Record<number, number> = {
   3: 70,
 };
 
-// index - seconds to generate
-//  LOG  0 4.053 // from guess the name
-//  LOG  1 4.056 // from guess the name
-//  LOG  2 349.337
-//  LOG  3 199.45
-//  LOG  4 96.899
-//  LOG  5 160.678
-
-export function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery, presetCount = 0 }: PhotoSelectProps) {
+export const PhotoSelect = memo(function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }: PhotoSelectProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   const handlePhotoPress = useCallback(
-    (photo: string | null) => {
+    (photo: string | null) => () => {
       if (photo) {
         onPhotoSelect(photo);
         setSelectedPhoto(photo);
@@ -49,7 +40,7 @@ export function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery, presetCo
           key={`${photo}_${index}`}
           className="relative w-1/3 p-3"
           style={{ aspectRatio: '1 / 1' }}
-          onPress={() => handlePhotoPress(photo)}
+          onPress={handlePhotoPress(photo)}
           disabled={selectedPhoto === photo || !photo}
         >
           <View
@@ -63,7 +54,7 @@ export function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery, presetCo
               <SelectedPhoto source={photo} className="h-full w-full rounded-full" />
             ) : (
               <View className="relative -top-1" style={{ transform: [{ scale: 0.8 }] }}>
-                <AnimatedProgress duration={duration[index - presetCount] ?? undefined} />
+                <AnimatedProgress duration={duration[index] ?? undefined} />
               </View>
             )}
           </View>
@@ -77,4 +68,4 @@ export function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery, presetCo
       {chooseFromGallery && <ChoosePhoto onSelect={handlePhotoPress} photo={selectedPhoto} />}
     </View>
   );
-}
+});

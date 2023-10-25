@@ -6,7 +6,7 @@ import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import { useGenerationPhotos } from '~/components/onboarding/GenerationPhotosContext';
 import { PhotoSelect } from '~/components/onboarding/PhotoSelect';
-import SelectedPhoto from '~/components/onboarding/SelectedPhoto';
+import { SelectedPhoto } from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { oldPhotoAtom, useCurrentPhotoAtom } from '~/atoms';

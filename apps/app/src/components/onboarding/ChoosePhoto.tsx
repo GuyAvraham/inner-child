@@ -9,7 +9,7 @@ import { CloseSVG } from '~/svg/close';
 import { SelectedSVG } from '~/svg/selected';
 import { UploadPhotoSVG } from '~/svg/uploadPhoto';
 import Text from '../ui/Text';
-import SelectedPhoto from './SelectedPhoto';
+import { SelectedPhoto } from './SelectedPhoto';
 
 interface ChoosePhotoProps {
   onSelect: (photo: string | null) => void;
