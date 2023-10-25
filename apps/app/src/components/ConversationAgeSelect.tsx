@@ -21,7 +21,7 @@ interface ConversationAgeSelectProps {
   disabled?: boolean;
 }
 
-function useAngle(isLoading: boolean) {
+function Animation({ isLoading }: { isLoading: boolean }) {
   const [angle, setAngle] = useState<number>(0);
 
   useEffect(() => {
@@ -29,12 +29,20 @@ function useAngle(isLoading: boolean) {
 
     const interval = setInterval(() => {
       setAngle((angle) => angle + 2);
-    }, 50);
+    }, 33);
 
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  return { angle };
+  return (
+    <View
+      className="absolute left-2 top-2 h-full w-full rounded-full border-2 border-transparent border-t-[#4285F4]"
+      style={{
+        transform: [{ rotate: `${angle}deg` }],
+        borderTopColor: !isLoading ? 'transparent' : '#4285F4',
+      }}
+    />
+  );
 }
 
 export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAgeSelectProps) {
@@ -52,7 +60,6 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
   const { mutateAsync: saveVideo } = api.video.create.useMutation();
   const { mutateAsync: deleteVideo } = api.video.deleteByAge.useMutation();
   const { video, clearVideo, isLoading: isVideoLoading } = useVideoResponse(age);
-  const { angle } = useAngle(isVideoLoading);
   const [young, setYoung] = useState<string>('');
   const [old, setOld] = useState<string>('');
 
@@ -122,13 +129,7 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
   return (
     <View className="relative flex-row justify-center ">
       <View className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-2">
-        <View
-          className="absolute left-2 top-2 h-full w-full rounded-full border-2 border-transparent border-t-[#4285F4]"
-          style={{
-            transform: [{ rotate: `${angle}deg` }],
-            borderTopColor: !isVideoLoading ? 'transparent' : '#4285F4',
-          }}
-        />
+        <Animation isLoading={isVideoLoading} />
         {videoUri && (
           <TouchableOpacity
             className="absolute bottom-0 right-0 z-10 rounded-full bg-[#4285F4]/80 p-2"
