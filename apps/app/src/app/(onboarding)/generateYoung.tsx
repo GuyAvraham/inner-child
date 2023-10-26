@@ -4,13 +4,13 @@ import { useRouter } from 'expo-router';
 
 import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
-import { useGenerationPhotos } from '~/components/onboarding/GenerationPhotosContext';
 import { PhotoSelect } from '~/components/onboarding/PhotoSelect';
 import { SelectedPhoto } from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { useCurrentPhotoAtom, youngPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
+import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import useUserData from '~/hooks/useUserData';
@@ -31,10 +31,13 @@ export default function GenerateYoungScreen() {
     upload: uploadYoungPhoto,
   } = useHandlePhoto(Age.Young, youngPhotoAtom);
 
-  const { updateUserData } = useUserData();
+  const { updateUserData, user: userData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  const { youngPhotos: generatedPhotos } = useGenerationPhotos();
+  const generatedPhotos = useGenerateAgedPhotos(Age.Young);
+  const { data: dataFromGame } = api.photo.getPhotosFromGame.useQuery({
+    email: userData?.emailAddresses[0]?.emailAddress ?? '',
+  });
 
   const replacePhotos = useCallback(async () => {
     setIsReplacing(true);
@@ -70,6 +73,14 @@ export default function GenerateYoungScreen() {
     [generatedPhotos],
   );
 
+  const photos = useMemo(() => {
+    if (dataFromGame?.photos) {
+      return [...generatedPhotos, ...dataFromGame.photos];
+    }
+
+    return generatedPhotos;
+  }, [dataFromGame, generatedPhotos]);
+
   return (
     <>
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ flexGrow: 1 }}>
@@ -90,7 +101,7 @@ export default function GenerateYoungScreen() {
 
           <View className="w-full">
             <Text className="self-start">AI generated child photos: </Text>
-            <PhotoSelect photos={generatedPhotos} onPhotoSelect={handleYoungPhoto} chooseFromGallery />
+            <PhotoSelect photos={photos} onPhotoSelect={handleYoungPhoto} chooseFromGallery />
           </View>
         </View>
       </ScrollView>

@@ -4,13 +4,13 @@ import { useRouter } from 'expo-router';
 
 import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
-import { useGenerationPhotos } from '~/components/onboarding/GenerationPhotosContext';
 import { PhotoSelect } from '~/components/onboarding/PhotoSelect';
 import { SelectedPhoto } from '~/components/onboarding/SelectedPhoto';
 import Button from '~/components/ui/Button';
 import Text from '~/components/ui/Text';
 import { oldPhotoAtom, useCurrentPhotoAtom } from '~/atoms';
 import { ROUTES } from '~/config/routes';
+import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import useUserData from '~/hooks/useUserData';
@@ -34,7 +34,7 @@ export default function GenerateOldScreen() {
   const { updateUserData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  const { oldPhotos: generatedPhotos } = useGenerationPhotos();
+  const generatedPhotos = useGenerateAgedPhotos(Age.Old);
 
   const replacePhotos = useCallback(async () => {
     setIsReplacing(true);

@@ -15,7 +15,7 @@ export function useAnimationValue(fast?: boolean, duration?: number) {
     if (!!duration || fast) {
       Animated.timing(animationValue, {
         toValue: 0.99,
-        duration: duration ? duration * 1000 : 2000,
+        duration: duration ? duration * 1000 : 3000,
         useNativeDriver,
       }).start();
     } else {

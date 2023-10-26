@@ -24,7 +24,7 @@ export const PhotoSelect = memo(function PhotoSelect({ photos, onPhotoSelect, ch
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   const handlePhotoPress = useCallback(
-    (photo: string | null) => () => {
+    (photo: string | null) => {
       if (photo) {
         onPhotoSelect(photo);
         setSelectedPhoto(photo);
@@ -40,7 +40,7 @@ export const PhotoSelect = memo(function PhotoSelect({ photos, onPhotoSelect, ch
           key={`${photo}_${index}`}
           className="relative w-1/3 p-3"
           style={{ aspectRatio: '1 / 1' }}
-          onPress={handlePhotoPress(photo)}
+          onPress={() => handlePhotoPress(photo)}
           disabled={selectedPhoto === photo || !photo}
         >
           <View
