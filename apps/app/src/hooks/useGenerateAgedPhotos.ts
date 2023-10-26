@@ -11,7 +11,7 @@ export const useGenerateAgedPhotos = (age: Age) => {
   const gender = data.gender as 'male' | 'female';
 
   const [predictionIds, setPredictionIds] = useState<string[]>([]);
-  const [photos, setPhotos] = useState<(string | null)[]>([]);
+  const [photos, setPhotos] = useState<(string | null)[]>([null, null, null, null]);
 
   const { data: currentPhoto } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: generateAged } = api.photo.generateAged.useMutation();
@@ -41,20 +41,24 @@ export const useGenerateAgedPhotos = (age: Age) => {
         const results = [] as (string | null)[];
         for await (const predictionId of predictionIds) {
           const result = await waitPhoto({ predictionId });
+          // Checking that result is a number, if so, it means that the prediction is FAILED
           if (typeof result === 'number') {
+            // remove the failed prediction from the list
             setPredictionIds((prev) => prev.filter((item) => item !== predictionId));
             continue;
           }
           results.push(result);
         }
 
-        setPhotos((prev) => {
-          if (JSON.stringify(prev) === JSON.stringify(results)) {
-            return prev;
-          }
+        if (predictionIds.length) {
+          setPhotos((prev) => {
+            if (JSON.stringify(prev) === JSON.stringify(results)) {
+              return prev;
+            }
 
-          return results;
-        });
+            return results;
+          });
+        }
       })();
     }, refetchInterval);
 
