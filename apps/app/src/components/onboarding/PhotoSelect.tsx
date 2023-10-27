@@ -13,11 +13,13 @@ interface PhotoSelectProps {
   chooseFromGallery?: boolean;
 }
 
+const loadingPredictionsIdTime = 20;
+
 const duration: Record<number, number> = {
-  0: 60,
-  1: 90,
-  2: 45,
-  3: 70,
+  0: 60 + loadingPredictionsIdTime,
+  1: 90 + loadingPredictionsIdTime,
+  2: 45 + loadingPredictionsIdTime,
+  3: 70 + loadingPredictionsIdTime,
 };
 
 export const PhotoSelect = memo(function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }: PhotoSelectProps) {
