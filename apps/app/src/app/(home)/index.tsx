@@ -108,8 +108,8 @@ export default function HomeScreen() {
     setIsOpenedOptions(false);
   }, [clearConversation, messages, utils.conversation, conversationAge]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isSendDisabled =
-    conversationStatus === ConversationStatus.Waiting || isGettingText || message.trim().length === 0;
+  const isStatusIdle = conversationStatus === ConversationStatus.Idle;
+  const isSendDisabled = !isStatusIdle || isGettingText || message.trim().length === 0;
   const visibleMessages = useMemo(() => {
     const list = messages?.slice() ?? [];
 
@@ -178,7 +178,7 @@ export default function HomeScreen() {
         <ConversationAgeSelect
           age={conversationAge}
           setAge={setConversationAge}
-          disabled={conversationStatus === ConversationStatus.Waiting || isGettingText}
+          disabled={!isStatusIdle || isGettingText}
         />
       </View>
       <FlatList
@@ -212,11 +212,11 @@ export default function HomeScreen() {
         )}
       >
         <TextInput
-          editable={conversationStatus === ConversationStatus.Idle}
-          focusable={conversationStatus === ConversationStatus.Idle}
+          editable={isStatusIdle}
+          focusable={isStatusIdle}
           className="flex-1 p-4 text-white"
-          value={message}
-          onChangeText={setMessage}
+          value={!isStatusIdle ? '' : message}
+          onChangeText={!isStatusIdle ? undefined : setMessage}
           multiline
         />
         <TouchableOpacity
