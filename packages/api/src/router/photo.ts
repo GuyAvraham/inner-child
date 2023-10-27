@@ -154,12 +154,20 @@ export const photoRoute = createTRPCRouter({
     const photos = await ctx.db.photo.findMany({
       where: { userId: ctx.session.userId },
     });
+    const videos = await ctx.db.video.findMany({
+      where: { userId: ctx.session.userId },
+    });
 
-    const s3Keys = photos.map((photo) => `${ctx.session.userId}/${photo.key}`);
+    const s3Keys = [...photos, ...videos].map((item) => `${ctx.session.userId}/${item.key}`);
     await ctx.s3.deleteFiles(s3Keys);
 
-    return ctx.db.photo.deleteMany({
-      where: { id: { in: photos.map((photo) => photo.id) } },
-    });
+    return Promise.allSettled([
+      ctx.db.photo.deleteMany({
+        where: { id: { in: photos.map((photo) => photo.id) } },
+      }),
+      ctx.db.video.deleteMany({
+        where: { id: { in: videos.map((video) => video.id) } },
+      }),
+    ]);
   }),
 });
