@@ -20,6 +20,8 @@ import { Age, ConversationStatus, Role } from '~/types';
 export default function HomeScreen() {
   const flatListRef = useRef<FlatList>(null);
   const { user } = useUserData();
+  const userName = user?.firstName ?? '';
+  const splitter = '<user_name>';
   const utils = api.useContext();
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Young);
@@ -53,8 +55,6 @@ export default function HomeScreen() {
     if (!(message && message.trim().length > 0) || !messages || !prompts) return;
 
     setConversationStatus(ConversationStatus.Waiting);
-    const splitter = '<user_name>';
-    const userName = user?.firstName ?? '';
     const messagesForSending = messages.map((message) => ({
       role: message.sender as Role,
       content: message.text,
@@ -78,8 +78,6 @@ export default function HomeScreen() {
       setInitialMessage(null);
       if (!areMessagesLoading && messages?.length === 0 && prompts) {
         setIsWaitingInitialMessage(true);
-        const splitter = '<user_name>';
-        const userName = user?.firstName ?? '';
         const responseMessage = await sendMessageToOpenAI([
           { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
         ]);
