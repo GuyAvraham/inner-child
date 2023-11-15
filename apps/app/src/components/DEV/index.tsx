@@ -62,7 +62,7 @@ function DEV_MENU() {
   }, [deleteAllPhotos, photos?.length, router, user, utils.photo, utils.upload]);
 
   return (
-    <View className={`z-50 px-4 ${isAndroid ? 'mt-4' : ''} items-end`}>
+    <View className={`z-50 px-4 ${isAndroid ? 'mt-4' : ''} items-start`}>
       <Button
         variant="small"
         onPress={() => {
