@@ -1,7 +1,7 @@
+import { useEffect } from 'react';
 import type { ReactElement } from 'react';
-import { View } from 'react-native';
+import { SplashScreen } from 'expo-router';
 
-import { AnimatedProgress } from '~/components/AnimatedProgress';
 import { Redirect } from '~/components/common/Redirect';
 import { ROUTES } from '~/config/routes';
 import useUserData from '~/hooks/useUserData';
@@ -16,13 +16,13 @@ const onboardingMap: Record<string, ReactElement> = {
 export default function Index() {
   const { data, isLoaded } = useUserData();
 
-  if (!isLoaded) {
-    return (
-      <View className="h-full items-center justify-center">
-        <AnimatedProgress fast />
-      </View>
-    );
-  }
+  useEffect(() => {
+    if (isLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [isLoaded]);
+
+  if (!isLoaded) return null;
 
   if (!data.onboarded) return <Redirect href={ROUTES.ONBOARDING.CURRENT} />;
 

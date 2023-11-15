@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
@@ -26,12 +25,6 @@ const RootLayout = () => {
     'Poppins-Bold': require('../assets/fonts/Poppins-Bold.ttf'),
     'Poppins-Bold-Italic': require('../assets/fonts/Poppins-BoldItalic.ttf'),
   });
-
-  useEffect(() => {
-    if (fontsLoaded || fontsError) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsError, fontsLoaded]);
 
   if (!fontsLoaded && !fontsError) return null;
 
