@@ -27,7 +27,7 @@ const config = {
   importOrderTypeScriptVersion: '4.4.0',
   arrowParens: 'always',
   // bracketSameLine: true,
-  // bracketSpacing: true,
+  bracketSpacing: true,
   endOfLine: 'lf',
   semi: true,
   // singleAttributePerLine: true,
