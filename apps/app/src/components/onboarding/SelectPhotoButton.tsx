@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { View } from 'react-native';
+import { Alert, Linking, View } from 'react-native';
 import type { ImagePickerAsset } from 'expo-image-picker';
 import { launchImageLibraryAsync, MediaTypeOptions, requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
 
@@ -18,8 +18,17 @@ export default function SelectPhotoButton({ onSelect, title }: SelectPhotoButton
   const selectPhoto = useCallback(async () => {
     const permissions = await requestMediaLibraryPermissionsAsync();
 
-    // TODO: show notification, try again
-    if (!permissions.granted) return;
+    if (!permissions.granted) {
+      const alertTitle = 'Permissions denied';
+      const alertMessage =
+        'You asked to open gallery, but you refused to provide the permission in the past. To solve it please open the the device settings app and look for the permissions';
+
+      Alert.alert(alertTitle, alertMessage, [
+        { text: 'Open device settings', onPress: () => void Linking.openSettings() },
+        { text: 'OK', onPress: () => console.log('OK Pressed') },
+      ]);
+      return;
+    }
 
     const result = await launchImageLibraryAsync({
       mediaTypes: MediaTypeOptions.Images,
