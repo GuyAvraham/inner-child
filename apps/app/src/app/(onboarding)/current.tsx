@@ -41,16 +41,22 @@ export default function CurrentScreen() {
 
   if (!photo) {
     return (
-      <View className="mx-4 my-auto rounded-2xl border border-white/20 bg-white/10 p-4">
-        <SelectedPhoto wrapped className="rounded-full" />
-        <Text className="mt-4 font-[Poppins-Bold] text-2xl">
-          You can now upload your present face photo, and we will generate your {'\n'}inner-child and your {'\n'}
-          future-self photos
-        </Text>
-        <Text className="mb-4 mt-2 font-[Poppins] text-sm">Just upload your saved photo or make selfie</Text>
-        <SelectPhotoButton onSelect={(photo) => handlePhoto(photo.uri)} />
-        <View className="h-4"></View>
-        <TakePhotoButton onTake={(photo) => handlePhoto(photo.uri)} />
+      <View className="flex-1 px-4 pt-8">
+        <View className="my-auto">
+          <SelectedPhoto wrapped className="rounded-full" />
+          <Text className="mt-8 text-center font-[Poppins-Bold] text-2xl">
+            You can now upload your present face photo, and we {'\n'}will generate your inner-{'\n'}child and your
+            future-self photos
+          </Text>
+          <Text className="mb-4 mt-4 text-center font-[Poppins] text-sm opacity-50">
+            Just upload your saved photo or make selfie
+          </Text>
+        </View>
+        <View className="mb-4">
+          <SelectPhotoButton onSelect={(photo) => handlePhoto(photo.uri)} />
+          <View className="h-4"></View>
+          <TakePhotoButton onTake={(photo) => handlePhoto(photo.uri)} />
+        </View>
       </View>
     );
   }
