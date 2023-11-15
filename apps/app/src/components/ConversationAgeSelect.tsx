@@ -122,6 +122,13 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
   }, [isPlayVideo, clearVideo]);
 
   const videoUri = age === Age.Young ? youngVideo?.uri : oldVideo?.uri;
+
+  useEffect(() => {
+    if (videoUri) {
+      setIsPlayVideo(true);
+    }
+  }, [videoUri]);
+
   const imageUri = age === Age.Young ? young : old;
   const secondaryImageUri = age === Age.Young ? old : young;
   const isLoading = age === Age.Young ? isYoungLoading || !young : isOldLoading || !old;

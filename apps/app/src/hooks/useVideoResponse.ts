@@ -30,12 +30,13 @@ export const useVideoResponse = (age: Age) => {
   const triggerVideoGeneration = useCallback(
     async (text: string) => {
       setVideoPredictionId(null);
+      setVideoURI(null);
       setIsLoading(true);
       const gender = data.gender as 'male' | 'female';
       const predictionId = await getVideo({ age, text, gender }).catch(console.error);
       setVideoPredictionId(predictionId ?? null);
     },
-    [age, getVideo, setVideoPredictionId, setIsLoading, data?.gender],
+    [age, getVideo, setVideoPredictionId, setIsLoading, setVideoURI, data?.gender],
   );
 
   const clearVideo = useCallback(async () => {
