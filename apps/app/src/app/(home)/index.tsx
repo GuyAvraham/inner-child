@@ -66,6 +66,7 @@ export default function HomeScreen() {
     if (responseMessage) {
       setLastGPTResponse(responseMessage);
       await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
+      void triggerVideoGeneration(responseMessage);
     }
 
     await utils.conversation.get.invalidate();
