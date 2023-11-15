@@ -74,7 +74,7 @@ export default function GenerateOldScreen() {
     <>
       <ScrollView className="flex-1 px-4" contentContainerStyle={{ flexGrow: 1 }}>
         <View className="flex-1 items-center">
-          {!generationFinished && <Text className="mb-14">It might take up to 30 seconds...</Text>}
+          {!generationFinished && <Text className="mb-14">It might take up to 2 minutes...</Text>}
 
           <View className="relative items-center justify-center rounded-full border border-white/40 bg-white/20 p-4">
             <SelectedPhoto className="rounded-full" source={currentPhoto ?? currentPhotoDB?.uri} />
