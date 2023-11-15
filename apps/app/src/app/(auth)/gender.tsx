@@ -20,11 +20,11 @@ export default function GenderScreen() {
 
   return (
     <View className="flex-1 justify-center px-4">
-      <Text className="my-auto font-[Poppins-Bold] text-4xl leading-[48px]">
+      <Text className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px]">
         Our image engine needs to understand if you are more of a {'\n'}male or female?
       </Text>
 
-      <View className="mb-8 mt-auto">
+      <View className="mb-4">
         <Button onPress={() => setUserGender('male')} wide>
           <Button.Text>Male</Button.Text>
         </Button>
