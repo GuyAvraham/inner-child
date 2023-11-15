@@ -1,7 +1,7 @@
 import { memo } from 'react';
 
 import { useAnimationValue } from '~/hooks/useAnimationValue';
-import { ProgressCircle } from './ui/ProgressCircle';
+import { ProgressCircle } from './ProgressCircle';
 
 interface AnimatedProgressProps {
   fast?: boolean;

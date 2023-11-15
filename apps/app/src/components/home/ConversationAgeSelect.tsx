@@ -13,7 +13,7 @@ import { useVideoResponse } from '~/hooks/useVideoResponse';
 import { ChangeAgeVG } from '~/svg/changeAge';
 import { PlayPauseSVG } from '~/svg/playPauseSvg';
 import { Age } from '~/types';
-import { AnimatedProgress } from './AnimatedProgress';
+import { AnimatedProgress } from '../ui/AnimatedProgress';
 
 interface ConversationAgeSelectProps {
   age: Age;

@@ -16,6 +16,8 @@ import Text from '../ui/Text';
 
 function DEV_MENU() {
   const [isOpened, setIsOpened] = useState(false);
+  const open = () => setIsOpened(true);
+  const close = () => setIsOpened(false);
   const [resetting, setResetting] = useState<'all' | 'photos' | 'conversations' | 'idle'>('idle');
 
   const { isSignedIn } = useAuth();
@@ -63,12 +65,7 @@ function DEV_MENU() {
 
   return (
     <View className={`z-50 px-4 ${isAndroid ? 'mt-4' : ''} items-start`}>
-      <Button
-        variant="small"
-        onPress={() => {
-          setIsOpened(true);
-        }}
-      >
+      <Button variant="small" onPress={open}>
         <Button.Text>DEV</Button.Text>
       </Button>
       {isOpened ? (
@@ -81,12 +78,7 @@ function DEV_MENU() {
                 <Text className="text-xl uppercase">DEV Menu</Text>
                 <Text>NODE_ENV: {process.env.NODE_ENV}</Text>
               </View>
-              <Button
-                variant="small"
-                onPress={() => {
-                  setIsOpened(false);
-                }}
-              >
+              <Button variant="small" onPress={close}>
                 <Button.Text>Close</Button.Text>
               </Button>
             </View>
@@ -98,17 +90,18 @@ function DEV_MENU() {
             <Text>Onboarding: {data.onboarded as string}</Text>
             <Text>Gender: {data.gender as string}</Text>
 
-            <View className="my-2"></View>
-
-            <Button onPress={resetPhotos} disabled={!user || !photos || photos?.length === 0}>
-              <Button.Text>{resetting === 'photos' ? 'Resetting photos...' : 'Reset photos'}</Button.Text>
-            </Button>
-
-            <View className="my-1"></View>
-
-            <Button onPress={resetAll} disabled={!user}>
-              <Button.Text>{resetting === 'all' ? 'Resetting all...' : 'Reset all'}</Button.Text>
-            </Button>
+            <View className="mt-4">
+              <Button
+                onPress={resetPhotos}
+                disabled={resetting === 'photos' || !user || !photos || photos?.length === 0}
+              >
+                <Button.Text>{resetting === 'photos' ? 'Resetting media...' : 'Reset photos and videos'}</Button.Text>
+              </Button>
+              <View className="h-2" />
+              <Button onPress={resetAll} disabled={resetting === 'all' || !user}>
+                <Button.Text>{resetting === 'all' ? 'Resetting all...' : 'Reset all'}</Button.Text>
+              </Button>
+            </View>
           </SafeAreaView>
         </Portal>
       ) : null}

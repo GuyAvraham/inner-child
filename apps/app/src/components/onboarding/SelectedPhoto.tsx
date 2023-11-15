@@ -6,7 +6,7 @@ import { Image } from 'expo-image';
 import { UploadSVG } from '~/svg/upload';
 import { WhiteCircle1SVG } from '~/svg/whiteCircle1';
 import { WhiteCircle2SVG } from '~/svg/whiteCircle2';
-import { AnimatedProgress } from '../AnimatedProgress';
+import { AnimatedProgress } from '../ui/AnimatedProgress';
 
 interface SelectedPhotoProps extends ImageProps {
   wrapped?: boolean;

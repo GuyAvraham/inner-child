@@ -3,7 +3,7 @@ import { TouchableOpacity, View } from 'react-native';
 import clsx from 'clsx';
 
 import { SelectedSVG } from '~/svg/selected';
-import { AnimatedProgress } from '../AnimatedProgress';
+import { AnimatedProgress } from '../ui/AnimatedProgress';
 import { ChoosePhoto } from './ChoosePhoto';
 import { SelectedPhoto } from './SelectedPhoto';
 

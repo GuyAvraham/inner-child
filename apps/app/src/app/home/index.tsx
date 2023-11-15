@@ -1,19 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, FlatList, KeyboardAvoidingView, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, TextInput, TouchableOpacity, View } from 'react-native';
 import clsx from 'clsx';
 
 import { api } from '~/utils/api';
-import { AnimatedProgress } from '~/components/AnimatedProgress';
-import { ConversationAgeSelect } from '~/components/ConversationAgeSelect';
+import { ChatOptions } from '~/components/home/ChatOptions';
+import { ConversationAgeSelect } from '~/components/home/ConversationAgeSelect';
+import { AnimatedProgress } from '~/components/ui/AnimatedProgress';
 import { Message } from '~/components/ui/Message';
 import Text from '~/components/ui/Text';
 import { isIos } from '~/config/variables';
 import { useKeyboardVisible } from '~/hooks/useKeyboardVisible';
 import useUserData from '~/hooks/useUserData';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
-import { CloseSVG } from '~/svg/close';
-import { OptionsSVG } from '~/svg/options';
-import { RefreshChatSVG } from '~/svg/refreshChat';
 import { SendMessageSVG } from '~/svg/sendMessage';
 import { Age, ConversationStatus, Role } from '~/types';
 
@@ -29,7 +27,7 @@ export default function HomeScreen() {
   const [initialMessage, setInitialMessage] = useState<string | null>(null);
   const [lastGPTResponse, setLastGPTResponse] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
-  const { mutateAsync: deleteVideo } = api.video.deleteByAge.useMutation();
+  const { mutateAsync: deleteVideo, isLoading: isDeletingVideo } = api.video.deleteByAge.useMutation();
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
   });
@@ -101,9 +99,9 @@ export default function HomeScreen() {
     }
 
     await deleteVideo({ age: conversationAge });
+    void utils.video.getByAge.invalidate();
     await clearConversation({ id: messages[0].conversationId });
-    await utils.conversation.invalidate();
-    await utils.video.invalidate();
+    void utils.conversation.invalidate();
     setIsOpenedOptions(false);
   }, [clearConversation, messages, utils.conversation, conversationAge]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -169,9 +167,13 @@ export default function HomeScreen() {
         <Text className="font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
         </Text>
-        <TouchableOpacity className="absolute right-3" onPress={() => setIsOpenedOptions(true)}>
-          <OptionsSVG />
-        </TouchableOpacity>
+        <ChatOptions
+          isOpen={isOpenedOptions}
+          open={() => setIsOpenedOptions(true)}
+          close={() => setIsOpenedOptions(false)}
+          isClearingConversation={isDeletingVideo || isClearingConversation}
+          handleClearConversation={handleClearConversation}
+        />
       </View>
       <View className="mb-5">
         <ConversationAgeSelect
@@ -226,33 +228,6 @@ export default function HomeScreen() {
           <SendMessageSVG />
         </TouchableOpacity>
       </View>
-
-      {isOpenedOptions && (
-        <View
-          className="absolute bg-black/80"
-          style={{
-            height: Dimensions.get('window').height,
-            width: Dimensions.get('window').width,
-          }}
-        >
-          <View className="z-40 flex-row justify-end p-6 pt-14">
-            <TouchableOpacity onPress={() => setIsOpenedOptions(false)}>
-              <CloseSVG />
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            className="w-full flex-row items-center justify-center p-4"
-            disabled={isClearingConversation}
-            onPress={handleClearConversation}
-          >
-            <RefreshChatSVG />
-            <View className="w-2" />
-            <Text className="font-[Poppins-Bold] text-lg">
-              {isClearingConversation ? 'Clearing chat...' : 'Reset chat'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </KeyboardAvoidingView>
   );
 }
