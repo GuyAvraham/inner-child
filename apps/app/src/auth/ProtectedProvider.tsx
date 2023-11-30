@@ -17,7 +17,7 @@ const useProtectedRoute = () => {
 
   useEffect(() => {
     if (!isAuthLoaded) return;
-    const inAuthGroup = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === 'auth';
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (!isSignedIn) return router.replace(ROUTES.AUTH.INDEX);
@@ -34,9 +34,5 @@ export default function ProtectedProvider({ children }: PropsWithChildren) {
   const { data, user } = useUserData();
   useProtectedRoute();
 
-  return (
-    <Provider key={(data?.token as string | undefined) ?? user?.id}>
-      {children}
-    </Provider>
-  );
+  return <Provider key={(data?.token as string | undefined) ?? user?.id}>{children}</Provider>;
 }
