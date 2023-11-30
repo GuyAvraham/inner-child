@@ -58,7 +58,7 @@ export const conversationRoute = createTRPCRouter({
         // voice gallery: https://speech.microsoft.com/portal/voicegallery
         const voices = {
           male: {
-            young: 'en-US-GuyNeural',
+            young: 'en-US-AnaNeural',
             old: 'en-US-DavisNeural',
           },
           female: {
