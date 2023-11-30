@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import type { AVPlaybackStatus } from 'expo-av';
 import { ResizeMode, Video } from 'expo-av';
@@ -121,10 +121,13 @@ export function ConversationAgeSelect({ age, setAge, disabled }: ConversationAge
     if (isPlayVideo) void clearVideo();
   }, [isPlayVideo, clearVideo]);
 
-  const videoUri = age === Age.Young ? youngVideo?.uri : oldVideo?.uri;
+  const videoUri = useMemo(() => {
+    if (video) return video;
+    return age === Age.Young ? youngVideo?.uri : oldVideo?.uri;
+  }, [video, age, youngVideo?.uri, oldVideo?.uri]);
 
   useEffect(() => {
-    if (videoUri) {
+    if (videoUri && videoUri.includes('d-id-talks')) {
       setIsPlayVideo(true);
     }
   }, [videoUri]);
