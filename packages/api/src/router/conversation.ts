@@ -25,7 +25,7 @@ export const conversationRoute = createTRPCRouter({
           'Content-Type': 'application/json',
           Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         },
-        body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: input }),
+        body: JSON.stringify({ model: 'gpt-4-1106-preview', messages: input }),
       });
       const json = (await response.json()) as OpenAIResponse;
 

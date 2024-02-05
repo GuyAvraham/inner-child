@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import Chat from './chat/page';
 
 export const runtime = 'edge';
 
@@ -21,7 +22,7 @@ export default function HomePage() {
       </header>
       <main>
         <SignedIn>
-          <h1>Hello</h1>
+          <Chat/>
         </SignedIn>
       </main>
     </>
