@@ -19,7 +19,6 @@ export const env = createEnv({
     REPLICATE_API_TOKEN: z.string(),
     OPENAI_API_KEY: z.string(),
     CLERK_SECRET_KEY: z.string(),
-    DID_API_TOKEN: z.string(),
   },
   /**
    * Specify your client-side environment variables schema here.
@@ -27,6 +26,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
+    NEXT_PUBLIC_DID_API_KEY: z.string(),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
@@ -37,10 +37,9 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
     REPLICATE_API_TOKEN: process.env.REPLICATE_API_TOKEN,
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
-      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
-    DID_API_TOKEN: process.env.DID_API_TOKEN,
+    NEXT_PUBLIC_DID_API_KEY: process.env.NEXT_PUBLIC_DID_API_KEY,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   },
   skipValidation: !!process.env.CI || !!process.env.SKIP_ENV_VALIDATION,
