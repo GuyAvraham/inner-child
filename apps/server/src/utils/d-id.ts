@@ -2,34 +2,11 @@ let pc: RTCPeerConnection | undefined;
 let streamId: string | undefined;
 let sessionId: string | undefined;
 
-const DID_API_URL = 'https://api.d-id.com';
-const DID_API_KEY = process.env.NEXT_PUBLIC_DID_API_KEY;
-
-const maxRetryCount = 3;
-const maxDelaySec = 4;
-
 let statsIntervalId: NodeJS.Timeout;
 let videoIsPlaying = false;
 let lastBytesReceived = 0;
 
 let videoElement: HTMLVideoElement | undefined;
-
-async function fetchWithRetries(url: string | URL | Request, options?: RequestInit | undefined, retries = 1) {
-  try {
-    return await fetch(url, options);
-  } catch (err) {
-    if (retries <= maxRetryCount) {
-      const delay = Math.min(Math.pow(2, retries) / 4 + Math.random(), maxDelaySec) * 1000;
-
-      await new Promise((resolve) => setTimeout(resolve, delay));
-
-      console.log(`Request failed, retrying ${retries}/${maxRetryCount}. Error ${err}`);
-      return fetchWithRetries(url, options, retries + 1);
-    } else {
-      throw new Error(`Max retries exceeded. error: ${err}`);
-    }
-  }
-}
 
 const onIceGatheringStateChange = () => {
   console.log('onIceGatheringStateChange', pc?.iceGatheringState);
@@ -42,17 +19,14 @@ const onIceCandidate = (ev: RTCPeerConnectionIceEvent) => {
     const { candidate, sdpMid, sdpMLineIndex } = ev.candidate;
 
     // step 3. send our ice server to the server
-    void fetch(`${DID_API_URL}/talks/streams/${streamId}/ice`, {
+    void fetch(`/api/did/ice`, {
       method: 'POST',
-      headers: {
-        Authorization: `Basic ${DID_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
         candidate,
         sdpMid,
         sdpMLineIndex,
-        session_id: sessionId,
+        sessionId,
+        streamId,
       }),
     });
   }
@@ -156,15 +130,6 @@ const destroy = async () => {
   pc.removeEventListener('signalingstatechange', onSignalingStateChange, true);
   pc.removeEventListener('track', onTrack, true);
 
-  await fetch(`${DID_API_URL}/talks/streams/${streamId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Basic ${DID_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ session_id: sessionId }),
-  });
-
   pc = undefined;
   sessionId = undefined;
   streamId = undefined;
@@ -195,12 +160,8 @@ const create = async ({ iceServers, offer }: { iceServers: RTCIceServer[]; offer
 
 const getDetails = async (face: string) => {
   // Step 1. ask did for webrtc details
-  const sessionResponse = await fetch(`${DID_API_URL}/talks/streams`, {
+  const sessionResponse = await fetch(`/api/did/streams`, {
     method: 'POST',
-    headers: {
-      Authorization: `Basic ${DID_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify({
       source_url: face,
     }),
@@ -228,8 +189,13 @@ const getDetails = async (face: string) => {
 
 // TODO: make a post call to generate the idle video from the submitted photo
 // TODO: send an empty request every 3-4 minutes after the last user request to keep the connection alive
+
+let initInProgress = false;
+
 export const init = async (face: string, outputElement: HTMLVideoElement) => {
-  if (pc && pc.connectionState === 'connected') return;
+  if ((pc && pc.connectionState === 'connected') || initInProgress) return;
+
+  initInProgress = true;
 
   videoElement = outputElement;
 
@@ -243,64 +209,52 @@ export const init = async (face: string, outputElement: HTMLVideoElement) => {
   const sessionClientAnswer = await create({ iceServers, offer });
 
   // Step 2. send answer to the did server
-  await fetch(`${DID_API_URL}/talks/streams/${details.newStreamId}/sdp`, {
+  await fetch(`/api/did/sdp`, {
     method: 'POST',
-    headers: {
-      Authorization: `Basic ${DID_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify({
       answer: sessionClientAnswer,
-      session_id: details.newSessionId,
+      sessionId: details.newSessionId,
+      streamId: details.newStreamId,
     }),
   });
 
+  initInProgress = false;
   // void sendIdleRequest();
 };
 
 export const send = async (input: string) => {
   if (pc && (pc.signalingState === 'stable' || pc.iceConnectionState === 'connected')) {
-    await fetchWithRetries(`${DID_API_URL}/talks/streams/${streamId}`, {
+    await fetch(`/api/did/send`, {
       method: 'POST',
-      headers: {
-        Authorization: `Basic ${DID_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
-        script: {
-          type: 'text',
-          input,
-          provider: { type: 'microsoft', voice_id: 'en-US-JennyNeural' },
-          ssml: 'false',
-        },
-        config: { fluent: true, pad_audio: 1, stitch: true },
-        audio_optimization: '2',
-        session_id: sessionId,
+        input,
+        sessionId,
+        streamId,
       }),
     });
   }
 };
 
-const sendIdleRequest = async () => {
-  if (pc && (pc.signalingState === 'stable' || pc.iceConnectionState === 'connected')) {
-    console.log('sending idle request');
-    await fetch(`${DID_API_URL}/talks`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${DID_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        script: {
-          type: 'text',
-          input: '<break time="10s"/>',
-          provider: { type: 'microsoft', voice_id: 'en-US-JennyNeural' },
-          ssml: 'true',
-        },
-        config: { fluent: true, pad_audio: 1, stitch: true },
-        audio_optimization: '2',
-        session_id: sessionId,
-      }),
-    });
-  }
-};
+// const sendIdleRequest = async () => {
+//   if (pc && (pc.signalingState === 'stable' || pc.iceConnectionState === 'connected')) {
+//     console.log('sending idle request');
+//     await fetch(`${DID_API_URL}/talks`, {
+//       method: 'POST',
+//       headers: {
+//         Authorization: `Basic ${DID_API_KEY}`,
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         script: {
+//           type: 'text',
+//           input: '<break time="10s"/>',
+//           provider: { type: 'microsoft', voice_id: 'en-US-JennyNeural' },
+//           ssml: 'true',
+//         },
+//         config: { fluent: true, pad_audio: 1, stitch: true },
+//         audio_optimization: '2',
+//         session_id: sessionId,
+//       }),
+//     });
+//   }
+// };
