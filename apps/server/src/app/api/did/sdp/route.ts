@@ -15,7 +15,7 @@ export const POST = async (request: Request) => {
     },
     body: JSON.stringify({
       answer,
-      sessionId,
+      session_id: sessionId,
     }),
   });
 };

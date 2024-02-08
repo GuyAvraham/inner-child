@@ -19,7 +19,7 @@ export const POST = async (request: Request) => {
       candidate,
       sdpMid,
       sdpMLineIndex,
-      sessionId,
+      session_id: sessionId,
     }),
   });
 };
