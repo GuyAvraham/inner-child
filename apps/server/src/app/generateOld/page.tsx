@@ -1,10 +1,8 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-import GenderForm from '~/components/screens/home/gender';
+import GenerationForm from '~/components/screens/generateOld/GenerationFrom';
 
-export const runtime = 'edge';
-
-export default function HomePage() {
+export default function GenerateOld() {
   return (
     <>
       <header className="flex justify-end p-4">
@@ -24,9 +22,7 @@ export default function HomePage() {
       </header>
       <main>
         <SignedIn>
-          <div className="p-4">
-            <GenderForm />
-          </div>
+          <GenerationForm />
         </SignedIn>
       </main>
     </>
