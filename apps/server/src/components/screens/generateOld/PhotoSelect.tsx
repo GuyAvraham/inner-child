@@ -38,11 +38,11 @@ export default function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }
   );
 
   return (
-    <div className="flex w-full flex-row flex-wrap justify-center">
+    <div className="flex w-full flex-row flex-wrap sm:justify-center">
       {photos.map((photo, index) => (
         <div
           key={`${photo}_${index}`}
-          className="relative w-[256px] p-3"
+          className="relative w-1/3 p-3 sm:w-[240px]"
           style={{ aspectRatio: '1 / 1' }}
           onClick={() => handlePhotoPress(photo)}
           // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -59,9 +59,15 @@ export default function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }
             )}
           >
             {photo ? (
-              <Image className="h-28 w-28 self-center object-cover" width={256} height={256} src={photo} alt={''} />
+              <Image
+                className="h-full w-full self-center rounded-full object-cover"
+                width={256}
+                height={256}
+                src={photo}
+                alt={''}
+              />
             ) : (
-              <div className="h-28 w-28">
+              <div className="flex h-28 w-28 items-center justify-center">
                 <AnimatedProgress duration={duration[index] ?? undefined} />
               </div>
             )}

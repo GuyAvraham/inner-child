@@ -20,7 +20,7 @@ export default function GenerateOld() {
           </SignInButton>
         </SignedOut>
       </header>
-      <main>
+      <main className="flex flex-1 flex-col p-4">
         <SignedIn>
           <GenerationForm />
         </SignedIn>
