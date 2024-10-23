@@ -27,8 +27,8 @@ export default function Button({
         blue
           ? 'border-[rgba(255, 255, 255, 0.2)] bg-[rgba(66, 133, 244, 0.92)]'
           : transparent
-          ? 'border-[#ffffffff] bg-transparent'
-          : 'border-[#ffffff33] bg-[#ffffff1a]',
+            ? 'border-[#ffffffff] bg-transparent'
+            : 'border-[#ffffff33] bg-[#ffffff1a]',
         variant === 'small' && 'rounded-md px-5 py-2.5',
         variant !== 'small' && 'rounded-[10px] px-10 py-4',
         wide && 'w-full',

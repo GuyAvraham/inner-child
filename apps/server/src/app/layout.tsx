@@ -4,7 +4,9 @@ import { Inter } from 'next/font/google';
 import '~/styles/globals.css';
 
 import { headers } from 'next/headers';
+import Image from 'next/image';
 import { ClerkProvider } from '@clerk/nextjs';
+import clsx from 'clsx';
 
 import { TRPCReactProvider } from './providers';
 
@@ -33,7 +35,14 @@ export default function Layout(props: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={['font-sans', fontSans.variable].join(' ')}>
+        <body className={clsx('flex h-screen flex-col font-sans', fontSans.variable)}>
+          <Image
+            src="/bg1.png"
+            width={375}
+            height={812}
+            alt="background"
+            className="lef-0 fixed top-0 -z-10 h-full w-full sm:hidden"
+          />
           <TRPCReactProvider headers={headers()}>{props.children}</TRPCReactProvider>
         </body>
       </html>

@@ -20,11 +20,9 @@ export default function Onboarding() {
           </SignInButton>
         </SignedOut>
       </header>
-      <main>
+      <main className="flex flex-1 flex-col p-4">
         <SignedIn>
-          <div className="p-4">
-            <UploadForm />
-          </div>
+          <UploadForm />
         </SignedIn>
       </main>
     </>

@@ -23,14 +23,18 @@ export default function GenderForm() {
   );
 
   return (
-    <div className="flex-1 justify-center px-4">
-      <p className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px]">
+    <div className="flex flex-1 flex-col justify-evenly p-4">
+      <p className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0">
         Our image engine needs to understand if you are more of a {'\n'}male or female?
       </p>
 
-      <div className="mt-4 flex items-center justify-center gap-8">
-        <Button onClick={() => setUserGender('male')}>Male</Button>
-        <Button onClick={() => setUserGender('female')}>Female</Button>
+      <div className="mt-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-16">
+        <Button className="w-full min-w-[140px] sm:w-auto" onClick={() => setUserGender('male')}>
+          Male
+        </Button>
+        <Button className="w-full min-w-[140px] sm:w-auto" onClick={() => setUserGender('female')}>
+          Female
+        </Button>
       </div>
     </div>
   );

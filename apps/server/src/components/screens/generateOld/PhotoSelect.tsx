@@ -45,6 +45,7 @@ export default function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }
           className="relative w-[256px] p-3"
           style={{ aspectRatio: '1 / 1' }}
           onClick={() => handlePhotoPress(photo)}
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           onKeyDown={() => {}}
           role="button"
           tabIndex={0}

@@ -22,11 +22,9 @@ export default function HomePage() {
           </SignInButton>
         </SignedOut>
       </header>
-      <main>
+      <main className="flex flex-1 flex-col">
         <SignedIn>
-          <div className="p-4">
-            <GenderForm />
-          </div>
+          <GenderForm />
         </SignedIn>
       </main>
     </>
