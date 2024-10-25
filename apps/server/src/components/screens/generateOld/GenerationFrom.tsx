@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
+import JumpingDots from '~/components/JumpingDots';
 import { oldPhotoAtom, useCurrentPhotoAtom } from '~/atoms';
 import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
@@ -78,7 +79,7 @@ export default function GenerationForm() {
           className="h-28 w-28 self-center rounded-full object-cover"
           width={256}
           height={256}
-          src={currentPhoto ?? currentPhotoDB?.uri ?? testImg}
+          src={currentPhoto ?? currentPhotoDB?.uri ?? testImg ?? ''}
           alt={''}
         />
         <button
@@ -89,7 +90,10 @@ export default function GenerationForm() {
           <ReplacePhotoSVG />
         </button>
       </div>
-      <p className="text-center">Generating your future images...</p>
+      <p className="text-center">
+        Generating your future images
+        <JumpingDots />
+      </p>
 
       <div className="w-full">
         <p className="mb-4 w-full sm:text-center">AI generated future photos: </p>

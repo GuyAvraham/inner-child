@@ -38,11 +38,11 @@ export default function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }
   );
 
   return (
-    <div className="flex w-full flex-row flex-wrap sm:justify-center">
+    <div className="flex w-full flex-row flex-wrap sm:justify-center sm:gap-6">
       {photos.map((photo, index) => (
         <div
           key={`${photo}_${index}`}
-          className="relative w-1/3 p-3 sm:w-[240px]"
+          className="relative w-1/3 p-3 sm:w-[216px] sm:p-0"
           style={{ aspectRatio: '1 / 1' }}
           onClick={() => handlePhotoPress(photo)}
           // eslint-disable-next-line @typescript-eslint/no-empty-function

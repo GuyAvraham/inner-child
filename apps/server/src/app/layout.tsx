@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { ClerkProvider } from '@clerk/nextjs';
 import clsx from 'clsx';
 
+import BGSVG from '~/svg/BGSVG';
 import { TRPCReactProvider } from './providers';
 
 const fontSans = Inter({
@@ -43,6 +44,7 @@ export default function Layout(props: { children: React.ReactNode }) {
             alt="background"
             className="lef-0 fixed top-0 -z-10 h-full w-full sm:hidden"
           />
+          <BGSVG className="lef-0 fixed top-0 -z-10 hidden h-full w-full sm:block" />
           <TRPCReactProvider headers={headers()}>{props.children}</TRPCReactProvider>
         </body>
       </html>
