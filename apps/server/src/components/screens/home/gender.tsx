@@ -1,15 +1,18 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 
+import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 
 export default function GenderForm() {
   const { user } = useUser();
   const router = useRouter();
+
+  const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
 
   const setUserGender = useCallback(
     async (gender: 'male' | 'female') => {
@@ -21,6 +24,12 @@ export default function GenderForm() {
     },
     [router, user],
   );
+
+  useEffect(() => {
+    if (currentPhotoDB && currentPhotoDB.uri.length > 0) {
+      router.replace('/chat');
+    }
+  }, [currentPhotoDB, router]);
 
   return (
     <div className="flex flex-1 flex-col justify-evenly p-4">

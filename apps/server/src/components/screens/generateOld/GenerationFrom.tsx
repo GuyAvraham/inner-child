@@ -18,8 +18,8 @@ import ReplacePhotoSVG from '~/svg/ReplacePhotoSVG';
 import { Age, Onboarded } from '~/types';
 import PhotoSelect from './PhotoSelect';
 
-const testImg =
-  'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yblFpMExhdGhBWWFaU2hiYzlhYkg1Nm03eGQifQ?width=80 1x,https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yblFpMExhdGhBWWFaU2hiYzlhYkg1Nm03eGQifQ?width=160';
+// const testImg =
+//   'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yblFpMExhdGhBWWFaU2hiYzlhYkg1Nm03eGQifQ?width=80 1x,https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yblFpMExhdGhBWWFaU2hiYzlhYkg1Nm03eGQifQ?width=160';
 
 export default function GenerationForm() {
   useOnboardedScreen(Onboarded.GenerateOld);
@@ -37,8 +37,8 @@ export default function GenerationForm() {
   const { updateUserData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-  // const generatedPhotos = useGenerateAgedPhotos(Age.Old);
-  const { data: all } = api.photo.getAll.useQuery();
+  const generatedPhotos = useGenerateAgedPhotos(Age.Old);
+  // const { data: all } = api.photo.getAll.useQuery();
 
   const replacePhotos = useCallback(async () => {
     setIsReplacing(true);
@@ -50,11 +50,11 @@ export default function GenerationForm() {
     router.replace('/onboarding');
   }, [router, updateUserData, utils.photo, deleteAllPhotos]);
 
-  // useEffect(() => {
-  //   if (currentPhotoDB === null) {
-  //     router.replace('/');
-  //   }
-  // }, [currentPhotoDB, router]);
+  useEffect(() => {
+    if (currentPhotoDB === null) {
+      router.replace('/');
+    }
+  }, [currentPhotoDB, router]);
 
   const submitPhoto = useCallback(async () => {
     if (!canSubmitOldPhoto) return;
@@ -67,10 +67,10 @@ export default function GenerationForm() {
     router.push('/chat');
   }, [canSubmitOldPhoto, router, updateUserData, uploadOldPhoto]);
 
-  // const generationFinished = useMemo(
-  //   () => generatedPhotos.every((photo) => typeof photo === 'string'),
-  //   [generatedPhotos],
-  // );
+  const generationFinished = useMemo(
+    () => generatedPhotos.every((photo) => typeof photo === 'string'),
+    [generatedPhotos],
+  );
 
   return (
     <div className="flex flex-col items-center gap-10">
@@ -79,7 +79,7 @@ export default function GenerationForm() {
           className="h-28 w-28 self-center rounded-full object-cover"
           width={256}
           height={256}
-          src={currentPhoto ?? currentPhotoDB?.uri ?? testImg ?? ''}
+          src={currentPhoto ?? currentPhotoDB?.uri ?? ''}
           alt={''}
         />
         <button
@@ -91,14 +91,14 @@ export default function GenerationForm() {
         </button>
       </div>
       <p className="text-center">
-        Generating your future images
-        <JumpingDots />
+        {generationFinished ? '   ' : 'Generating your future images'}
+        {!generationFinished && <JumpingDots />}
       </p>
 
       <div className="w-full">
         <p className="mb-4 w-full sm:text-center">AI generated future photos: </p>
-        {/* <PhotoSelect photos={generatedPhotos} onPhotoSelect={handleOldPhoto} /> */}
-        <PhotoSelect photos={[testImg, null, null, null]} onPhotoSelect={handleOldPhoto} />
+        <PhotoSelect photos={generatedPhotos} onPhotoSelect={handleOldPhoto} />
+        {/* <PhotoSelect photos={[testImg, null, null, null]} onPhotoSelect={handleOldPhoto} /> */}
         {/* {all?.map((item, index) => <Image key={index} src={item.uri} width={100} height={100} alt="" />)} */}
       </div>
 

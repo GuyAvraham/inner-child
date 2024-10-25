@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-import UploadForm from '../../components/screens/onboarding/UploadForm';
+import UploadForm from '~/components/screens/onboarding/UploadForm';
 
 export default function Onboarding() {
   return (

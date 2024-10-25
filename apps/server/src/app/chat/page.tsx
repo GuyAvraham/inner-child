@@ -1,81 +1,30 @@
-'use client';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-import type { FormEvent } from 'react';
-import { useEffect, useRef, useState } from 'react';
-import { useChat } from 'ai/react';
+import Chat from '~/components/screens/chat';
 
-import { api } from '~/utils/api';
-import { init, send } from '~/utils/d-id';
-import { Age, ConversationStatus, Role } from '~/types';
-
-export default function Chat() {
-  const [conversationAge] = useState(Age.Young);
-  const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
-
-  const { mutateAsync: saveMessage } = api.conversation.saveMessage.useMutation();
-  const { data: initialMessages } = api.conversation.get.useQuery({
-    age: conversationAge,
-  });
-
-  const [didReady, setDidReady] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: '/api/gpt/send',
-    id: 'guy-av',
-    onFinish(message) {
-      void send(message.content);
-      // FIXME: we can just send chunk of text to the D-ID server because it may and probably will result in junk video and artifacts
-      void saveMessage({ age: conversationAge, message: message.content, sender: Role.Assistant });
-      setConversationStatus(ConversationStatus.Idle);
-    },
-    onError(error) {
-      console.error(error);
-      setConversationStatus(ConversationStatus.Idle);
-    },
-    initialMessages: initialMessages?.map((m) => ({ id: m.id, role: m.sender, content: m.text })) ?? [],
-  });
-
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setConversationStatus(ConversationStatus.Waiting);
-    void saveMessage({ age: conversationAge, message: input, sender: Role.User });
-    handleSubmit(event);
-  };
-
-  useEffect(() => {
-    if (videoRef.current)
-      init('https://d-id-public-bucket.s3.amazonaws.com/or-roman.jpg', videoRef.current)
-        .then(() => {
-          setDidReady(true);
-        })
-        .catch((error) => {
-          console.error('init', error);
-          setDidReady(false);
-        });
-  }, [videoRef.current]);
-
+export default function ChatPage() {
   return (
-    <div>
-      <video ref={videoRef} autoPlay playsInline width={400} height={400}></video>
-
-      {messages.map((m) => (
-        <div key={m.id}>
-          {m.role}: {m.content}
-        </div>
-      ))}
-
-      <form onSubmit={onSubmit}>
-        <label>
-          Say something...
-          <input
-            className="border"
-            value={input}
-            onChange={handleInputChange}
-            disabled={conversationStatus !== ConversationStatus.Idle || !didReady}
-          />
-        </label>
-      </form>
-    </div>
+    <>
+      <header className="flex justify-end p-4">
+        <SignedIn>
+          <UserButton afterSignOutUrl="/" />
+        </SignedIn>
+        <SignedOut>
+          <SignInButton mode="modal">
+            <button
+              className="mb-2 mr-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              type="button"
+            >
+              Sign in
+            </button>
+          </SignInButton>
+        </SignedOut>
+      </header>
+      <main className="flex flex-1 flex-col p-4">
+        <SignedIn>
+          <Chat />
+        </SignedIn>
+      </main>
+    </>
   );
 }
