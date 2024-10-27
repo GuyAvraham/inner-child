@@ -44,7 +44,7 @@ export default function Chat() {
   const { triggerVideoGeneration } = useVideoResponse(conversationAge);
   const scrollListToEnd = useCallback(() => {
     setTimeout(() => {
-      massageListRef.current?.scrollTo({ top: massageListRef.current.offsetHeight, behavior: 'smooth' });
+      massageListRef.current?.scrollTo({ top: massageListRef.current.scrollHeight, behavior: 'smooth' });
     }, 100);
   }, []);
 
