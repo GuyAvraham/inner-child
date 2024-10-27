@@ -44,7 +44,7 @@ export default function Chat() {
   const { triggerVideoGeneration } = useVideoResponse(conversationAge);
   const scrollListToEnd = useCallback(() => {
     setTimeout(() => {
-      massageListRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      massageListRef.current?.scrollTo({ top: massageListRef.current.offsetHeight, behavior: 'smooth' });
     }, 100);
   }, []);
 
@@ -74,7 +74,6 @@ export default function Chat() {
       await utils.conversation.get.invalidate();
       setMessage('');
       setConversationStatus(ConversationStatus.Idle);
-      scrollListToEnd();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts],
