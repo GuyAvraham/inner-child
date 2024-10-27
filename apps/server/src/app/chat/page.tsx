@@ -5,7 +5,7 @@ import Chat from '~/components/screens/chat';
 export default function ChatPage() {
   return (
     <>
-      <header className="flex justify-end p-4">
+      <header className="absolute left-0 top-0 flex justify-end p-4">
         <SignedIn>
           <UserButton afterSignOutUrl="/" />
         </SignedIn>

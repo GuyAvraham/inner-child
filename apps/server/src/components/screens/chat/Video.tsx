@@ -2,15 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
-import { uploadToS3 } from '~/utils/uploadToS3';
+// import { uploadToS3 } from '~/utils/uploadToS3';
 import AnimatedProgress from '~/components/AnimatedProgress';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import PlayPauseSVG from '~/svg/PlayPauseSVG';
 import { Age } from '~/types';
+import VideoLoadingAnimation from './VideoLoadingAnimation';
 
 interface ConversationAgeSelectProps {
   age: Age;
@@ -53,8 +53,18 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
         const key = `${age}-${Date.now()}.${videoBlob?.type.split('/').at(1) ?? 'mp4'}`;
         const url = await getUploadURL({ key });
         await saveVideo({ age, key });
-        await uploadToS3(url, videoBlob);
-        await utils.video.getByAge.invalidate();
+        // await uploadToS3(url, videoBlob);
+        const formData = new FormData();
+        formData.append('url', url);
+        formData.append('file', videoBlob);
+        const response = (await fetch('/api/uploadImage', {
+          method: 'POST',
+          body: formData,
+        }).then((resp) => resp.json())) as { status: 'success' | 'fail'; error?: unknown };
+
+        if (response.status === 'success') {
+          await utils.video.getByAge.invalidate();
+        }
         setVideoBlob(null);
       })();
     }
@@ -110,8 +120,8 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
 
   return (
     <div className="relative flex-row justify-center ">
-      <div className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-2">
-        {/* <Animation isLoading={isVideoLoading} /> */}
+      <div className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-4">
+        <VideoLoadingAnimation isLoading={isVideoLoading} />
         {videoUri && (
           <button
             className="absolute bottom-0 right-0 z-10 rounded-full border-0 bg-[#4285F4]/80 p-2 outline-none"
@@ -128,14 +138,14 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
           // eslint-disable-next-line jsx-a11y/media-has-caption
           <video
             key={videoUri ?? 'no-video'}
-            className="m-2 h-40 w-40 rounded-full"
+            className="h-40 w-40 rounded-full"
             src={videoUri}
             poster={imageUri}
             autoPlay
             // onPlaybackStatusUpdate={handleVideoStatusUpdate}
           />
         ) : (
-          <Image height={200} width={200} src={imageUri} alt="" className="m-2 h-40 w-40 rounded-full" />
+          <Image height={200} width={200} src={imageUri} alt="" className="h-40 w-40 rounded-full object-cover" />
         )}
       </div>
 

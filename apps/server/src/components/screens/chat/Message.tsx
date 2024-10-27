@@ -29,9 +29,9 @@ export default function Message({ text, isUserMessage, withAnimation }: MessageP
   return (
     <div
       className={clsx(
-        'mb-4 flex max-w-[500px] overflow-y-auto rounded-xl p-3',
-        isUserMessage && 'self-end bg-[#4285F4]',
-        !isUserMessage && 'self-start bg-[rgba(255,255,255,0.19)]',
+        'mb-4 flex w-fit max-w-[500px] overflow-y-auto rounded-xl p-3',
+        isUserMessage && 'ml-auto bg-[#4285F4]',
+        !isUserMessage && 'bg-[rgba(255,255,255,0.19)]',
       )}
     >
       {message}

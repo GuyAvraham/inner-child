@@ -10,11 +10,13 @@ import useUserData from '~/hooks/useUserData';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import SendSVG from '~/svg/SendSVG';
 import { Age, ConversationStatus, Role } from '~/types';
+import ChatOptions from './ChatOptions';
 import Message from './Message';
 import Video from './Video';
 
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
+  const massageListContainerRef = useRef<HTMLDivElement>(null);
   const { user } = useUserData();
   const userName = user?.firstName ?? '';
   const splitter = '<user_name>';
@@ -72,7 +74,9 @@ export default function Chat() {
       await utils.conversation.get.invalidate();
       setMessage('');
       setConversationStatus(ConversationStatus.Idle);
+      scrollListToEnd();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts],
   );
 
@@ -165,31 +169,52 @@ export default function Chat() {
 
   useEffect(scrollListToEnd, [messages, scrollListToEnd]);
 
+  useEffect(() => {
+    if (!isGettingText && massageListContainerRef.current) {
+      const h = massageListContainerRef.current.offsetHeight;
+      massageListContainerRef.current.style.maxHeight = `${h}px`;
+    }
+  }, [isGettingText]);
+
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-10">
-      <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
+      <div className="relative flex w-full flex-col items-center">
+        <h2 className="mb-1 font-[Poppins-Bold] text-lg">
+          {conversationAge === Age.Young ? 'Young you' : 'Future you'}
+        </h2>
+        <ChatOptions
+          isOpen={isOpenedOptions}
+          open={() => setIsOpenedOptions(true)}
+          close={() => setIsOpenedOptions(false)}
+          isClearingConversation={isDeletingVideo || isClearingConversation}
+          handleClearConversation={handleClearConversation}
+        />
+        <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
+      </div>
 
-      <div ref={massageListRef} className="flex w-full flex-1 flex-col overflow-y-auto py-4">
-        {visibleMessages.length > 0 ? (
-          visibleMessages.map((m, index) => (
-            <Message
-              key={m.id + index}
-              text={m.text}
-              isUserMessage={m.sender === Role.User}
-              withAnimation={m.id === 'typing'}
-            />
-          ))
-        ) : (
-          <div className="self-center">
-            {isWaitingInitialMessage ? (
-              <JumpingDots />
-            ) : (
-              <p className="font-[Poppins-Bold] text-base text-white/40">
-                {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
-              </p>
-            )}
-          </div>
-        )}
+      <div ref={massageListContainerRef} className="flex w-full flex-1 flex-col overflow-hidden py-4">
+        <div ref={massageListRef} className="w-full overflow-y-auto">
+          {visibleMessages.length > 0 ? (
+            visibleMessages.map((m, index) => (
+              <Message
+                key={m.id + index}
+                text={m.text}
+                isUserMessage={m.sender === Role.User}
+                withAnimation={m.id === 'typing'}
+              />
+            ))
+          ) : (
+            <div className="self-center">
+              {isWaitingInitialMessage ? (
+                <JumpingDots />
+              ) : (
+                <p className="font-[Poppins-Bold] text-base text-white/40">
+                  {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <form className="flex w-full flex-col items-center gap-4" onSubmit={handleSendMessage}>
         <textarea
