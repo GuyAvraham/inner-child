@@ -176,7 +176,7 @@ export default function Chat() {
   }, [isGettingText]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-10">
+    <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
       <div className="relative flex w-full flex-col items-center">
         <h2 className="mb-1 font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
@@ -191,7 +191,7 @@ export default function Chat() {
         <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
       </div>
 
-      <div ref={massageListContainerRef} className="flex w-full flex-1 flex-col overflow-hidden py-4">
+      <div ref={massageListContainerRef} className="flex w-full flex-1 flex-col overflow-hidden">
         <div ref={massageListRef} className="w-full overflow-y-auto">
           {visibleMessages.length > 0 ? (
             visibleMessages.map((m, index) => (

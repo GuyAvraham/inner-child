@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
+import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
-// import { uploadToS3 } from '~/utils/uploadToS3';
 import AnimatedProgress from '~/components/AnimatedProgress';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import PlayPauseSVG from '~/svg/PlayPauseSVG';
@@ -20,6 +20,7 @@ interface ConversationAgeSelectProps {
 
 export default function Video({ age, setAge }: ConversationAgeSelectProps) {
   const utils = api.useContext();
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { data: youngPhoto, isLoading: isYoungLoading } = api.photo.getByAge.useQuery({
     age: Age.Young,
   });
@@ -37,6 +38,7 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
 
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
   const [isPlayVideo, setIsPlayVideo] = useState<boolean>(false);
+  // const [isVideoLoaded, setIsVideoLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     if (video) {
@@ -90,6 +92,11 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
   //   [clearVideo],
   // );
 
+  const handleVideoEnded = useCallback(() => {
+    setIsPlayVideo(false);
+    void clearVideo();
+  }, [clearVideo]);
+
   // const handleChangeAge = useCallback(() => {
   //   setAge(age === Age.Young ? Age.Old : Age.Young);
   //   if (video) {
@@ -99,7 +106,7 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
   // }, [age, setAge, clearVideo, video]);
 
   const handlePlayPauseVideo = useCallback(() => {
-    setIsPlayVideo(!isPlayVideo);
+    setIsPlayVideo((prev) => !prev);
     if (isPlayVideo) void clearVideo();
   }, [isPlayVideo, clearVideo]);
 
@@ -114,6 +121,16 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
     }
   }, [videoUri]);
 
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isPlayVideo) {
+        void videoRef.current.play();
+      } else {
+        videoRef.current.pause();
+      }
+    }
+  }, [isPlayVideo]);
+
   const imageUri = age === Age.Young ? young : old;
   const secondaryImageUri = age === Age.Young ? old : young;
   const isLoading = age === Age.Young ? isYoungLoading || !young : isOldLoading || !old;
@@ -122,31 +139,39 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
     <div className="relative flex-row justify-center ">
       <div className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-4">
         <VideoLoadingAnimation isLoading={isVideoLoading} />
-        {videoUri && (
-          <button
-            className="absolute bottom-0 right-0 z-10 rounded-full border-0 bg-[#4285F4]/80 p-2 outline-none"
-            onClick={handlePlayPauseVideo}
-          >
-            <PlayPauseSVG pause={isPlayVideo} />
-          </button>
-        )}
-        {isLoading ? (
-          <div className="h-40 w-40 items-center justify-center">
+        <button
+          className={clsx(
+            'absolute bottom-0 right-0 z-20 rounded-full border-0 bg-[#4285F4]/80 p-2 outline-none',
+            !videoUri && 'hidden',
+          )}
+          onClick={handlePlayPauseVideo}
+        >
+          <PlayPauseSVG pause={isPlayVideo} />
+        </button>
+        <div className="relative z-10 h-40 w-40 overflow-hidden rounded-full">
+          <div className={clsx('h-40 w-40 items-center justify-center', !isLoading && 'hidden')}>
             <AnimatedProgress />
           </div>
-        ) : videoUri && isPlayVideo ? (
-          // eslint-disable-next-line jsx-a11y/media-has-caption
+          {imageUri && (
+            <Image
+              height={200}
+              width={200}
+              src={imageUri}
+              alt=""
+              className={clsx('absolute h-40 w-40 rounded-full object-cover', isLoading && 'hidden')}
+            />
+          )}
+          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <video
+            ref={videoRef}
             key={videoUri ?? 'no-video'}
-            className="h-40 w-40 rounded-full"
+            className={clsx('absolute h-40 w-40 rounded-full', (!videoUri || !isPlayVideo) && 'opacity-0')}
             src={videoUri}
             poster={imageUri}
-            autoPlay
+            onEnded={handleVideoEnded}
             // onPlaybackStatusUpdate={handleVideoStatusUpdate}
           />
-        ) : (
-          <Image height={200} width={200} src={imageUri} alt="" className="h-40 w-40 rounded-full object-cover" />
-        )}
+        </div>
       </div>
 
       {/* <div className="absolute right-3 flex-row items-center">
@@ -159,29 +184,4 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
       </div> */}
     </div>
   );
-  // return <video ref={videoRef} autoPlay playsInline width={400} height={400} className="bg-orange-400"></video>;
 }
-
-// function Animation({ isLoading }: { isLoading: boolean }) {
-//   const [angle, setAngle] = useState(0);
-
-//   useEffect(() => {
-//     if (!isLoading) return;
-
-//     const interval = setInterval(() => {
-//       setAngle((angle) => angle + 2);
-//     }, 33);
-
-//     return () => clearInterval(interval);
-//   }, [isLoading]);
-
-//   return (
-//     <div
-//       className="absolute left-2 top-2 h-full w-full rounded-full border-2 border-transparent border-t-[#4285F4]"
-//       style={{
-//         transform: [{ rotate: `${angle}deg` }],
-//         borderTopColor: !isLoading ? 'transparent' : '#4285F4',
-//       }}
-//     />
-//   );
-// }
