@@ -18,7 +18,7 @@ interface ConversationAgeSelectProps {
   disabled?: boolean;
 }
 
-export default function Video({ age, setAge }: ConversationAgeSelectProps) {
+export default function Video({ age }: ConversationAgeSelectProps) {
   const utils = api.useContext();
   const videoRef = useRef<HTMLVideoElement>(null);
   const { data: youngPhoto, isLoading: isYoungLoading } = api.photo.getByAge.useQuery({
@@ -132,7 +132,7 @@ export default function Video({ age, setAge }: ConversationAgeSelectProps) {
   }, [isPlayVideo]);
 
   const imageUri = age === Age.Young ? young : old;
-  const secondaryImageUri = age === Age.Young ? old : young;
+  // const secondaryImageUri = age === Age.Young ? old : young;
   const isLoading = age === Age.Young ? isYoungLoading || !young : isOldLoading || !old;
 
   return (

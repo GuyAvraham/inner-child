@@ -1,6 +1,6 @@
 'use client';
 
-import type { FormEvent } from 'react';
+import type { FormEvent, KeyboardEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { api } from '~/utils/api';
@@ -17,6 +17,7 @@ import Video from './Video';
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
   const massageListContainerRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const { user } = useUserData();
   const userName = user?.firstName ?? '';
   const splitter = '<user_name>';
@@ -166,6 +167,13 @@ export default function Chat() {
     return list;
   }, [messages, conversationStatus, initialMessage, lastGPTResponse]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && formRef.current) {
+      e.preventDefault();
+      formRef.current.requestSubmit();
+    }
+  }, []);
+
   useEffect(scrollListToEnd, [messages, scrollListToEnd]);
 
   useEffect(() => {
@@ -215,18 +223,25 @@ export default function Chat() {
           )}
         </div>
       </div>
-      <form className="flex w-full flex-col items-center gap-4" onSubmit={handleSendMessage}>
+      <form ref={formRef} className="flex w-full flex-col items-center gap-4" onSubmit={handleSendMessage}>
         <textarea
           className="w-full rounded-lg border border-white/20 bg-white/10 p-4 text-white outline-none sm:min-h-[120px]"
           placeholder="Say something..."
           value={!isStatusIdle ? '' : message}
           onChange={!isStatusIdle ? undefined : (e) => setMessage(e.target.value)}
           disabled={conversationStatus !== ConversationStatus.Idle}
+          onKeyDown={handleKeyDown}
         />
-        <Button className="w-full gap-2 sm:w-fit" type="submit" disabled={isSendDisabled}>
-          Send message
-          <SendSVG height={20} width={20} />
-        </Button>
+        <div className="flex w-full items-center justify-between gap-4">
+          <div className="hidden flex-col opacity-50 sm:flex">
+            <span className="text-sm text-white">* Enter - to send</span>
+            <span className="text-sm text-white">* Shift + Enter - new row</span>
+          </div>
+          <Button className="w-full gap-2 sm:w-fit" type="submit" disabled={isSendDisabled}>
+            Send message
+            <SendSVG height={20} width={20} />
+          </Button>
+        </div>
       </form>
     </div>
   );
