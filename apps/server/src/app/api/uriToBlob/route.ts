@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 
-import { uriToBlob } from '~/utils/blob';
-
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();

@@ -28,7 +28,12 @@ export default function GenderForm() {
 
   return (
     <div className="flex flex-1 flex-col justify-evenly p-4">
-      <p className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0">
+      <p
+        className={clsx(
+          'my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0',
+          isChecking && 'hidden',
+        )}
+      >
         Our image engine needs to understand if you are more of a {'\n'}male or female?
       </p>
 

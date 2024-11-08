@@ -16,5 +16,5 @@ export const useExistingUser = () => {
     }
   }, [isOldLoading, oldPhoto?.uri, router]);
 
-  return isOldLoading;
+  return isOldLoading || !!oldPhoto?.uri;
 };

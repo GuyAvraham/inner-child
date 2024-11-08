@@ -28,7 +28,7 @@ export const blobToUri = async (blob: Blob) => {
 export const uriToBlob = (uri: string) => {
   const formData = new FormData();
   formData.append('uri', uri);
-  return fetch('/api/getVideo', {
+  return fetch('/api/uriToBlob', {
     method: 'POST',
     body: formData,
   }).then((res) => res.blob());
