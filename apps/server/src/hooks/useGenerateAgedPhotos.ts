@@ -13,7 +13,7 @@ export const useGenerateAgedPhotos = (age: Age) => {
   const [predictionIds, setPredictionIds] = useState<string[]>([]);
   const [photos, setPhotos] = useState<(string | null)[]>([null, null, null, null]);
 
-  const { data: currentPhoto } = api.photo.getByAge.useQuery({ age: 'current' });
+  const { data: currentPhoto } = api.photo.getByAge.useQuery({ age: 'current' }, { refetchOnWindowFocus: false });
   const { mutateAsync: generateAged } = api.photo.generateAged.useMutation();
   const { mutateAsync: waitPhoto } = api.photo.wait.useMutation();
 

@@ -1,12 +1,13 @@
 'use client';
 
 import type { MouseEvent } from 'react';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 import Button from '~/components/Button';
 import { currentPhotoAtom } from '~/atoms';
+import { useExistingUser } from '~/hooks/useExistingUser';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import SelectPhotoSVG from '~/svg/SelectPhotoSVG';
@@ -15,9 +16,12 @@ import { Onboarded } from '~/types';
 
 export default function UploadForm() {
   useOnboardedScreen(Onboarded.Current);
+  const [isHandled, setIsHandled] = useState(false);
   const { photo, handlePhoto, upload, isUploading, canSubmit } = useHandlePhoto('current', currentPhotoAtom);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const isChecking = useExistingUser();
 
   function selectFile() {
     const file = fileInputRef?.current?.files?.item(0);
@@ -26,6 +30,7 @@ export default function UploadForm() {
       reader.onload = async (e) => {
         if (e.target?.result) {
           await handlePhoto(e.target.result as string);
+          setIsHandled(true);
         }
       };
       reader.readAsDataURL(file);
@@ -38,6 +43,16 @@ export default function UploadForm() {
     await upload();
     router.replace('/generateOld');
   }
+
+  useEffect(() => {
+    if (photo) {
+      void (async () => {
+        await handlePhoto(photo);
+        setIsHandled(true);
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <form className="flex flex-1 flex-col items-center sm:mx-auto sm:w-[430px] sm:flex-initial">
@@ -56,7 +71,7 @@ export default function UploadForm() {
           type="submit"
           onClick={uploadFile}
           blue
-          disabled={!canSubmit || isUploading}
+          disabled={!canSubmit || isUploading || !isHandled || isChecking}
           wide
           className="w-full gap-2"
         >

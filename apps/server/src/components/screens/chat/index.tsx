@@ -174,7 +174,7 @@ export default function Chat() {
     }
   }, []);
 
-  useEffect(scrollListToEnd, [messages, scrollListToEnd]);
+  useEffect(scrollListToEnd, [messages?.length, scrollListToEnd]);
 
   useEffect(() => {
     if (!isGettingText && massageListContainerRef.current) {

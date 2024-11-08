@@ -1,14 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import { oldPhotoAtom, useCurrentPhotoAtom } from '~/atoms';
+import { useExistingUser } from '~/hooks/useExistingUser';
 import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -34,8 +36,10 @@ export default function GenerationForm() {
     upload: uploadOldPhoto,
   } = useHandlePhoto(Age.Old, oldPhotoAtom);
 
+  useExistingUser();
+
   const { updateUserData } = useUserData();
-  const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' });
+  const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' }, { refetchOnWindowFocus: false });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
   const generatedPhotos = useGenerateAgedPhotos(Age.Old);
   // const { data: all } = api.photo.getAll.useQuery();
@@ -45,16 +49,9 @@ export default function GenerationForm() {
     await deleteAllPhotos();
     await utils.photo.invalidate();
     await updateUserData({ token: generateToken(), onboarded: Onboarded.Current });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    router.replace('/onboarding');
-  }, [router, updateUserData, utils.photo, deleteAllPhotos]);
 
-  useEffect(() => {
-    if (currentPhotoDB === null) {
-      router.replace('/');
-    }
-  }, [currentPhotoDB, router]);
+    router.replace('/onboarding');
+  }, [deleteAllPhotos, utils.photo, updateUserData, router]);
 
   const submitPhoto = useCallback(async () => {
     if (!canSubmitOldPhoto) return;
@@ -87,6 +84,12 @@ export default function GenerationForm() {
           onClick={replacePhotos}
           disabled={isReplacing || isOldPhotoUploading}
         >
+          <div
+            className={clsx(
+              'absolute left-0 top-0 h-full w-full animate-spin rounded-full border-2 border-transparent border-t-white',
+              !isReplacing && 'hidden',
+            )}
+          />
           <ReplacePhotoSVG />
         </button>
       </div>
@@ -106,7 +109,7 @@ export default function GenerationForm() {
         onClick={submitPhoto}
         wide
         blue
-        disabled={!canSubmitOldPhoto || isOldPhotoUploading}
+        disabled={!canSubmitOldPhoto || isOldPhotoUploading || isReplacing}
         className="w-full gap-2 sm:w-fit"
       >
         {isOldPhotoUploading ? 'Saving...' : 'Continue'}

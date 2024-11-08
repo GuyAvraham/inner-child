@@ -29,7 +29,7 @@ export const conversationRoute = createTRPCRouter({
       });
       const json = (await response.json()) as OpenAIResponse;
 
-      return json.choices[0]?.message?.content ?? null;
+      return json.choices?.[0]?.message?.content ?? null;
     }),
   saveMessage: protectedProcedure
     .input(z.object({ message: z.string(), age: z.enum(['young', 'old']), sender: z.enum(['user', 'assistant']) }))
