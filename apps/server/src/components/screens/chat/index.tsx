@@ -115,7 +115,8 @@ export default function Chat() {
 
   const isStatusIdle = conversationStatus === ConversationStatus.Idle;
   const isSendDisabled = !isStatusIdle || isGettingText || message.trim().length === 0;
-  const visibleMessages = useMemo(() => {
+  const { visibleMessages, lastVisibleMessageId } = useMemo(() => {
+    let lastId = '';
     const list = messages?.slice() ?? [];
 
     const commonProps = {
@@ -133,6 +134,7 @@ export default function Chat() {
         text: message,
         ...commonProps,
       });
+      lastId = 'newMessage';
       if (lastGPTResponse) {
         // fast showing last GRP response message
         list.push({
@@ -141,6 +143,7 @@ export default function Chat() {
           text: lastGPTResponse,
           ...commonProps,
         });
+        lastId = 'lastGPTResponse';
       } else {
         // showing typing message
         list.push({
@@ -149,6 +152,7 @@ export default function Chat() {
           text: 'Typing',
           ...commonProps,
         });
+        lastId = 'typing';
       }
     } else {
       // clear if we loaded all messages from server
@@ -162,10 +166,13 @@ export default function Chat() {
         text: initialMessage,
         ...commonProps,
       });
+      lastId = 'initialMessage';
     }
 
-    return list;
+    return { visibleMessages: list, lastVisibleMessageId: lastId };
   }, [messages, conversationStatus, initialMessage, lastGPTResponse]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // const lastVisibleMessageId = visibleMessages[visibleMessages.length - 1] ?? '';
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && formRef.current) {
@@ -174,7 +181,7 @@ export default function Chat() {
     }
   }, []);
 
-  useEffect(scrollListToEnd, [messages?.length, scrollListToEnd]);
+  useEffect(scrollListToEnd, [visibleMessages.length, lastVisibleMessageId, scrollListToEnd]);
 
   useEffect(() => {
     if (!isGettingText && massageListContainerRef.current) {
