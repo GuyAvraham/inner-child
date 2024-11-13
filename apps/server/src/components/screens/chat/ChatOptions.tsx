@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
+import Toggle from '~/components/Toggle';
 import { useOnClickOutside } from '~/hooks/useOnClickOutside';
 import useUserData from '~/hooks/useUserData';
 import CloseSVG from '~/svg/CloseSVG';
@@ -50,6 +51,15 @@ export default function ChatOptions({
     router.replace('/onboarding');
   }, [deleteAllPhotos, utils.photo, handleClearConversation, updateUserData, router]);
 
+  const toggleAnimationBG = useCallback(() => {
+    const attr = 'data-animation';
+    const bg = document.querySelector(`#bg-image[${attr}]`);
+    if (bg) {
+      const isAnimationOn = bg.getAttribute(attr) === 'on';
+      bg.setAttribute(attr, isAnimationOn ? 'off' : 'on');
+    }
+  }, []);
+
   return (
     <div className="absolute right-3 z-20">
       <button className="border-0 bg-transparent outline-none" onClick={isOpen ? close : open}>
@@ -62,6 +72,15 @@ export default function ChatOptions({
           !isOpen && 'hidden',
         )}
       >
+        <div className="mb-2 flex justify-end">
+          <Toggle
+            label="Background animation"
+            title="Toggle background animation"
+            defaultChecked
+            onChange={toggleAnimationBG}
+            disabled={isClearingConversation || isReplacing}
+          />
+        </div>
         <Button
           className="mb-2 flex w-full items-center justify-center gap-2 whitespace-nowrap p-4 font-[Poppins-Bold]"
           disabled={isClearingConversation || isReplacing}

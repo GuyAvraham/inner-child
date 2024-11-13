@@ -44,7 +44,7 @@ export default function Layout(props: { children: React.ReactNode }) {
             alt="background"
             className="lef-0 fixed top-0 -z-10 h-full w-full sm:hidden"
           />
-          <BGSVG className="lef-0 fixed top-0 -z-10 hidden h-full w-full sm:block" />
+          <BGSVG className="lef-0 fixed top-0 -z-10 hidden h-full w-full sm:block" id="bg-image" data-animation="on" />
           <TRPCReactProvider headers={headers()}>{props.children}</TRPCReactProvider>
         </body>
       </html>
