@@ -27,7 +27,7 @@ const useHandlePhoto = (age: Age | 'current', photoAtom: ReturnType<typeof atom<
       setPhoto(photo);
 
       try {
-        const photoBlob = await uriToBlob(photo);
+        const photoBlob = await uriToBlob(photo, true);
         const key = `${age}-${Date.now()}.${photoBlob?.type.split('/').at(1) ?? 'jpeg'}`;
 
         const url = await getUploadURL({ key });

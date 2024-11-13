@@ -5,12 +5,15 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     const uri = formData.get('uri') as string;
+    const contentType = formData.get('contentType') as string;
     if (uri) {
       // const blob = await uriToBlob(body.url);
       const res = await fetch(uri);
       const blob = await res.blob();
+
       const headers = new Headers();
-      headers.set('Content-Type', 'video/*');
+      headers.set('Content-Type', contentType);
+
       return new NextResponse(blob, { status: 200, statusText: 'OK', headers });
     }
 

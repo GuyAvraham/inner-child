@@ -74,12 +74,12 @@ export default function Video({ age }: ConversationAgeSelectProps) {
 
   useEffect(() => {
     if (!youngPhoto?.uri) return;
-    void uriToBlob(youngPhoto.uri).then(blobToUri).then(setYoung);
+    void uriToBlob(youngPhoto.uri, true).then(blobToUri).then(setYoung);
   }, [youngPhoto?.uri]);
 
   useEffect(() => {
     if (!oldPhoto?.uri) return;
-    void uriToBlob(oldPhoto.uri).then(blobToUri).then(setOld);
+    void uriToBlob(oldPhoto.uri, true).then(blobToUri).then(setOld);
   }, [oldPhoto?.uri]);
 
   // const handleVideoStatusUpdate = useCallback(

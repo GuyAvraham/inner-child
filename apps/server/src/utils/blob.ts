@@ -25,9 +25,10 @@ export const blobToUri = async (blob: Blob) => {
 //   });
 // };
 
-export const uriToBlob = (uri: string) => {
+export const uriToBlob = (uri: string, isImage?: boolean) => {
   const formData = new FormData();
   formData.append('uri', uri);
+  formData.append('contentType', isImage ? 'image/jpeg' : 'video/*');
   return fetch('/api/uriToBlob', {
     method: 'POST',
     body: formData,
