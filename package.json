@@ -16,6 +16,7 @@
     "db:studio": "pnpm -F db dev",
     "dev": "turbo dev --parallel",
     "dev:server": "pnpm -F server dev",
+    "dev:server:w": "pnpm -F server dev:w",
     "dev:app:ios": "pnpm -F app dev:ios -- --clear",
     "dev:app:android": "pnpm -F app dev:android -- --clear",
     "format": "prettier --write \"**/*.{js,cjs,mjs,ts,tsx,md,json}\" --ignore-path .gitignore",
