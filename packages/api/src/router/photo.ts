@@ -54,13 +54,13 @@ export const photoRoute = createTRPCRouter({
 
       // MODELS of generation photos
       return Promise.allSettled([
-        ctx.replicate.predictions.create({
-          version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
-          input: {
-            image: photoURL,
-            target_age: { young: '0', old: '80' }[age],
-          },
-        }),
+        // ctx.replicate.predictions.create({
+        //   version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
+        //   input: {
+        //     image: photoURL,
+        //     target_age: { young: '0', old: '80' }[age],
+        //   },
+        // }),
         ctx.replicate.predictions.create({
           // deliberate v3
           version: '1851b62340ae657f05f8b8c8a020e3f9a46efde9fe80f273eef026c0003252ac',
