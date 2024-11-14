@@ -1,13 +1,8 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
-const chatPageStyles = 'absolute left-0 top-0 flex justify-end p-4';
-const defaultStyles = 'flex justify-end p-4';
-
-export default function Header({ isChatPage }: { isChatPage?: boolean }) {
-  const className = isChatPage ? chatPageStyles : defaultStyles;
-
+export default function Header() {
   return (
-    <header className={className}>
+    <header className="absolute left-0 top-0 flex justify-end p-4">
       <SignedIn>
         <UserButton afterSignOutUrl="/" />
       </SignedIn>

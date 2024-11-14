@@ -6,7 +6,7 @@ import Chat from '~/components/screens/chat';
 export default function ChatPage() {
   return (
     <>
-      <Header isChatPage />
+      <Header />
       <main className="flex flex-1 flex-col p-4">
         <SignedIn>
           <Chat />
