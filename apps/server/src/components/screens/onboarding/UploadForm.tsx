@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
+import { api } from '~/utils/api';
 import Button from '~/components/Button';
 import { currentPhotoAtom } from '~/atoms';
 import { useExistingUser } from '~/hooks/useExistingUser';
@@ -17,9 +18,13 @@ import { Onboarded } from '~/types';
 export default function UploadForm() {
   useOnboardedScreen(Onboarded.Current);
   const [isHandled, setIsHandled] = useState(false);
+  const [isReplacing, setIsReplacing] = useState(false);
   const { photo, handlePhoto, upload, isUploading, canSubmit } = useHandlePhoto('current', currentPhotoAtom);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const utils = api.useContext();
+
+  const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
 
   const isChecking = useExistingUser();
 
@@ -39,6 +44,9 @@ export default function UploadForm() {
 
   async function uploadFile(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+    setIsReplacing(true);
+    await deleteAllPhotos();
+    await utils.photo.invalidate();
 
     await upload();
     router.replace('/generateOld');
@@ -71,11 +79,11 @@ export default function UploadForm() {
           type="submit"
           onClick={uploadFile}
           blue
-          disabled={!canSubmit || isUploading || !isHandled || isChecking}
+          disabled={!canSubmit || isUploading || isReplacing || !isHandled || isChecking}
           wide
           className="w-full gap-2"
         >
-          {isUploading ? 'Uploading...' : 'Ok, Upload this photo'}
+          {isUploading || isReplacing ? 'Uploading...' : 'Ok, Upload this photo'}
           <TakePhotoSVG />
         </Button>
       </div>
