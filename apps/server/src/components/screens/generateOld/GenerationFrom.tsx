@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
@@ -11,6 +11,7 @@ import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import { oldPhotoAtom, useCurrentPhotoAtom } from '~/atoms';
 import { useExistingUser } from '~/hooks/useExistingUser';
+import useGenderCheck from '~/hooks/useGenderCheck';
 import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -19,9 +20,6 @@ import NextSVG from '~/svg/NextSVG';
 import ReplacePhotoSVG from '~/svg/ReplacePhotoSVG';
 import { Age, Onboarded } from '~/types';
 import PhotoSelect from './PhotoSelect';
-
-// const testImg =
-//   'https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yblFpMExhdGhBWWFaU2hiYzlhYkg1Nm03eGQifQ?width=80 1x,https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yblFpMExhdGhBWWFaU2hiYzlhYkg1Nm03eGQifQ?width=160';
 
 export default function GenerationForm() {
   useOnboardedScreen(Onboarded.GenerateOld);
@@ -36,13 +34,13 @@ export default function GenerationForm() {
     upload: uploadOldPhoto,
   } = useHandlePhoto(Age.Old, oldPhotoAtom);
 
+  useGenderCheck();
   useExistingUser();
 
-  const { updateUserData } = useUserData();
+  const { data: userData, updateUserData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' }, { refetchOnWindowFocus: false });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
   const generatedPhotos = useGenerateAgedPhotos(Age.Old);
-  // const { data: all } = api.photo.getAll.useQuery();
 
   const replacePhotos = useCallback(async () => {
     setIsReplacing(true);
@@ -59,8 +57,6 @@ export default function GenerationForm() {
     await uploadOldPhoto();
     await updateUserData({ onboarded: Onboarded.Finished });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     router.push('/chat');
   }, [canSubmitOldPhoto, router, updateUserData, uploadOldPhoto]);
 
@@ -68,6 +64,12 @@ export default function GenerationForm() {
     () => generatedPhotos.every((photo) => typeof photo === 'string'),
     [generatedPhotos],
   );
+
+  useLayoutEffect(() => {
+    if (typeof userData.gender !== 'string' || userData.gender?.length === 0) {
+      router.replace('/');
+    }
+  }, [router, userData.gender]);
 
   return (
     <div className="flex flex-col items-center gap-10">

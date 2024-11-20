@@ -9,7 +9,7 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <main className="flex flex-1 flex-col">
+      <main className="flex flex-1 flex-col p-4">
         <SignedIn>
           <GenderForm />
         </SignedIn>

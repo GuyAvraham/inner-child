@@ -8,17 +8,20 @@ import clsx from 'clsx';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import { useExistingUser } from '~/hooks/useExistingUser';
+import useGenderCheck from '~/hooks/useGenderCheck';
 
 export default function GenderForm() {
   const { user } = useUser();
   const router = useRouter();
 
+  useGenderCheck();
   const isChecking = useExistingUser();
 
   const setUserGender = useCallback(
     async (gender: 'male' | 'female') => {
       if (!user) return;
 
+      localStorage.setItem('gender', gender);
       await user.update({ unsafeMetadata: { gender, token: generateToken() } });
 
       router.replace('/onboarding');

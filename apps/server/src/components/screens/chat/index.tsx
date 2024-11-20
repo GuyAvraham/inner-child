@@ -1,11 +1,13 @@
 'use client';
 
 import type { FormEvent, KeyboardEvent } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { api } from '~/utils/api';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
+import useGenderCheck from '~/hooks/useGenderCheck';
 import useUserData from '~/hooks/useUserData';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import SendSVG from '~/svg/SendSVG';
@@ -18,10 +20,11 @@ export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
   const massageListContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const { user } = useUserData();
+  const { user, data: userData } = useUserData();
   const userName = user?.firstName ?? '';
   const splitter = '<user_name>';
   const utils = api.useContext();
+  const router = useRouter();
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Old);
   const [isWaitingInitialMessage, setIsWaitingInitialMessage] = useState(false);
@@ -48,6 +51,8 @@ export default function Chat() {
       massageListRef.current?.scrollTo({ top: massageListRef.current.scrollHeight, behavior: 'smooth' });
     }, 100);
   }, []);
+
+  useGenderCheck();
 
   const handleSendMessage = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -189,6 +194,12 @@ export default function Chat() {
       massageListContainerRef.current.style.maxHeight = `${h}px`;
     }
   }, [isGettingText]);
+
+  useEffect(() => {
+    if (userData.gender !== 'male' && userData.gender !== 'female') {
+      router.replace('/');
+    }
+  }, [router, userData.gender]);
 
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">

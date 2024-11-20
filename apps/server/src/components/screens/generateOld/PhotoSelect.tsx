@@ -22,7 +22,7 @@ const duration: Record<number, number> = {
   3: 70 + loadingPredictionsIdTime,
 };
 
-export default function PhotoSelect({ photos, onPhotoSelect, chooseFromGallery }: PhotoSelectProps) {
+export default function PhotoSelect({ photos, onPhotoSelect }: PhotoSelectProps) {
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   const handlePhotoPress = useCallback(
