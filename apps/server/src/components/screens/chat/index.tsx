@@ -69,7 +69,9 @@ export default function Chat() {
       if (responseMessage) {
         setLastGPTResponse(responseMessage);
         await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
-        void triggerVideoGeneration(responseMessage);
+        if (process.env.SERVER_MODE !== 'development') {
+          void triggerVideoGeneration(responseMessage);
+        }
       }
 
       await utils.conversation.get.invalidate();

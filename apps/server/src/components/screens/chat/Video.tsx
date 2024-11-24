@@ -111,6 +111,10 @@ export default function Video({ age }: ConversationAgeSelectProps) {
   }, [isPlayVideo, clearVideo]);
 
   const videoUri = useMemo(() => {
+    if (process.env.SERVER_MODE === 'development') {
+      return '/old-video.mp4';
+    }
+
     if (video) return video;
     return age === Age.Young ? youngVideo?.uri : oldVideo?.uri;
   }, [video, age, youngVideo?.uri, oldVideo?.uri]);
