@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 
 import { api } from '~/utils/api';
@@ -9,6 +8,7 @@ import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import Toggle from '~/components/Toggle';
 import { useOnClickOutside } from '~/hooks/useOnClickOutside';
+import { useRouteState } from '~/hooks/useRouteState';
 import useUserData from '~/hooks/useUserData';
 import CloseSVG from '~/svg/CloseSVG';
 import OptionsSVG from '~/svg/OptionsSVG';
@@ -33,7 +33,7 @@ export default function ChatOptions({
   const modalRef = useRef<HTMLDivElement>(null);
   const [isReplacing, setIsReplacing] = useState(false);
   const utils = api.useContext();
-  const router = useRouter();
+  const { openUpload } = useRouteState();
   const { updateUserData } = useUserData();
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
 
@@ -48,8 +48,8 @@ export default function ChatOptions({
     handleClearConversation();
     await updateUserData({ token: generateToken(), onboarded: Onboarded.Current });
 
-    router.replace('/onboarding');
-  }, [deleteAllPhotos, utils.photo, handleClearConversation, updateUserData, router]);
+    openUpload();
+  }, [deleteAllPhotos, utils.photo, handleClearConversation, updateUserData, openUpload]);
 
   const toggleAnimationBG = useCallback(() => {
     const attr = 'data-animation';

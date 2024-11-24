@@ -1,17 +1,19 @@
-import { SignedIn } from '@clerk/nextjs';
+import { currentUser, SignedIn } from '@clerk/nextjs';
 
 import Header from '~/components/Header';
-import GenderForm from '~/components/screens/home/gender';
+import AccountChecker from '~/components/screens/home/AccountChecker';
 
 export const runtime = 'edge';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const user = await currentUser();
+
   return (
     <>
       <Header />
       <main className="flex flex-1 flex-col p-4">
         <SignedIn>
-          <GenderForm />
+          <AccountChecker isGenderExist={!!user?.unsafeMetadata?.gender} />
         </SignedIn>
       </main>
     </>

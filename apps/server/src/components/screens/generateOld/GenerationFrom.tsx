@@ -1,8 +1,7 @@
 'use client';
 
-import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 
 import { api } from '~/utils/api';
@@ -10,11 +9,10 @@ import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import { oldPhotoAtom, useCurrentPhotoAtom } from '~/atoms';
-import { useExistingUser } from '~/hooks/useExistingUser';
-import useGenderCheck from '~/hooks/useGenderCheck';
 import { useGenerateAgedPhotos } from '~/hooks/useGenerateAgedPhotos';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
+import { useRouteState } from '~/hooks/useRouteState';
 import useUserData from '~/hooks/useUserData';
 import NextSVG from '~/svg/NextSVG';
 import ReplacePhotoSVG from '~/svg/ReplacePhotoSVG';
@@ -26,7 +24,7 @@ export default function GenerationForm() {
   const [currentPhoto] = useCurrentPhotoAtom();
   const [isReplacing, setIsReplacing] = useState(false);
   const utils = api.useContext();
-  const router = useRouter();
+  const { openChat, openUpload } = useRouteState();
   const {
     canSubmit: canSubmitOldPhoto,
     handlePhoto: handleOldPhoto,
@@ -34,10 +32,7 @@ export default function GenerationForm() {
     upload: uploadOldPhoto,
   } = useHandlePhoto(Age.Old, oldPhotoAtom);
 
-  useGenderCheck();
-  useExistingUser();
-
-  const { data: userData, updateUserData } = useUserData();
+  const { updateUserData } = useUserData();
   const { data: currentPhotoDB } = api.photo.getByAge.useQuery({ age: 'current' }, { refetchOnWindowFocus: false });
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
   const generatedPhotos = useGenerateAgedPhotos(Age.Old);
@@ -48,8 +43,8 @@ export default function GenerationForm() {
     await utils.photo.invalidate();
     await updateUserData({ token: generateToken(), onboarded: Onboarded.Current });
 
-    router.replace('/onboarding');
-  }, [deleteAllPhotos, utils.photo, updateUserData, router]);
+    openUpload();
+  }, [deleteAllPhotos, utils.photo, updateUserData, openUpload]);
 
   const submitPhoto = useCallback(async () => {
     if (!canSubmitOldPhoto) return;
@@ -57,19 +52,13 @@ export default function GenerationForm() {
     await uploadOldPhoto();
     await updateUserData({ onboarded: Onboarded.Finished });
 
-    router.push('/chat');
-  }, [canSubmitOldPhoto, router, updateUserData, uploadOldPhoto]);
+    openChat();
+  }, [canSubmitOldPhoto, openChat, updateUserData, uploadOldPhoto]);
 
   const generationFinished = useMemo(
     () => generatedPhotos.every((photo) => typeof photo === 'string'),
     [generatedPhotos],
   );
-
-  useLayoutEffect(() => {
-    if (typeof userData.gender !== 'string' || userData.gender?.length === 0) {
-      router.replace('/');
-    }
-  }, [router, userData.gender]);
 
   return (
     <div className="flex flex-col items-center gap-10">

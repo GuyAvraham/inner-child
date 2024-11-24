@@ -14,3 +14,7 @@ export const useVideoUriAtom = () => useAtom(videoUriAtom);
 
 const videoLoadingAtom = atom<boolean>(false);
 export const useVideoLoadingAtom = () => useAtom(videoLoadingAtom);
+
+export type TRouteState = 'gender' | 'upload' | 'generateOld' | 'chat';
+const routeStateAtom = atom<TRouteState>('gender');
+export const useRouteStateAtom = () => useAtom(routeStateAtom);

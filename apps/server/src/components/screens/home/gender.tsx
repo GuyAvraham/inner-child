@@ -1,55 +1,34 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import clsx from 'clsx';
 
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
-import { useExistingUser } from '~/hooks/useExistingUser';
-import useGenderCheck from '~/hooks/useGenderCheck';
+import { useRouteState } from '~/hooks/useRouteState';
 
 export default function GenderForm() {
   const { user } = useUser();
-  const router = useRouter();
-
-  useGenderCheck();
-  const isChecking = useExistingUser();
+  const { openUpload } = useRouteState();
 
   const setUserGender = useCallback(
     async (gender: 'male' | 'female') => {
       if (!user) return;
 
-      localStorage.setItem('gender', gender);
       await user.update({ unsafeMetadata: { gender, token: generateToken() } });
 
-      router.replace('/onboarding');
+      openUpload();
     },
-    [router, user],
+    [openUpload, user],
   );
 
   return (
     <div className="flex flex-1 flex-col justify-evenly p-4">
-      <p
-        className={clsx(
-          'my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0',
-          isChecking && 'hidden',
-        )}
-      >
+      <p className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0">
         Our image engine needs to understand if you are more of a {'\n'}male or female?
       </p>
 
-      <div className={clsx('mt-4', !isChecking && 'hidden')}>
-        <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-transparent border-t-white" />
-      </div>
-
-      <div
-        className={clsx(
-          'mt-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-16',
-          isChecking && 'hidden',
-        )}
-      >
+      <div className="mt-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-16">
         <Button className="w-full min-w-[140px] sm:w-auto" onClick={() => setUserGender('male')}>
           Male
         </Button>

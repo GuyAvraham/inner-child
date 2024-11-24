@@ -1,18 +1,15 @@
 'use client';
 
 import type { MouseEvent } from 'react';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 import { api } from '~/utils/api';
 import Button from '~/components/Button';
 import { currentPhotoAtom } from '~/atoms';
-import { useExistingUser } from '~/hooks/useExistingUser';
-import useGenderCheck from '~/hooks/useGenderCheck';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
-import useUserData from '~/hooks/useUserData';
+import { useRouteState } from '~/hooks/useRouteState';
 import SelectPhotoSVG from '~/svg/SelectPhotoSVG';
 import TakePhotoSVG from '~/svg/TakePhotoSVG';
 import { Onboarded } from '~/types';
@@ -23,14 +20,10 @@ export default function UploadForm() {
   const [isReplacing, setIsReplacing] = useState(false);
   const { photo, handlePhoto, upload, isUploading, canSubmit } = useHandlePhoto('current', currentPhotoAtom);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  const { openGenerateOld } = useRouteState();
   const utils = api.useContext();
 
-  const { data: userData } = useUserData();
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
-
-  useGenderCheck();
-  const isChecking = useExistingUser();
 
   const selectFile = useCallback(() => {
     const file = fileInputRef?.current?.files?.item(0);
@@ -54,9 +47,9 @@ export default function UploadForm() {
       await utils.photo.invalidate();
 
       await upload();
-      router.replace('/generateOld');
+      openGenerateOld();
     },
-    [deleteAllPhotos, router, upload, utils.photo],
+    [deleteAllPhotos, openGenerateOld, upload, utils.photo],
   );
 
   useEffect(() => {
@@ -68,12 +61,6 @@ export default function UploadForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useLayoutEffect(() => {
-    if (typeof userData.gender !== 'string' || userData.gender?.length === 0) {
-      router.replace('/');
-    }
-  }, [router, userData.gender]);
 
   return (
     <form className="flex flex-1 flex-col items-center sm:mx-auto sm:w-[430px] sm:flex-initial">
@@ -92,7 +79,7 @@ export default function UploadForm() {
           type="submit"
           onClick={uploadFile}
           blue
-          disabled={!canSubmit || isUploading || isReplacing || !isHandled || isChecking}
+          disabled={!canSubmit || isUploading || isReplacing || !isHandled}
           wide
           className="w-full gap-2"
         >
