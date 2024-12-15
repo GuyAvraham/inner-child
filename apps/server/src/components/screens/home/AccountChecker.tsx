@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { api } from '~/utils/api';
+import Spinner from '~/components/Spinner';
 import { useRouteState } from '~/hooks/useRouteState';
 import { Age } from '~/types';
 import Chat from '../chat';
@@ -28,11 +29,7 @@ export default function AccountChecker({ isGenderExist }: { isGenderExist?: bool
   }
 
   if (isOldLoading) {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-transparent border-t-white" />
-      </div>
-    );
+    return <Spinner />;
   }
 
   return (

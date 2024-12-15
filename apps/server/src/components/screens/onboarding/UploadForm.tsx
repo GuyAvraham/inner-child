@@ -6,6 +6,7 @@ import Image from 'next/image';
 
 import { api } from '~/utils/api';
 import Button from '~/components/Button';
+import Spinner from '~/components/Spinner';
 import { currentPhotoAtom } from '~/atoms';
 import useHandlePhoto from '~/hooks/useHandlePhoto';
 import useOnboardedScreen from '~/hooks/useOnboardedScreen';
@@ -28,12 +29,14 @@ export default function UploadForm() {
   const selectFile = useCallback(() => {
     const file = fileInputRef?.current?.files?.item(0);
     if (file) {
+      setIsReplacing(true);
       const reader = new FileReader();
       reader.onload = async (e) => {
         if (e.target?.result) {
           await handlePhoto(e.target.result as string);
           setIsHandled(true);
         }
+        setIsReplacing(false);
       };
       reader.readAsDataURL(file);
     }
@@ -83,7 +86,7 @@ export default function UploadForm() {
           wide
           className="w-full gap-2"
         >
-          {isUploading || isReplacing ? 'Uploading...' : 'Ok, Upload this photo'}
+          {isUploading || isReplacing ? <Spinner /> : 'Ok, Upload this photo'}
           <TakePhotoSVG />
         </Button>
       </div>

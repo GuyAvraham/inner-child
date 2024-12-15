@@ -2,7 +2,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 
 export default function Header() {
   return (
-    <header className="absolute left-0 top-0 flex justify-end p-4">
+    <header className="flex justify-end p-4">
       <SignedIn>
         <UserButton afterSignOutUrl="/" />
       </SignedIn>

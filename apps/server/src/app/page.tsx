@@ -3,7 +3,7 @@ import { currentUser, SignedIn } from '@clerk/nextjs';
 import Header from '~/components/Header';
 import AccountChecker from '~/components/screens/home/AccountChecker';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export default async function HomePage() {
   const user = await currentUser();

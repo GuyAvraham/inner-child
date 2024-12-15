@@ -36,7 +36,7 @@ export default function Layout(props: { children: React.ReactNode }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={clsx('flex h-screen flex-col font-sans', fontSans.variable)}>
+        <body className={clsx('flex flex-col font-sans sm:h-screen', fontSans.variable)}>
           <Image
             src="/bg1.png"
             width={375}
