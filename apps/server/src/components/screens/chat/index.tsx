@@ -208,7 +208,7 @@ export default function Chat() {
         <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
       </div>
 
-      <div ref={massageListContainerRef} className="flex w-full flex-1 flex-col overflow-hidden">
+      <div ref={massageListContainerRef} className="flex w-full flex-1 flex-col overflow-hidden min-h-[200px] overflow-y-visible">
         <div ref={massageListRef} className="w-full overflow-y-auto">
           {visibleMessages.length > 0 ? (
             visibleMessages.map((m, index) => (
