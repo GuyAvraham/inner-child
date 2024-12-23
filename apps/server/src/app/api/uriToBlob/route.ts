@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 
-const isDev = process.env.NODE_ENV === 'development';
-export const runtime = isDev ? 'nodejs' : 'edge';
-
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
