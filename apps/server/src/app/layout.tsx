@@ -6,6 +6,7 @@ import '~/styles/globals.css';
 import { headers } from 'next/headers';
 import Image from 'next/image';
 import { ClerkProvider } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import clsx from 'clsx';
 
 import BGSVG from '~/svg/BGSVG';
@@ -34,9 +35,9 @@ export const metadata: Metadata = {
 
 export default function Layout(props: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
-        <body className={clsx('flex flex-col font-sans sm:h-screen', fontSans.variable)}>
+        <body className={clsx('flex h-screen flex-col font-sans', fontSans.variable)}>
           <Image
             src="/bg1.png"
             width={375}
