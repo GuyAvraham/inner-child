@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 
+// TODO FIX: for Vercel it needs to be 'edge' but for local development we need 'nodejs'
+// there is not solution yet, so if you're developing locally use 'nodejs'
+export const runtime = 'edge';
+
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
