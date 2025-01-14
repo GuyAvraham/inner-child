@@ -111,7 +111,7 @@ export default function Video({ age }: ConversationAgeSelectProps) {
   }, [isPlayVideo, clearVideo]);
 
   const videoUri = useMemo(() => {
-    if (process.env.SERVER_MODE === 'development') {
+    if (process.env.NEXT_PUBLIC_SERVER_MODE === 'development') {
       return '/old-video.mp4';
     }
 
@@ -120,8 +120,10 @@ export default function Video({ age }: ConversationAgeSelectProps) {
   }, [video, age, youngVideo?.uri, oldVideo?.uri]);
 
   useEffect(() => {
-    if (videoUri && videoUri.includes('d-id-talks')) {
+    // if (videoUri && videoUri.includes('d-id-talks')) {
+    if (videoUri && !localStorage.getItem('wasPlayed')) {
       setIsPlayVideo(true);
+      localStorage.setItem('wasPlayed', 'true');
     }
   }, [videoUri]);
 

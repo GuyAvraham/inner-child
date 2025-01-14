@@ -49,6 +49,8 @@ export default function GenerationForm() {
   const submitPhoto = useCallback(async () => {
     if (!canSubmitOldPhoto) return;
 
+    localStorage.setItem('wasPlayed', '');
+
     await uploadOldPhoto();
     await updateUserData({ onboarded: Onboarded.Finished });
 

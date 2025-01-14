@@ -58,6 +58,6 @@
     "PORT",
     "VERCEL",
     "VERCEL_URL",
-    "SERVER_MODE"
+    "NEXT_PUBLIC_SERVER_MODE"
   ]
 }

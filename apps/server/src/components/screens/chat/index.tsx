@@ -53,6 +53,7 @@ export default function Chat() {
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!(message && message.trim().length > 0) || !messages || !prompts) return;
+      localStorage.setItem('wasPlayed', '');
 
       setConversationStatus(ConversationStatus.Waiting);
       const messagesForSending = messages.map((message) => ({
@@ -69,7 +70,7 @@ export default function Chat() {
       if (responseMessage) {
         setLastGPTResponse(responseMessage);
         await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
-        if (process.env.SERVER_MODE !== 'development') {
+        if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
           void triggerVideoGeneration(responseMessage);
         }
       }
@@ -94,7 +95,9 @@ export default function Chat() {
         if (responseMessage) {
           setInitialMessage(responseMessage);
           await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
-          void triggerVideoGeneration(responseMessage);
+          if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+            void triggerVideoGeneration(responseMessage);
+          }
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
         }
@@ -208,7 +211,10 @@ export default function Chat() {
         <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
       </div>
 
-      <div ref={massageListContainerRef} className="flex w-full flex-1 flex-col overflow-hidden min-h-[200px] overflow-y-visible">
+      <div
+        ref={massageListContainerRef}
+        className="flex min-h-[200px] w-full flex-1 flex-col overflow-hidden overflow-y-visible"
+      >
         <div ref={massageListRef} className="w-full overflow-y-auto">
           {visibleMessages.length > 0 ? (
             visibleMessages.map((m, index) => (
