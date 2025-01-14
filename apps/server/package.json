@@ -6,6 +6,7 @@
     "build": "pnpm with-env next build",
     "clean": "git clean -xdf .next .turbo node_modules",
     "dev": "pnpm with-env next dev",
+    "dev:w": "pnpm with-env next dev --turbo",
     "lint": "dotenv -v SKIP_ENV_VALIDATION=1 next lint",
     "lint:fix": "pnpm lint --fix",
     "start": "pnpm with-env next start",
@@ -14,6 +15,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.6",
+    "@clerk/themes": "^2.2.3",
     "@innch/api": "^0.1.0",
     "@innch/db": "^0.1.0",
     "@innch/utils": "*",
@@ -26,9 +28,11 @@
     "@trpc/react-query": "^10.38.0",
     "@trpc/server": "^10.38.0",
     "ai": "^2.2.31",
+    "clsx": "^2.0.0",
     "next": "^14.1.0",
     "openai-edge": "^1.2.2",
     "react": "18.2.0",
+    "react-circular-progressbar": "2.1.0",
     "react-dom": "18.2.0",
     "superjson": "1.13.1",
     "zod": "^3.22.2"

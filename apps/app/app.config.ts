@@ -10,7 +10,7 @@ import type { ExpoConfig } from '@expo/config';
 
 // Guy personal
 const owner = undefined;
-const projectId = '8d3e99f7-8501-45f3-8065-4bd53e160b63';
+const projectId = '';
 
 const bundleId = 'com.guyavraham.innerchild';
 const buildNumber = 3;

@@ -55,12 +55,28 @@ export const photoRoute = createTRPCRouter({
       // MODELS of generation photos
       return Promise.allSettled([
         ctx.replicate.predictions.create({
-          version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
+          // mixinmax1990/realisitic-vision-v3-image-to-image
+          version: '6eb633a82ab3e7a4417d0af2e84e24b4b419c76f86f6e837824d02ae6845dc81',
           input: {
             image: photoURL,
-            target_age: { young: '0', old: '80' }[age],
+            prompt: `${gender}, ${age === 'old' ? '69' : '5'} years old, ${
+              age === 'young' ? 'child' : '((gray hair:1.5))'
+            }, RAW photo, natural skin`,
+            negative_prompt: `${
+              age === 'young' ? '(beard, mustache, whisker:1.3),' : ''
+            } [deformed | disfigured], poorly drawn, [bad : wrong] anatomy, [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry`,
+            prompt_strength: 0.5,
+            seed: 12,
           },
         }),
+        //// *** first ugly version in past ***
+        // ctx.replicate.predictions.create({
+        //   version: '9222a21c181b707209ef12b5e0d7e94c994b58f01c7b2fec075d2e892362f13c',
+        //   input: {
+        //     image: photoURL,
+        //     target_age: { young: '0', old: '80' }[age],
+        //   },
+        // }),
         ctx.replicate.predictions.create({
           // deliberate v3
           version: '1851b62340ae657f05f8b8c8a020e3f9a46efde9fe80f273eef026c0003252ac',
@@ -100,6 +116,21 @@ export const photoRoute = createTRPCRouter({
               age === 'young' ? '(beard, mustache, whisker:1.3),' : ''
             } [deformed | disfigured], poorly drawn, [bad : wrong] anatomy, [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry`,
             prompt_strength: 0.5,
+          },
+        }),
+        ctx.replicate.predictions.create({
+          // mixinmax1990/realisitic-vision-v3-image-to-image
+          version: '6eb633a82ab3e7a4417d0af2e84e24b4b419c76f86f6e837824d02ae6845dc81',
+          input: {
+            image: photoURL,
+            prompt: `${gender}, ${age === 'old' ? '69' : '5'} years old, ${
+              age === 'young' ? 'child' : '((gray hair:1.5))'
+            }, RAW photo, natural skin`,
+            negative_prompt: `${
+              age === 'young' ? '(beard, mustache, whisker:1.3),' : ''
+            } [deformed | disfigured], poorly drawn, [bad : wrong] anatomy, [extra | missing | floating | disconnected] limb, (mutated hands and fingers), blurry`,
+            prompt_strength: 0.5,
+            seed: 1,
           },
         }),
       ]);
@@ -160,6 +191,8 @@ export const photoRoute = createTRPCRouter({
     });
 
     const s3Keys = [...photos, ...videos].map((item) => `${ctx.session.userId}/${item.key}`);
+    if (s3Keys.length === 0) return Promise.allSettled([]);
+
     await ctx.s3.deleteFiles(s3Keys);
 
     return Promise.allSettled([
