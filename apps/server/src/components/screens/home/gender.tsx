@@ -24,8 +24,8 @@ export default function GenderForm() {
 
   return (
     <div className="flex flex-1 flex-col justify-evenly p-4">
-      <p className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0">
-        Our image engine needs to understand if you are more of a {'\n'}male or female?
+      <p className="my-auto text-center font-[Poppins-Bold] text-4xl leading-[48px] sm:my-0 whitespace-pre-line">
+        We respect all gender identities.{'\n'}For our AI to generate an older image, please select{'\n'} ‘Male’ or ‘Female’—whichever best fits your older self.
       </p>
 
       <div className="mt-4 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-16">
