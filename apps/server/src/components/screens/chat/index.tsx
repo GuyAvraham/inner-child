@@ -2,17 +2,28 @@
 
 import type { FormEvent, KeyboardEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 import { api } from '~/utils/api';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import useUserData from '~/hooks/useUserData';
-import { useVideoResponse } from '~/hooks/useVideoResponse';
+// import { useVideoResponse } from '~/hooks/useVideoResponse';
+import { useVideoStreaming } from '~/hooks/useVideoStreaming';
 import SendSVG from '~/svg/SendSVG';
 import { Age, ConversationStatus, Role } from '~/types';
 import ChatOptions from './ChatOptions';
 import Message from './Message';
-import Video from './Video';
+
+// import Video from './Video';
+
+// import { VideoStream } from './VideoStream';
+const VideoStream = dynamic(() => import('./VideoStream'), { ssr: false });
+
+const mockText = () => {
+  const randNum = Math.floor(Math.random() * 100);
+  return `Hello, I am your future self. I am here to help you with your journey. ${randNum}`;
+};
 
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
@@ -42,12 +53,13 @@ export default function Chat() {
   });
   const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
   const [isOpenedOptions, setIsOpenedOptions] = useState(false);
-  const { triggerVideoGeneration } = useVideoResponse(conversationAge);
+  // const { triggerVideoGeneration } = useVideoResponse(conversationAge);
   const scrollListToEnd = useCallback(() => {
     setTimeout(() => {
       massageListRef.current?.scrollTo({ top: massageListRef.current.scrollHeight, behavior: 'smooth' });
     }, 100);
   }, []);
+  const { videoRef, sendStreamMessage } = useVideoStreaming(conversationAge);
 
   const handleSendMessage = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -65,13 +77,17 @@ export default function Chat() {
         content: prompts[conversationAge].split(splitter).join(userName),
       });
       messagesForSending.push({ role: Role.User, content: message.trim() });
-      const responseMessage = await sendMessageToOpenAI(messagesForSending);
+      const responseMessage =
+        process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
+          ? mockText()
+          : await sendMessageToOpenAI(messagesForSending);
       await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
       if (responseMessage) {
         setLastGPTResponse(responseMessage);
         await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
         if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-          void triggerVideoGeneration(responseMessage);
+          // void triggerVideoGeneration(responseMessage);
+          void sendStreamMessage(responseMessage);
         }
       }
 
@@ -88,22 +104,26 @@ export default function Chat() {
       setInitialMessage(null);
       if (!areMessagesLoading && messages?.length === 0 && prompts) {
         setIsWaitingInitialMessage(true);
-        const responseMessage = await sendMessageToOpenAI([
-          { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
-        ]);
+        const responseMessage =
+          process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
+            ? mockText()
+            : await sendMessageToOpenAI([
+                { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
+              ]);
         console.log(responseMessage);
         if (responseMessage) {
           setInitialMessage(responseMessage);
           await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
           if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-            void triggerVideoGeneration(responseMessage);
+            // void triggerVideoGeneration(responseMessage);
+            void sendStreamMessage(responseMessage);
           }
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
         }
       }
     })();
-  }, [areMessagesLoading, messages, conversationAge, prompts, triggerVideoGeneration]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [areMessagesLoading, messages, conversationAge, prompts, sendStreamMessage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {
@@ -208,7 +228,8 @@ export default function Chat() {
           isClearingConversation={isDeletingVideo || isClearingConversation}
           handleClearConversation={handleClearConversation}
         />
-        <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
+        {/* <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} /> */}
+        <VideoStream key="video-stream" videoRef={videoRef} />
       </div>
 
       <div
