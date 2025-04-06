@@ -61,7 +61,7 @@ export default function ChatOptions({
   }, []);
 
   return (
-    <div className="absolute right-3 z-20">
+    <div className="absolute right-3 z-30">
       <button className="border-0 bg-transparent outline-none" onClick={isOpen ? close : open}>
         {isOpen ? <CloseSVG /> : <OptionsSVG />}
       </button>
