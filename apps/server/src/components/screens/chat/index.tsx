@@ -5,19 +5,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import { api } from '~/utils/api';
+import { send } from '~/utils/d-id';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import useUserData from '~/hooks/useUserData';
-// import { useVideoResponse } from '~/hooks/useVideoResponse';
-import { useVideoStreaming } from '~/hooks/useVideoStreaming';
 import SendSVG from '~/svg/SendSVG';
 import { Age, ConversationStatus, Role } from '~/types';
 import ChatOptions from './ChatOptions';
 import Message from './Message';
 
-// import Video from './Video';
-
-// import { VideoStream } from './VideoStream';
 const VideoStream = dynamic(() => import('./VideoStream'), { ssr: false });
 
 const mockText = () =>
@@ -28,14 +24,16 @@ const mockText = () =>
 
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
-  const massageListContainerRef = useRef<HTMLDivElement>(null);
+  const massageListContainerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const { user } = useUserData();
+  const { user, data } = useUserData();
+  const gender = data.gender as 'male' | 'female';
   const userName = user?.firstName ?? '';
   const splitter = '<user_name>';
   const utils = api.useContext();
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Old);
+  const [wasPlayedLastAiMessageAfterLoad, setWasPlayedLastAiMessageAfterLoad] = useState(false);
   const [isWaitingInitialMessage, setIsWaitingInitialMessage] = useState(false);
   const [initialMessage, setInitialMessage] = useState<string | null>(null);
   const [lastGPTResponse, setLastGPTResponse] = useState<string | null>(null);
@@ -54,13 +52,12 @@ export default function Chat() {
   });
   const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
   const [isOpenedOptions, setIsOpenedOptions] = useState(false);
-  // const { triggerVideoGeneration } = useVideoResponse(conversationAge);
   const scrollListToEnd = useCallback(() => {
     setTimeout(() => {
       massageListRef.current?.scrollTo({ top: massageListRef.current.scrollHeight, behavior: 'smooth' });
     }, 100);
   }, []);
-  const { videoRef, sendStreamMessage } = useVideoStreaming(conversationAge);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleSendMessage = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
@@ -87,8 +84,7 @@ export default function Chat() {
         setLastGPTResponse(responseMessage);
         await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
         if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-          // void triggerVideoGeneration(responseMessage);
-          void sendStreamMessage(responseMessage);
+          void send(responseMessage, gender, conversationAge);
         }
       }
 
@@ -97,7 +93,7 @@ export default function Chat() {
       setConversationStatus(ConversationStatus.Idle);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts],
+    [conversationAge, gender, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts],
   );
 
   useEffect(() => {
@@ -116,15 +112,14 @@ export default function Chat() {
           setInitialMessage(responseMessage);
           await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
           if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-            // void triggerVideoGeneration(responseMessage);
-            void sendStreamMessage(responseMessage);
+            void send(responseMessage, gender, conversationAge);
           }
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
         }
       }
     })();
-  }, [areMessagesLoading, messages, conversationAge, prompts, sendStreamMessage]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [areMessagesLoading, messages, gender, conversationAge, prompts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {
@@ -198,7 +193,17 @@ export default function Chat() {
     return { visibleMessages: list, lastVisibleMessageId: lastId };
   }, [messages, conversationStatus, initialMessage, lastGPTResponse]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // const lastVisibleMessageId = visibleMessages[visibleMessages.length - 1] ?? '';
+  useEffect(() => {
+    if (!wasPlayedLastAiMessageAfterLoad && messages && messages?.length > 0) {
+      const lastAiMessage = messages.findLast((message) => message.sender === Role.Assistant);
+      setWasPlayedLastAiMessageAfterLoad(true);
+      if (!lastAiMessage) return;
+
+      if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+        void send(lastAiMessage.text, gender, conversationAge);
+      }
+    }
+  }, [wasPlayedLastAiMessageAfterLoad, conversationAge, gender, messages]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && formRef.current) {
@@ -209,12 +214,24 @@ export default function Chat() {
 
   useEffect(scrollListToEnd, [visibleMessages.length, lastVisibleMessageId, scrollListToEnd]);
 
-  useEffect(() => {
-    if (!isGettingText && massageListContainerRef.current) {
-      const h = massageListContainerRef.current.offsetHeight;
-      massageListContainerRef.current.style.maxHeight = `${h}px`;
+  const handleMessageListContainerRef = useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      // calculate height of screen - node height ans set result to node maxHeight
+      const screenHeight = window.innerHeight;
+      const nodeHeight = node.offsetHeight;
+      const newMaxHeight = screenHeight - nodeHeight - 16; // 16px for padding and other elements
+      if (newMaxHeight >= 0) {
+        node.style.maxHeight = `${newMaxHeight}px`;
+      }
+      massageListContainerRef.current = node;
     }
-  }, [isGettingText]);
+  }, []);
+
+  useEffect(() => {
+    if (massageListContainerRef.current) {
+      handleMessageListContainerRef(massageListContainerRef.current);
+    }
+  }, [handleMessageListContainerRef]);
 
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
@@ -229,12 +246,11 @@ export default function Chat() {
           isClearingConversation={isDeletingVideo || isClearingConversation}
           handleClearConversation={handleClearConversation}
         />
-        {/* <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} /> */}
         <VideoStream key="video-stream" videoRef={videoRef} />
       </div>
 
       <div
-        ref={massageListContainerRef}
+        ref={handleMessageListContainerRef}
         className="flex min-h-[200px] w-full flex-1 flex-col overflow-hidden overflow-y-visible"
       >
         <div ref={massageListRef} className="w-full overflow-y-auto">

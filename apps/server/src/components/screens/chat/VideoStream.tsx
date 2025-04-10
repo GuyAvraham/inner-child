@@ -1,12 +1,13 @@
 'use client';
 
 import type { MutableRefObject } from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 
 import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
+import { init } from '~/utils/d-id';
 import AnimatedProgress from '~/components/AnimatedProgress';
 import { Age } from '~/types';
 
@@ -24,6 +25,12 @@ const VideoStream = ({ videoRef }: VideoStreamProps) => {
     if (!oldPhoto?.uri) return;
     void uriToBlob(oldPhoto.uri, true).then(blobToUri).then(setOld);
   }, [oldPhoto?.uri]);
+
+  useEffect(() => {
+    if (!videoRef?.current) return;
+
+    void init(Age.Old, videoRef.current);
+  }, [videoRef]);
 
   return (
     <div className="relative flex-row justify-center">
@@ -56,4 +63,4 @@ const VideoStream = ({ videoRef }: VideoStreamProps) => {
   );
 };
 
-export default VideoStream;
+export default memo(VideoStream);
