@@ -20,10 +20,11 @@ import Message from './Message';
 // import { VideoStream } from './VideoStream';
 const VideoStream = dynamic(() => import('./VideoStream'), { ssr: false });
 
-const mockText = () => {
-  const randNum = Math.floor(Math.random() * 100);
-  return `Hello, I am your future self. I am here to help you with your journey. ${randNum}`;
-};
+const mockText = () =>
+  new Promise<string>((resolve) => {
+    const randNum = Math.floor(Math.random() * 100);
+    resolve(`Hello, I am your future self. I am here to help you with your journey. ${randNum}`);
+  });
 
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
@@ -79,7 +80,7 @@ export default function Chat() {
       messagesForSending.push({ role: Role.User, content: message.trim() });
       const responseMessage =
         process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
-          ? mockText()
+          ? await mockText()
           : await sendMessageToOpenAI(messagesForSending);
       await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
       if (responseMessage) {
@@ -106,7 +107,7 @@ export default function Chat() {
         setIsWaitingInitialMessage(true);
         const responseMessage =
           process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
-            ? mockText()
+            ? await mockText()
             : await sendMessageToOpenAI([
                 { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
               ]);
