@@ -1,16 +1,38 @@
-import { DID_API_KEY, DID_API_URL } from '@innch/utils';
+import { NextResponse } from 'next/server';
+import { currentUser } from '@clerk/nextjs';
+
+import { s3 } from '@innch/api/src/s3';
+import { db } from '@innch/db';
+import { DID_API_KEY, DID_API_URL, raise } from '@innch/utils';
+
+import type { Age } from '~/types';
 
 export const POST = async (request: Request) => {
-  const { source_url } = (await request.json()) as { source_url: string };
+  const user = await currentUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const { id } = user;
+  const { age } = (await request.json()) as { age: Age };
+  const photo = await db.photo.findFirst({
+    where: { age, userId: id },
+  });
 
-  return await fetch(`${DID_API_URL}/talks/streams`, {
+  const source_url = await s3.getPresignedUrl(`${id}/${photo?.key ?? raise('No photo found')}`);
+
+  const res = await fetch(`${DID_API_URL}/talks/streams`, {
     method: 'POST',
     headers: {
-      Authorization: `Basic ${DID_API_KEY}`,
+      accept: 'application/json',
+      authorization: `Basic ${DID_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       source_url,
     }),
   });
+
+  const json = await res.json();
+
+  return NextResponse.json(json);
 };
