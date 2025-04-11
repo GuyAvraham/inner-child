@@ -216,11 +216,11 @@ export default function Chat() {
 
   const handleMessageListContainerRef = useCallback((node: HTMLDivElement | null) => {
     if (node) {
-      // calculate height of screen - node height ans set result to node maxHeight
+      // calculate height of screen - node height and set result to node maxHeight
       const screenHeight = window.innerHeight;
       const nodeHeight = node.offsetHeight;
       const newMaxHeight = screenHeight - nodeHeight - 16; // 16px for padding and other elements
-      if (newMaxHeight >= 0) {
+      if (newMaxHeight > 0) {
         node.style.maxHeight = `${newMaxHeight}px`;
       }
       massageListContainerRef.current = node;

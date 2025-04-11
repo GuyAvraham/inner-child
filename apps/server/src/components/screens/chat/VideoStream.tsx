@@ -29,7 +29,9 @@ const VideoStream = ({ videoRef }: VideoStreamProps) => {
   useEffect(() => {
     if (!videoRef?.current) return;
 
-    void init(Age.Old, videoRef.current);
+    if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+      void init(Age.Old, videoRef.current);
+    }
   }, [videoRef]);
 
   return (
