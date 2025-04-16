@@ -12,6 +12,7 @@
     "clean:workspaces": "turbo clean",
     "commit": "pnpm lint && better-commits",
     "db:generate": "turbo db:generate",
+    "db:server:generate": "prisma generate --schema=apps/server/prisma/schema.prisma",
     "db:push": "turbo db:push db:generate",
     "db:studio": "pnpm -F db dev",
     "dev": "turbo dev --parallel",

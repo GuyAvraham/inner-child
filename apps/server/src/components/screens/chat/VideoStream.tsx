@@ -1,18 +1,18 @@
 'use client';
 
-import type { MutableRefObject } from 'react';
+import type { RefObject } from 'react';
 import { memo, useEffect, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 
-import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
 import { init } from '~/utils/d-id';
 import AnimatedProgress from '~/components/AnimatedProgress';
+import { api } from '~/trpc/react';
 import { Age } from '~/types';
 
 interface VideoStreamProps {
-  videoRef?: MutableRefObject<HTMLVideoElement | null>;
+  videoRef?: RefObject<HTMLVideoElement | null>;
 }
 
 const VideoStream = ({ videoRef }: VideoStreamProps) => {

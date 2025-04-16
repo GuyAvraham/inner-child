@@ -3,18 +3,18 @@ import { Inter } from 'next/font/google';
 
 import '~/styles/globals.css';
 
-import { headers } from 'next/headers';
 import Image from 'next/image';
 import { ClerkProvider } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
-import clsx from 'clsx';
 
+import { cn } from '~/utils/cn';
 import BGSVG from '~/svg/BGSVG';
-import { TRPCReactProvider } from './providers';
+import { TRPCReactProvider } from '~/trpc/react';
 
-const fontSans = Inter({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-sans',
+  display: 'swap',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ export default function Layout(props: { children: React.ReactNode }) {
   return (
     <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
-        <body className={clsx('flex h-screen flex-col font-sans', fontSans.variable)}>
+        <body className={cn('flex h-screen flex-col font-sans', inter.variable)}>
           <Image
             src="/bg1.png"
             width={375}
@@ -46,7 +46,7 @@ export default function Layout(props: { children: React.ReactNode }) {
             className="lef-0 fixed top-0 -z-10 h-full w-full sm:hidden"
           />
           <BGSVG className="lef-0 fixed top-0 -z-10 hidden h-full w-full sm:block" id="bg-image" data-animation="on" />
-          <TRPCReactProvider headers={headers()}>{props.children}</TRPCReactProvider>
+          <TRPCReactProvider>{props.children}</TRPCReactProvider>
         </body>
       </html>
     </ClerkProvider>

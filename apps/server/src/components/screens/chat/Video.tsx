@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 
-import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
 import AnimatedProgress from '~/components/AnimatedProgress';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import PlayPauseSVG from '~/svg/PlayPauseSVG';
+import { api } from '~/trpc/react';
 import { Age } from '~/types';
 import VideoLoadingAnimation from './VideoLoadingAnimation';
 
@@ -147,7 +147,7 @@ export default function Video({ age }: ConversationAgeSelectProps) {
         <VideoLoadingAnimation isLoading={isVideoLoading} />
         <button
           className={clsx(
-            'absolute bottom-0 right-0 z-20 rounded-full border-0 bg-[#4285F4]/80 p-2 outline-none',
+            'outline-hidden absolute bottom-0 right-0 z-20 rounded-full border-0 bg-[#4285F4]/80 p-2',
             !videoUri && 'hidden',
           )}
           onClick={handlePlayPauseVideo}

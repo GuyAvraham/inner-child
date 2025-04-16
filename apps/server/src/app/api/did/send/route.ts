@@ -1,6 +1,5 @@
-import { DID_API_KEY, DID_API_URL } from '@innch/utils';
-
 import type { Age } from '~/types';
+import { DID_API_KEY, DID_API_URL } from '~/utils';
 
 // voice gallery: https://speech.microsoft.com/portal/voicegallery
 const voices = {

@@ -3,7 +3,6 @@
 import { useCallback, useRef, useState } from 'react';
 import clsx from 'clsx';
 
-import { api } from '~/utils/api';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import Toggle from '~/components/Toggle';
@@ -13,6 +12,7 @@ import useUserData from '~/hooks/useUserData';
 import CloseSVG from '~/svg/CloseSVG';
 import OptionsSVG from '~/svg/OptionsSVG';
 import RefreshChatSVG from '~/svg/RefreshChatSVG';
+import { api } from '~/trpc/react';
 import { Onboarded } from '~/types';
 
 interface ChatOptionsProps {
@@ -34,7 +34,7 @@ export default function ChatOptions({
   const [isReplacing, setIsReplacing] = useState(false);
   const utils = api.useContext();
   const { openUpload } = useRouteState();
-  const { updateUserData } = useUserData();
+  const { updateUserData, user } = useUserData();
   const { mutateAsync: deleteAllPhotos } = api.photo.deleteAll.useMutation();
 
   const handler = useCallback(() => close(), [close]);
@@ -62,7 +62,7 @@ export default function ChatOptions({
 
   return (
     <div className="absolute right-3 z-30">
-      <button className="border-0 bg-transparent outline-none" onClick={isOpen ? close : open}>
+      <button className="outline-hidden border-0 bg-transparent" onClick={isOpen ? close : open}>
         {isOpen ? <CloseSVG /> : <OptionsSVG />}
       </button>
       <div
