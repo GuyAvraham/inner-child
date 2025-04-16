@@ -239,7 +239,7 @@ export default function Chat() {
       const h = massageListContainerRef.current.clientHeight;
       massageListSubContainerRef.current.style.maxHeight = `${h}px`;
     }
-  }, [visibleMessages.length]);
+  }, [visibleMessages.length, user, data, messages]);
 
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
@@ -260,7 +260,7 @@ export default function Chat() {
       <div ref={massageListContainerRef} className="flex w-full flex-1 overflow-hidden">
         <div
           ref={massageListSubContainerRef}
-          className="flex min-h-[200px] w-full flex-1 flex-col overflow-hidden overflow-y-visible"
+          className="flex min-h-[200px] w-full flex-col overflow-hidden overflow-y-visible"
           style={{
             maxHeight: '76px',
           }}
