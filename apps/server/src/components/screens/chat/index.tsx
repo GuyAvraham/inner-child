@@ -215,11 +215,11 @@ export default function Chat() {
   useEffect(scrollListToEnd, [visibleMessages.length, lastVisibleMessageId, scrollListToEnd]);
 
   const handleMessageListContainerRef = useCallback((node: HTMLDivElement | null) => {
-    if (node) {
-      // calculate height of screen - node height and set result to node maxHeight
+    if (node && window.getComputedStyle(node).getPropertyValue('max-height') === 'none') {
       const screenHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
       const nodeHeight = node.offsetHeight;
-      const newMaxHeight = screenHeight - nodeHeight - 16; // 16px for padding and other elements
+      const newMaxHeight = screenHeight - (documentHeight - nodeHeight - 16); // 16px for padding and other elements
       if (newMaxHeight > 0) {
         node.style.maxHeight = `${newMaxHeight}px`;
       }
@@ -231,7 +231,7 @@ export default function Chat() {
     if (massageListContainerRef.current) {
       handleMessageListContainerRef(massageListContainerRef.current);
     }
-  }, [handleMessageListContainerRef]);
+  }, [handleMessageListContainerRef, visibleMessages.length]);
 
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
