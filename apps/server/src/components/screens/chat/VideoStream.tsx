@@ -50,10 +50,10 @@ const VideoStream = ({ videoRef }: VideoStreamProps) => {
               className={clsx('absolute h-24 w-24 rounded-full object-cover sm:h-40 sm:w-40', isOldLoading && 'hidden')}
             />
           )}
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <video
             ref={videoRef}
             autoPlay
+            muted
             id="video-stream"
             key="video-stream"
             className={clsx('absolute h-24 w-24 rounded-full sm:h-40 sm:w-40', isOldLoading && 'opacity-0')}

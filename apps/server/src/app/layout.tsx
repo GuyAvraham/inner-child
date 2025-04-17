@@ -38,6 +38,10 @@ export default function Layout(props: { children: React.ReactNode }) {
     <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
         <body className={clsx('flex h-screen flex-col font-sans', fontSans.variable)}>
+          {/* This is web console, to test on mobile */}
+          {/* <script src="https://cdn.jsdelivr.net/npm/eruda" />
+          <script>eruda.init();</script> */}
+
           <Image
             src="/bg1.png"
             width={375}
