@@ -228,10 +228,12 @@ export const init = async (age: Age, outputElement: HTMLVideoElement) => {
 
 let isReconnecting = false;
 let retrySendTimeoutId: NodeJS.Timeout | undefined;
+let retries = 0;
+const maxRetries = 5;
 
 export const send = async (input: string, gender: 'male' | 'female', age: Age) => {
   if (pc && pc.signalingState === 'stable' && pc.iceConnectionState === 'connected') {
-    await fetch(`/api/did/send`, {
+    const result = await fetch(`/api/did/send`, {
       method: 'POST',
       body: JSON.stringify({
         input,
@@ -244,12 +246,19 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
 
     isReconnecting = false;
     clearTimeout(retrySendTimeoutId);
+
+    if (result.status !== 200 && retries < maxRetries) {
+      retries++;
+      retrySendTimeoutId = setTimeout(() => {
+        void send(input, gender, age);
+      }, 1000);
+    }
   } else {
     if (!isReconnecting) {
       isReconnecting = true;
       await init(age, videoElement!);
     }
-    setTimeout(() => {
+    retrySendTimeoutId = setTimeout(() => {
       void send(input, gender, age);
     }, 1000);
   }
