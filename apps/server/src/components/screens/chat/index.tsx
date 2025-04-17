@@ -13,6 +13,7 @@ import SendSVG from '~/svg/SendSVG';
 import { Age, ConversationStatus, Role } from '~/types';
 import ChatOptions from './ChatOptions';
 import Message from './Message';
+import { ScrollArea } from './ScrollArea';
 
 const VideoStream = dynamic(() => import('./VideoStream'), { ssr: false });
 
@@ -215,35 +216,9 @@ export default function Chat() {
 
   useEffect(scrollListToEnd, [visibleMessages.length, lastVisibleMessageId, scrollListToEnd]);
 
-  // const handleMessageListContainerRef = useCallback((node: HTMLDivElement | null) => {
-  //   if (node && window.getComputedStyle(node).getPropertyValue('max-height') === 'none') {
-  //     const screenHeight = window.innerHeight;
-  //     const documentHeight = document.documentElement.scrollHeight;
-  //     const nodeHeight = node.offsetHeight;
-  //     const newMaxHeight = screenHeight - (documentHeight - nodeHeight - 16); // 16px for padding and other elements
-  //     if (newMaxHeight > 0) {
-  //       node.style.maxHeight = `${newMaxHeight}px`;
-  //     }
-  //     massageListContainerRef.current = node;
-  //   }
-  // }, []);
-
-  // useEffect(() => {
-  //   if (massageListContainerRef.current) {
-  //     handleMessageListContainerRef(massageListContainerRef.current);
-  //   }
-  // }, [handleMessageListContainerRef, visibleMessages.length]);
-
-  useEffect(() => {
-    if (massageListContainerRef.current && massageListSubContainerRef.current && visibleMessages.length === 0) {
-      const h = massageListContainerRef.current.clientHeight;
-      massageListSubContainerRef.current.style.maxHeight = `${h}px`;
-    }
-  }, [visibleMessages.length, user, data, messages]);
-
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
-      <div className="relative flex w-full flex-col items-center">
+      <div className="relative flex min-h-[226px] w-full flex-col items-center">
         <h2 className="mb-1 font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
         </h2>
@@ -257,39 +232,34 @@ export default function Chat() {
         <VideoStream key="video-stream" videoRef={videoRef} />
       </div>
 
-      <div ref={massageListContainerRef} className="flex w-full flex-1 overflow-hidden">
-        <div
-          ref={massageListSubContainerRef}
-          className="flex min-h-[200px] w-full flex-col overflow-hidden overflow-y-visible"
-          style={{
-            maxHeight: '76px',
-          }}
-        >
-          <div ref={massageListRef} className="w-full overflow-y-auto">
-            {visibleMessages.length > 0 ? (
-              visibleMessages.map((m, index) => (
-                <Message
-                  key={m.id + index}
-                  text={m.text}
-                  isUserMessage={m.sender === Role.User}
-                  withAnimation={m.id === 'typing'}
-                />
-              ))
+      <ScrollArea containerRef={massageListRef} className="w-full">
+        {visibleMessages.length > 0 ? (
+          visibleMessages.map((m, index) => (
+            <Message
+              key={m.id + index}
+              text={m.text}
+              isUserMessage={m.sender === Role.User}
+              withAnimation={m.id === 'typing'}
+            />
+          ))
+        ) : (
+          <div className="self-center">
+            {isWaitingInitialMessage ? (
+              <JumpingDots />
             ) : (
-              <div className="self-center">
-                {isWaitingInitialMessage ? (
-                  <JumpingDots />
-                ) : (
-                  <p className="font-[Poppins-Bold] text-base text-white/40">
-                    {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
-                  </p>
-                )}
-              </div>
+              <p className="font-[Poppins-Bold] text-base text-white/40">
+                {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
+              </p>
             )}
           </div>
-        </div>
-      </div>
-      <form ref={formRef} className="flex w-full flex-col items-center gap-4" onSubmit={handleSendMessage}>
+        )}
+      </ScrollArea>
+
+      <form
+        ref={formRef}
+        className="flex min-h-[194px] w-full flex-col items-center gap-4"
+        onSubmit={handleSendMessage}
+      >
         <textarea
           className="w-full rounded-lg border border-white/20 bg-white/10 p-4 text-white outline-none sm:min-h-[120px]"
           placeholder="Say something..."
