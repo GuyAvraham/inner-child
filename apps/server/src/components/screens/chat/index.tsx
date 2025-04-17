@@ -216,7 +216,7 @@ export default function Chat() {
 
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
-      <div className="relative flex min-h-[226px] w-full flex-col items-center">
+      <div className="relative flex min-h-[162px] w-full flex-col items-center sm:min-h-[226px]">
         <h2 className="mb-1 font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
         </h2>
@@ -255,7 +255,7 @@ export default function Chat() {
 
       <form
         ref={formRef}
-        className="flex min-h-[194px] w-full flex-col items-center gap-4"
+        className="flex min-h-[156px] w-full flex-col items-center gap-4 sm:min-h-[194px]"
         onSubmit={handleSendMessage}
       >
         <textarea

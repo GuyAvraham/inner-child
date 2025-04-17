@@ -201,6 +201,7 @@ export const init = async (age: Age, outputElement: HTMLVideoElement) => {
   initInProgress = true;
 
   videoElement = outputElement;
+  videoElement.setAttribute('playsinline', '');
 
   stopAllStreams();
   await destroy();
