@@ -25,8 +25,6 @@ const mockText = () =>
 
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
-  const massageListContainerRef = useRef<HTMLDivElement | null>(null);
-  const massageListSubContainerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const { user, data } = useUserData();
   const gender = data.gender as 'male' | 'female';
