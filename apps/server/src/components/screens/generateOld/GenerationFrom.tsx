@@ -2,8 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
-import clsx from 'clsx';
 
+import { cn } from '~/utils/cn';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
@@ -78,7 +78,7 @@ export default function GenerationForm() {
           disabled={isReplacing || isOldPhotoUploading}
         >
           <div
-            className={clsx(
+            className={cn(
               'absolute left-0 top-0 h-full w-full animate-spin rounded-full border-2 border-transparent border-t-white',
               !isReplacing && 'hidden',
             )}

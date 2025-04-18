@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import clsx from 'clsx';
 
+import { cn } from '~/utils/cn';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import Toggle from '~/components/Toggle';
@@ -67,7 +67,7 @@ export default function ChatOptions({
       </button>
       <div
         ref={modalRef}
-        className={clsx(
+        className={cn(
           'absolute right-[110%] top-0 rounded-lg border border-black bg-black/80 p-4',
           !isOpen && 'hidden',
         )}
