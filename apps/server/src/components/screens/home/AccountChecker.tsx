@@ -12,7 +12,7 @@ import UploadForm from '../onboarding/UploadForm';
 import GenderForm from './gender';
 
 export default function AccountChecker({ isGenderExist }: { isGenderExist?: boolean }) {
-  const { state, openChat } = useRouteState();
+  const { state, openChat, openGender } = useRouteState();
 
   const { data: oldPhoto, isLoading: isOldLoading } = api.photo.getByAge.useQuery({
     age: Age.Old,
@@ -24,9 +24,11 @@ export default function AccountChecker({ isGenderExist }: { isGenderExist?: bool
     }
   }, [isOldLoading, oldPhoto?.uri, openChat]);
 
-  if (!isGenderExist) {
-    return <GenderForm />;
-  }
+  useEffect(() => {
+    if (!isGenderExist) {
+      openGender();
+    }
+  }, []);
 
   if (isOldLoading) {
     return <Spinner />;
