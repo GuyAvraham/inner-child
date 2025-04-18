@@ -2,28 +2,38 @@
 
 import type { FormEvent, KeyboardEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 
 import { api } from '~/utils/api';
+import { send } from '~/utils/d-id';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import useUserData from '~/hooks/useUserData';
-import { useVideoResponse } from '~/hooks/useVideoResponse';
 import SendSVG from '~/svg/SendSVG';
 import { Age, ConversationStatus, Role } from '~/types';
 import ChatOptions from './ChatOptions';
 import Message from './Message';
-import Video from './Video';
+import { ScrollArea } from './ScrollArea';
+
+const VideoStream = dynamic(() => import('./VideoStream'), { ssr: false });
+
+const mockText = () =>
+  new Promise<string>((resolve) => {
+    const randNum = Math.floor(Math.random() * 100);
+    resolve(`Hello, I am your future self. I am here to help you with your journey. ${randNum}`);
+  });
 
 export default function Chat() {
   const massageListRef = useRef<HTMLDivElement>(null);
-  const massageListContainerRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const { user } = useUserData();
+  const { user, data } = useUserData();
+  const gender = data.gender as 'male' | 'female';
   const userName = user?.firstName ?? '';
   const splitter = '<user_name>';
   const utils = api.useContext();
   const [conversationStatus, setConversationStatus] = useState(ConversationStatus.Idle);
   const [conversationAge, setConversationAge] = useState(Age.Old);
+  const [wasPlayedLastAiMessageAfterLoad, setWasPlayedLastAiMessageAfterLoad] = useState(false);
   const [isWaitingInitialMessage, setIsWaitingInitialMessage] = useState(false);
   const [initialMessage, setInitialMessage] = useState<string | null>(null);
   const [lastGPTResponse, setLastGPTResponse] = useState<string | null>(null);
@@ -42,14 +52,14 @@ export default function Chat() {
   });
   const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
   const [isOpenedOptions, setIsOpenedOptions] = useState(false);
-  const { triggerVideoGeneration } = useVideoResponse(conversationAge);
   const scrollListToEnd = useCallback(() => {
     setTimeout(() => {
       massageListRef.current?.scrollTo({ top: massageListRef.current.scrollHeight, behavior: 'smooth' });
     }, 100);
   }, []);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handleSendMessage = useCallback(
+  const handleUserSendMessage = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!(message && message.trim().length > 0) || !messages || !prompts) return;
@@ -65,14 +75,17 @@ export default function Chat() {
         content: prompts[conversationAge].split(splitter).join(userName),
       });
       messagesForSending.push({ role: Role.User, content: message.trim() });
-      const responseMessage = await sendMessageToOpenAI(messagesForSending);
       await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
+      const responseMessage =
+        process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
+          ? await mockText()
+          : await sendMessageToOpenAI(messagesForSending);
       if (responseMessage) {
+        if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+          void send(responseMessage, gender, conversationAge);
+        }
         setLastGPTResponse(responseMessage);
         await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
-        if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-          void triggerVideoGeneration(responseMessage);
-        }
       }
 
       await utils.conversation.get.invalidate();
@@ -80,30 +93,35 @@ export default function Chat() {
       setConversationStatus(ConversationStatus.Idle);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [conversationAge, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts],
+    [conversationAge, gender, message, utils.conversation.get, saveMessage, sendMessageToOpenAI, messages, prompts],
   );
 
   useEffect(() => {
-    void (async () => {
+    const settingInitialMessageForNewUser = async () => {
       setInitialMessage(null);
       if (!areMessagesLoading && messages?.length === 0 && prompts) {
         setIsWaitingInitialMessage(true);
-        const responseMessage = await sendMessageToOpenAI([
-          { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
-        ]);
+        const responseMessage =
+          process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
+            ? await mockText()
+            : await sendMessageToOpenAI([
+                { role: Role.System, content: prompts[conversationAge].split(splitter).join(userName) },
+              ]);
         console.log(responseMessage);
         if (responseMessage) {
+          if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+            void send(responseMessage, gender, conversationAge);
+          }
           setInitialMessage(responseMessage);
           await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
-          if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-            void triggerVideoGeneration(responseMessage);
-          }
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
         }
       }
-    })();
-  }, [areMessagesLoading, messages, conversationAge, prompts, triggerVideoGeneration]); // eslint-disable-line react-hooks/exhaustive-deps
+    };
+
+    void settingInitialMessageForNewUser();
+  }, [areMessagesLoading, messages, gender, conversationAge, prompts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
     if (!messages?.[0]) {
@@ -177,7 +195,21 @@ export default function Chat() {
     return { visibleMessages: list, lastVisibleMessageId: lastId };
   }, [messages, conversationStatus, initialMessage, lastGPTResponse]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // const lastVisibleMessageId = visibleMessages[visibleMessages.length - 1] ?? '';
+  useEffect(() => {
+    const sendLastAiMessageAfterLoad = () => {
+      if (!wasPlayedLastAiMessageAfterLoad && messages && messages?.length > 0) {
+        const lastAiMessage = messages.findLast((message) => message.sender === Role.Assistant);
+        setWasPlayedLastAiMessageAfterLoad(true);
+        if (!lastAiMessage) return;
+
+        if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+          void send(lastAiMessage.text, gender, conversationAge);
+        }
+      }
+    };
+
+    sendLastAiMessageAfterLoad();
+  }, [wasPlayedLastAiMessageAfterLoad, conversationAge, gender, messages]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && formRef.current) {
@@ -188,16 +220,9 @@ export default function Chat() {
 
   useEffect(scrollListToEnd, [visibleMessages.length, lastVisibleMessageId, scrollListToEnd]);
 
-  useEffect(() => {
-    if (!isGettingText && massageListContainerRef.current) {
-      const h = massageListContainerRef.current.offsetHeight;
-      massageListContainerRef.current.style.maxHeight = `${h}px`;
-    }
-  }, [isGettingText]);
-
   return (
     <div className="mx-auto flex w-full max-w-[600px] flex-1 flex-col items-center gap-6">
-      <div className="relative flex w-full flex-col items-center">
+      <div className="relative flex min-h-[162px] w-full flex-col items-center sm:min-h-[226px]">
         <h2 className="mb-1 font-[Poppins-Bold] text-lg">
           {conversationAge === Age.Young ? 'Young you' : 'Future you'}
         </h2>
@@ -208,37 +233,37 @@ export default function Chat() {
           isClearingConversation={isDeletingVideo || isClearingConversation}
           handleClearConversation={handleClearConversation}
         />
-        <Video age={conversationAge} setAge={setConversationAge} disabled={!isStatusIdle || isGettingText} />
+        <VideoStream key="video-stream" videoRef={videoRef} />
       </div>
 
-      <div
-        ref={massageListContainerRef}
-        className="flex min-h-[200px] w-full flex-1 flex-col overflow-hidden overflow-y-visible"
+      <ScrollArea containerRef={massageListRef} className="w-full">
+        {visibleMessages.length > 0 ? (
+          visibleMessages.map((m, index) => (
+            <Message
+              key={m.id + index}
+              text={m.text}
+              isUserMessage={m.sender === Role.User}
+              withAnimation={m.id === 'typing'}
+            />
+          ))
+        ) : (
+          <div className="self-center">
+            {isWaitingInitialMessage ? (
+              <JumpingDots />
+            ) : (
+              <p className="font-[Poppins-Bold] text-base text-white/40">
+                {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
+              </p>
+            )}
+          </div>
+        )}
+      </ScrollArea>
+
+      <form
+        ref={formRef}
+        className="flex min-h-[156px] w-full flex-col items-center gap-4 sm:min-h-[194px]"
+        onSubmit={handleUserSendMessage}
       >
-        <div ref={massageListRef} className="w-full overflow-y-auto">
-          {visibleMessages.length > 0 ? (
-            visibleMessages.map((m, index) => (
-              <Message
-                key={m.id + index}
-                text={m.text}
-                isUserMessage={m.sender === Role.User}
-                withAnimation={m.id === 'typing'}
-              />
-            ))
-          ) : (
-            <div className="self-center">
-              {isWaitingInitialMessage ? (
-                <JumpingDots />
-              ) : (
-                <p className="font-[Poppins-Bold] text-base text-white/40">
-                  {areMessagesLoading ? 'Loading previous messages...' : 'No messages yet...'}
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-      <form ref={formRef} className="flex w-full flex-col items-center gap-4" onSubmit={handleSendMessage}>
         <textarea
           className="w-full rounded-lg border border-white/20 bg-white/10 p-4 text-white outline-none sm:min-h-[120px]"
           placeholder="Say something..."

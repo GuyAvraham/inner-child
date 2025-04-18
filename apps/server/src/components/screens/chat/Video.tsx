@@ -142,7 +142,7 @@ export default function Video({ age }: ConversationAgeSelectProps) {
   const isLoading = age === Age.Young ? isYoungLoading || !young : isOldLoading || !old;
 
   return (
-    <div className="relative flex-row justify-center ">
+    <div className="relative flex-row justify-center">
       <div className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-4">
         <VideoLoadingAnimation isLoading={isVideoLoading} />
         <button
