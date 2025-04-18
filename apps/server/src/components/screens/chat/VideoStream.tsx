@@ -37,8 +37,8 @@ const VideoStream = ({ videoRef }: VideoStreamProps) => {
   return (
     <div className="relative flex-row justify-center">
       <div className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-4">
-        <div className="relative z-10 h-40 w-40 overflow-hidden rounded-full">
-          <div className={clsx('h-40 w-40 items-center justify-center', !isOldLoading && 'hidden')}>
+        <div className="relative z-10 h-24 w-24 overflow-hidden rounded-full sm:h-40 sm:w-40">
+          <div className={clsx('h-24 w-24 items-center justify-center sm:h-40 sm:w-40', !isOldLoading && 'hidden')}>
             <AnimatedProgress />
           </div>
           {old && (
@@ -47,16 +47,16 @@ const VideoStream = ({ videoRef }: VideoStreamProps) => {
               width={200}
               src={old}
               alt="Future You"
-              className={clsx('absolute h-40 w-40 rounded-full object-cover', isOldLoading && 'hidden')}
+              className={clsx('absolute h-24 w-24 rounded-full object-cover sm:h-40 sm:w-40', isOldLoading && 'hidden')}
             />
           )}
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <video
             ref={videoRef}
             autoPlay
+            muted
             id="video-stream"
             key="video-stream"
-            className={clsx('absolute h-40 w-40 rounded-full', isOldLoading && 'opacity-0')}
+            className={clsx('absolute h-24 w-24 rounded-full sm:h-40 sm:w-40', isOldLoading && 'opacity-0')}
             poster={old}
           />
         </div>

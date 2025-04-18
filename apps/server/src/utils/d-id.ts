@@ -64,6 +64,7 @@ const setVideoElement = (stream?: MediaStream) => {
       .then((_) => {})
       .catch((e) => {});
   }
+  videoElement.muted = false;
 };
 
 const playIdleVideo = () => {
@@ -98,6 +99,7 @@ const onVideoStatusChange = (videoIsPlaying: boolean, stream?: MediaStream) => {
 };
 
 const onTrack = (ev: RTCTrackEvent) => {
+  console.log('onTrack', ev);
   if (!ev.track) return;
 
   statsIntervalId = setInterval(async () => {
@@ -106,7 +108,7 @@ const onTrack = (ev: RTCTrackEvent) => {
     const stats = await pc.getStats(ev.track);
 
     stats.forEach((report) => {
-      if (report.type === 'inbound-rtp' && report.mediaType === 'video') {
+      if (report.type === 'inbound-rtp' && (report.mediaType === 'video' || report.kind === 'video')) {
         const videoStatusChanged = videoIsPlaying !== report.bytesReceived > lastBytesReceived;
 
         if (videoStatusChanged) {
@@ -140,6 +142,12 @@ const destroy = async () => {
 
 const create = async ({ iceServers, offer }: { iceServers: RTCIceServer[]; offer: RTCSessionDescriptionInit }) => {
   if (!pc) {
+    const RTCPeerConnection = (
+      window.RTCPeerConnection || //@ts-ignore
+      window.webkitRTCPeerConnection || //@ts-ignore
+      window.mozRTCPeerConnection
+    ).bind(window);
+
     pc = new RTCPeerConnection({ iceServers });
     pc.addEventListener('icegatheringstatechange', onIceGatheringStateChange, true);
     pc.addEventListener('icecandidate', onIceCandidate, true);
@@ -191,7 +199,6 @@ const getDetails = async (age: Age) => {
 };
 
 // TODO: make a post call to generate the idle video from the submitted photo
-// TODO: send an empty request every 3-4 minutes after the last user request to keep the connection alive
 
 let initInProgress = false;
 
@@ -201,6 +208,7 @@ export const init = async (age: Age, outputElement: HTMLVideoElement) => {
   initInProgress = true;
 
   videoElement = outputElement;
+  videoElement.setAttribute('playsinline', '');
 
   stopAllStreams();
   await destroy();
@@ -227,10 +235,12 @@ export const init = async (age: Age, outputElement: HTMLVideoElement) => {
 
 let isReconnecting = false;
 let retrySendTimeoutId: NodeJS.Timeout | undefined;
+let retries = 0;
+const maxRetries = 5;
 
 export const send = async (input: string, gender: 'male' | 'female', age: Age) => {
   if (pc && pc.signalingState === 'stable' && pc.iceConnectionState === 'connected') {
-    await fetch(`/api/did/send`, {
+    const result = await fetch(`/api/did/send`, {
       method: 'POST',
       body: JSON.stringify({
         input,
@@ -242,13 +252,21 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
     });
 
     isReconnecting = false;
+    retries = 0;
     clearTimeout(retrySendTimeoutId);
+
+    if (result.status !== 200 && retries < maxRetries) {
+      retries++;
+      retrySendTimeoutId = setTimeout(() => {
+        void send(input, gender, age);
+      }, 1000);
+    }
   } else {
     if (!isReconnecting) {
       isReconnecting = true;
       await init(age, videoElement!);
     }
-    setTimeout(() => {
+    retrySendTimeoutId = setTimeout(() => {
       void send(input, gender, age);
     }, 1000);
   }

@@ -24,7 +24,7 @@ export default async function HomePage() {
           </SignInButton>
         </div>
       </SignedOut>
-      <main className="flex max-h-fit flex-1 flex-col p-4 sm:max-h-none">
+      <main className="flex flex-1 flex-col p-4">
         <SignedIn>
           <AccountChecker isGenderExist={!!user?.unsafeMetadata?.gender} />
         </SignedIn>
