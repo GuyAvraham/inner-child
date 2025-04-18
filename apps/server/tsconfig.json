@@ -6,7 +6,8 @@
       "~/*": ["./src/*"]
     },
     "plugins": [{ "name": "next" }],
-    "strict": true
+    "strict": true,
+    "moduleResolution": "bundler"
   },
   "exclude": [],
   "include": ["next-env.d.ts", "src", "*.ts", "*.mjs", ".next/types/**/*.ts"]
