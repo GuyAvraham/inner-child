@@ -1,18 +1,7 @@
 import { DID_API_KEY, DID_API_URL } from '@innch/utils';
 
+import { getVoiceId } from '~/utils/voices';
 import type { Age } from '~/types';
-
-// voice gallery: https://speech.microsoft.com/portal/voicegallery
-const voices = {
-  male: {
-    young: 'en-US-AnaNeural',
-    old: 'en-US-DavisNeural',
-  },
-  female: {
-    young: 'en-US-AnaNeural',
-    old: 'en-US-CoraNeural',
-  },
-};
 
 export const POST = async (request: Request) => {
   const { input, sessionId, streamId, gender, age } = (await request.json()) as {
@@ -22,6 +11,8 @@ export const POST = async (request: Request) => {
     gender: 'male' | 'female';
     age: Age;
   };
+
+  const voiceId = getVoiceId(input, gender, age);
 
   return await fetch(`${DID_API_URL}/talks/streams/${streamId}`, {
     method: 'POST',
@@ -35,7 +26,7 @@ export const POST = async (request: Request) => {
         type: 'text',
         input,
         subtitles: 'false',
-        provider: { type: 'microsoft', voice_id: voices[gender][age] },
+        provider: { type: 'microsoft', voice_id: voiceId },
         ssml: false,
       },
       config: { fluent: 'false', pad_audio: '0.0' },

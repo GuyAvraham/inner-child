@@ -59,7 +59,7 @@ export default function Chat() {
   }, []);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const handleSendMessage = useCallback(
+  const handleUserSendMessage = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       if (!(message && message.trim().length > 0) || !messages || !prompts) return;
@@ -75,17 +75,17 @@ export default function Chat() {
         content: prompts[conversationAge].split(splitter).join(userName),
       });
       messagesForSending.push({ role: Role.User, content: message.trim() });
+      await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
       const responseMessage =
         process.env.NEXT_PUBLIC_SERVER_MODE === 'development'
           ? await mockText()
           : await sendMessageToOpenAI(messagesForSending);
-      await saveMessage({ age: conversationAge, message: message.trim(), sender: Role.User });
       if (responseMessage) {
-        setLastGPTResponse(responseMessage);
-        await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
         if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
           void send(responseMessage, gender, conversationAge);
         }
+        setLastGPTResponse(responseMessage);
+        await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
       }
 
       await utils.conversation.get.invalidate();
@@ -97,7 +97,7 @@ export default function Chat() {
   );
 
   useEffect(() => {
-    void (async () => {
+    const settingInitialMessageForNewUser = async () => {
       setInitialMessage(null);
       if (!areMessagesLoading && messages?.length === 0 && prompts) {
         setIsWaitingInitialMessage(true);
@@ -109,16 +109,18 @@ export default function Chat() {
               ]);
         console.log(responseMessage);
         if (responseMessage) {
-          setInitialMessage(responseMessage);
-          await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
           if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
             void send(responseMessage, gender, conversationAge);
           }
+          setInitialMessage(responseMessage);
+          await saveMessage({ age: conversationAge, message: responseMessage, sender: Role.Assistant });
           await utils.conversation.get.invalidate();
           setIsWaitingInitialMessage(false);
         }
       }
-    })();
+    };
+
+    void settingInitialMessageForNewUser();
   }, [areMessagesLoading, messages, gender, conversationAge, prompts]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClearConversation = useCallback(async () => {
@@ -194,15 +196,19 @@ export default function Chat() {
   }, [messages, conversationStatus, initialMessage, lastGPTResponse]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!wasPlayedLastAiMessageAfterLoad && messages && messages?.length > 0) {
-      const lastAiMessage = messages.findLast((message) => message.sender === Role.Assistant);
-      setWasPlayedLastAiMessageAfterLoad(true);
-      if (!lastAiMessage) return;
+    const sendLastAiMessageAfterLoad = () => {
+      if (!wasPlayedLastAiMessageAfterLoad && messages && messages?.length > 0) {
+        const lastAiMessage = messages.findLast((message) => message.sender === Role.Assistant);
+        setWasPlayedLastAiMessageAfterLoad(true);
+        if (!lastAiMessage) return;
 
-      if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
-        void send(lastAiMessage.text, gender, conversationAge);
+        if (process.env.NEXT_PUBLIC_SERVER_MODE !== 'development') {
+          void send(lastAiMessage.text, gender, conversationAge);
+        }
       }
-    }
+    };
+
+    sendLastAiMessageAfterLoad();
   }, [wasPlayedLastAiMessageAfterLoad, conversationAge, gender, messages]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -256,7 +262,7 @@ export default function Chat() {
       <form
         ref={formRef}
         className="flex min-h-[156px] w-full flex-col items-center gap-4 sm:min-h-[194px]"
-        onSubmit={handleSendMessage}
+        onSubmit={handleUserSendMessage}
       >
         <textarea
           className="w-full rounded-lg border border-white/20 bg-white/10 p-4 text-white outline-none sm:min-h-[120px]"

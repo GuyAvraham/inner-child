@@ -18,13 +18,13 @@ const fontSans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Inner Child',
+  title: 'Future Self',
   description: 'Get in touch with your inner self',
   openGraph: {
-    title: 'Inner Child',
+    title: 'Future Self',
     description: 'Get in touch with your inner self',
     url: 'https://inner-child-server-one.vercel.app',
-    siteName: 'Inner Child',
+    siteName: 'Future Self',
   },
   twitter: {
     card: 'summary_large_image',
@@ -38,7 +38,8 @@ export default function Layout(props: { children: React.ReactNode }) {
     <ClerkProvider appearance={{ baseTheme: dark }}>
       <html lang="en">
         <body className={clsx('flex h-screen flex-col font-sans', fontSans.variable)}>
-          {/* This is web console, to test on mobile */}
+          {/* This plugin can allow u to open the inspector in your chrome browser on mobile */}
+          {/* We keep it here for future mobile debug */}
           {/* <script src="https://cdn.jsdelivr.net/npm/eruda" />
           <script>eruda.init();</script> */}
 
