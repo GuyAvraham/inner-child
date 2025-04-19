@@ -18,5 +18,5 @@
     "noUncheckedIndexedAccess": true
   },
   "include": ["prettier.config.mjs"],
-  "extends": "expo/tsconfig.base"
+  "extends": "./tsconfig.base"
 }
