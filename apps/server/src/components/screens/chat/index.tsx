@@ -4,12 +4,12 @@ import type { FormEvent, KeyboardEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 
-import { api } from '~/utils/api';
 import { send } from '~/utils/d-id';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
 import useUserData from '~/hooks/useUserData';
 import SendSVG from '~/svg/SendSVG';
+import { api } from '~/trpc/react';
 import { Age, ConversationStatus, Role } from '~/types';
 import ChatOptions from './ChatOptions';
 import Message from './Message';
@@ -38,11 +38,11 @@ export default function Chat() {
   const [initialMessage, setInitialMessage] = useState<string | null>(null);
   const [lastGPTResponse, setLastGPTResponse] = useState<string | null>(null);
   const [message, setMessage] = useState<string>('');
-  const { mutateAsync: deleteVideo, isLoading: isDeletingVideo } = api.video.deleteByAge.useMutation();
+  const { mutateAsync: deleteVideo, isPending: isDeletingVideo } = api.video.deleteByAge.useMutation();
   const { data: messages, isLoading: areMessagesLoading } = api.conversation.get.useQuery({
     age: conversationAge,
   });
-  const { mutateAsync: saveMessage, isLoading: isGettingText } = api.conversation.saveMessage.useMutation();
+  const { mutateAsync: saveMessage, isPending: isGettingText } = api.conversation.saveMessage.useMutation();
   const { data: prompts } = api.conversation.getPrompts.useQuery();
   const { mutateAsync: sendMessageToOpenAI } = api.conversation.sendMessageToOpenAI.useMutation({
     onError(error) {
@@ -50,7 +50,7 @@ export default function Chat() {
       setConversationStatus(ConversationStatus.Idle);
     },
   });
-  const { mutateAsync: clearConversation, isLoading: isClearingConversation } = api.conversation.clear.useMutation();
+  const { mutateAsync: clearConversation, isPending: isClearingConversation } = api.conversation.clear.useMutation();
   const [isOpenedOptions, setIsOpenedOptions] = useState(false);
   const scrollListToEnd = useCallback(() => {
     setTimeout(() => {
@@ -265,7 +265,7 @@ export default function Chat() {
         onSubmit={handleUserSendMessage}
       >
         <textarea
-          className="w-full rounded-lg border border-white/20 bg-white/10 p-4 text-white outline-none sm:min-h-[120px]"
+          className="outline-hidden w-full rounded-lg border border-white/20 bg-white/10 p-4 text-white sm:min-h-[120px]"
           placeholder="Say something..."
           value={!isStatusIdle ? '' : message}
           onChange={!isStatusIdle ? undefined : (e) => setMessage(e.target.value)}

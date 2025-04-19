@@ -2,9 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import Image from 'next/image';
-import clsx from 'clsx';
 
-import { api } from '~/utils/api';
+import { cn } from '~/utils/cn';
 import { generateToken } from '~/utils/token';
 import Button from '~/components/Button';
 import JumpingDots from '~/components/JumpingDots';
@@ -16,6 +15,7 @@ import { useRouteState } from '~/hooks/useRouteState';
 import useUserData from '~/hooks/useUserData';
 import NextSVG from '~/svg/NextSVG';
 import ReplacePhotoSVG from '~/svg/ReplacePhotoSVG';
+import { api } from '~/trpc/react';
 import { Age, Onboarded } from '~/types';
 import PhotoSelect from './PhotoSelect';
 
@@ -64,9 +64,9 @@ export default function GenerationForm() {
 
   return (
     <div className="flex flex-col items-center gap-10">
-      <div className="relative flex h-[256] w-[256] items-center justify-center rounded-full border border-white/40 bg-white/20 p-4">
+      <div className="relative flex h-[256px] w-[256px] items-center justify-center rounded-full border border-white/40 bg-white/20 p-4">
         <Image
-          className="h-28 w-28 self-center rounded-full object-cover"
+          className="h-56 w-56 self-center rounded-full object-cover"
           width={256}
           height={256}
           src={currentPhoto ?? currentPhotoDB?.uri ?? ''}
@@ -78,7 +78,7 @@ export default function GenerationForm() {
           disabled={isReplacing || isOldPhotoUploading}
         >
           <div
-            className={clsx(
+            className={cn(
               'absolute left-0 top-0 h-full w-full animate-spin rounded-full border-2 border-transparent border-t-white',
               !isReplacing && 'hidden',
             )}

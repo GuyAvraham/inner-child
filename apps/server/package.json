@@ -14,48 +14,41 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.29.6",
-    "@clerk/themes": "^2.2.3",
-    "@innch/api": "^0.1.0",
+    "@clerk/nextjs": "^6.15.0",
+    "@clerk/themes": "^2.2.32",
     "@innch/db": "^0.1.0",
-    "@innch/utils": "*",
-    "@t3-oss/env-nextjs": "^0.6.1",
-    "@tanstack/react-query": "^4.33.0",
-    "@tanstack/react-query-devtools": "^4.33.0",
-    "@tanstack/react-query-next-experimental": "5.0.0-alpha.80",
-    "@trpc/client": "^10.38.0",
-    "@trpc/next": "^10.38.0",
-    "@trpc/react-query": "^10.38.0",
-    "@trpc/server": "^10.38.0",
-    "ai": "^2.2.31",
-    "clsx": "^2.0.0",
-    "next": "^14.1.0",
+    "@t3-oss/env-nextjs": "^0.12.0",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@tanstack/react-query": "^5.74.3",
+    "@tanstack/react-query-devtools": "^5.74.3",
+    "@tanstack/react-query-next-experimental": "5.74.3",
+    "@trpc/client": "^11.1.0",
+    "@trpc/next": "^11.1.0",
+    "@trpc/react-query": "^11.1.0",
+    "@trpc/server": "^11.1.0",
+    "ai": "^4.3.6",
+    "clsx": "^2.1.1",
+    "next": "^15.3.0",
     "openai-edge": "^1.2.2",
-    "react": "18.2.0",
-    "react-circular-progressbar": "2.1.0",
-    "react-dom": "18.2.0",
-    "superjson": "1.13.1",
-    "zod": "^3.22.2"
+    "react": "19.1.0",
+    "react-circular-progressbar": "2.2.0",
+    "react-dom": "19.1.0",
+    "superjson": "2.2.2",
+    "tailwind-merge": "^3.2.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@innch/eslint-config": "^0.2.0",
-    "@innch/tailwind-config": "^0.1.0",
-    "@types/node": "^18.17.11",
-    "@types/react": "^18.2.21",
-    "@types/react-dom": "^18.2.7",
-    "autoprefixer": "^10.4.15",
-    "dotenv-cli": "^7.3.0",
-    "eslint": "^8.47.0",
-    "postcss": "^8.4.28",
-    "tailwindcss": "3.3.2",
-    "typescript": "^5.2.2"
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "autoprefixer": "^10.4.21",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "^9.24.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "4.1.4",
+    "typescript": "^5.8.3"
   },
   "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@innch/eslint-config/base",
-      "@innch/eslint-config/nextjs",
-      "@innch/eslint-config/react"
-    ]
+    "root": true
   }
 }

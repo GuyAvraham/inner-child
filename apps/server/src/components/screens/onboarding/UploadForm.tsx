@@ -4,7 +4,6 @@ import type { MouseEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
-import { api } from '~/utils/api';
 import Button from '~/components/Button';
 import Spinner from '~/components/Spinner';
 import { currentPhotoAtom } from '~/atoms';
@@ -13,6 +12,7 @@ import useOnboardedScreen from '~/hooks/useOnboardedScreen';
 import { useRouteState } from '~/hooks/useRouteState';
 import SelectPhotoSVG from '~/svg/SelectPhotoSVG';
 import TakePhotoSVG from '~/svg/TakePhotoSVG';
+import { api } from '~/trpc/react';
 import { Onboarded } from '~/types';
 
 export default function UploadForm() {

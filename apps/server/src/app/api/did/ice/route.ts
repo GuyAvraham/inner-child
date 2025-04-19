@@ -1,4 +1,4 @@
-import { DID_API_KEY, DID_API_URL } from '@innch/utils';
+import { DID_API_KEY, DID_API_URL } from '~/utils';
 
 export const POST = async (request: Request) => {
   const { candidate, sdpMid, sdpMLineIndex, sessionId, streamId } = (await request.json()) as {

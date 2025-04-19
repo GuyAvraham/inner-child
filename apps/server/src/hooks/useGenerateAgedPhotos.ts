@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { api } from '~/utils/api';
+import { api } from '~/trpc/react';
 import type { Age } from '~/types';
 import useUserData from './useUserData';
 

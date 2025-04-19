@@ -1,10 +1,11 @@
 import type { HTMLAttributes } from 'react';
-import clsx from 'clsx';
+
+import { cn } from '~/utils/cn';
 
 export default function JumpingDots({ className, style }: HTMLAttributes<HTMLDivElement>) {
   return (
     <span
-      className={clsx('inline-flex', className)}
+      className={cn('inline-flex', className)}
       style={{
         transform: 'translateY(0.25rem) rotate(180deg)',
         ...style,

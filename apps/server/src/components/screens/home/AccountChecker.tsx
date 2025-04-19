@@ -2,9 +2,9 @@
 
 import { useEffect } from 'react';
 
-import { api } from '~/utils/api';
 import Spinner from '~/components/Spinner';
 import { useRouteState } from '~/hooks/useRouteState';
+import { api } from '~/trpc/react';
 import { Age } from '~/types';
 import Chat from '../chat';
 import GenerationForm from '../generateOld/GenerationFrom';
@@ -22,7 +22,7 @@ export default function AccountChecker({ isGenderExist }: { isGenderExist?: bool
     if (!isOldLoading && oldPhoto?.uri) {
       openChat();
     }
-  }, [isOldLoading, oldPhoto?.uri, openChat]);
+  }, [isOldLoading, oldPhoto?.uri]);
 
   useEffect(() => {
     if (!isGenderExist) {

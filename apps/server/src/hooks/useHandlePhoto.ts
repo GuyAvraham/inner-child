@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 import type { atom } from 'jotai';
 import { useAtom } from 'jotai';
 
-import { api } from '~/utils/api';
 import { uriToBlob } from '~/utils/blob';
+import { api } from '~/trpc/react';
 import type { Age } from '~/types';
 
 const useHandlePhoto = (age: Age | 'current', photoAtom: ReturnType<typeof atom<string | undefined>>) => {

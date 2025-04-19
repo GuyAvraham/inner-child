@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 
-import { api } from '~/utils/api';
 import { useVideoLoadingAtom, useVideoPredictionIdAtom, useVideoUriAtom } from '~/atoms';
+import { api } from '~/trpc/react';
 import type { Age } from '~/types';
 import useUserData from './useUserData';
 
@@ -11,7 +11,7 @@ export const useVideoResponse = (age: Age) => {
   const [videoPredictionId, setVideoPredictionId] = useVideoPredictionIdAtom();
   const [videoURI, setVideoURI] = useVideoUriAtom();
   const [isLoading, setIsLoading] = useVideoLoadingAtom();
-  const { mutateAsync: getVideo, isLoading: isPredictionLoading } = api.conversation.video.useMutation({
+  const { mutateAsync: getVideo, isPending: isPredictionLoading } = api.conversation.video.useMutation({
     onError(error) {
       setIsLoading(false);
       alert(`Video Generation Error: ${error.message}`);
