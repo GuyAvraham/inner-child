@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from 'react';
 import Image from 'next/image';
-import clsx from 'clsx';
 
+import { cn } from '~/utils/cn';
 import AnimatedProgress from '~/components/AnimatedProgress';
 import SelectedSVG from '~/svg/SelectedSVG';
 
@@ -52,7 +52,7 @@ export default function PhotoSelect({ photos, onPhotoSelect }: PhotoSelectProps)
           title={String(photo)}
         >
           <div
-            className={clsx(
+            className={cn(
               'flex h-full w-full items-center justify-center rounded-full border border-white/40 p-3',
               (selectedPhoto !== photo || !photo) && 'bg-white/20',
               selectedPhoto === photo && !!photo && 'border-white bg-[#1877F2]/30',

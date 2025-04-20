@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
-import clsx from 'clsx';
 
-import { api } from '~/utils/api';
 import { blobToUri, uriToBlob } from '~/utils/blob';
+import { cn } from '~/utils/cn';
 import AnimatedProgress from '~/components/AnimatedProgress';
 import { useVideoResponse } from '~/hooks/useVideoResponse';
 import PlayPauseSVG from '~/svg/PlayPauseSVG';
+import { api } from '~/trpc/react';
 import { Age } from '~/types';
 import VideoLoadingAnimation from './VideoLoadingAnimation';
 
@@ -146,8 +146,8 @@ export default function Video({ age }: ConversationAgeSelectProps) {
       <div className="relative rounded-full border border-[#4285F4] bg-[#4285F4]/20 p-4">
         <VideoLoadingAnimation isLoading={isVideoLoading} />
         <button
-          className={clsx(
-            'absolute bottom-0 right-0 z-20 rounded-full border-0 bg-[#4285F4]/80 p-2 outline-none',
+          className={cn(
+            'outline-hidden absolute bottom-0 right-0 z-20 rounded-full border-0 bg-[#4285F4]/80 p-2',
             !videoUri && 'hidden',
           )}
           onClick={handlePlayPauseVideo}
@@ -155,7 +155,7 @@ export default function Video({ age }: ConversationAgeSelectProps) {
           <PlayPauseSVG pause={isPlayVideo} />
         </button>
         <div className="relative z-10 h-40 w-40 overflow-hidden rounded-full">
-          <div className={clsx('h-40 w-40 items-center justify-center', !isLoading && 'hidden')}>
+          <div className={cn('h-40 w-40 items-center justify-center', !isLoading && 'hidden')}>
             <AnimatedProgress />
           </div>
           {imageUri && (
@@ -164,14 +164,14 @@ export default function Video({ age }: ConversationAgeSelectProps) {
               width={200}
               src={imageUri}
               alt=""
-              className={clsx('absolute h-40 w-40 rounded-full object-cover', isLoading && 'hidden')}
+              className={cn('absolute h-40 w-40 rounded-full object-cover', isLoading && 'hidden')}
             />
           )}
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <video
             ref={videoRef}
             key={videoUri ?? 'no-video'}
-            className={clsx('absolute h-40 w-40 rounded-full', (!videoUri || !isPlayVideo) && 'opacity-0')}
+            className={cn('absolute h-40 w-40 rounded-full', (!videoUri || !isPlayVideo) && 'opacity-0')}
             src={videoUri}
             poster={imageUri}
             onEnded={handleVideoEnded}

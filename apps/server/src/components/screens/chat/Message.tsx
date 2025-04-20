@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import type { Message } from 'ai/react';
-import clsx from 'clsx';
+
+import { cn } from '~/utils/cn';
 
 interface MessageProps {
   text: string;
@@ -28,7 +29,7 @@ export default function Message({ text, isUserMessage, withAnimation }: MessageP
 
   return (
     <div
-      className={clsx(
+      className={cn(
         'mb-4 flex w-fit max-w-[500px] overflow-y-auto rounded-xl p-3',
         isUserMessage && 'ml-auto bg-[#4285F4]',
         !isUserMessage && 'bg-[rgba(255,255,255,0.19)]',

@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import { currentUser } from '@clerk/nextjs';
+import { currentUser } from '@clerk/nextjs/server';
 
-import { s3 } from '@innch/api/src/s3';
-import { db } from '@innch/db';
-import { DID_API_KEY, DID_API_URL, raise } from '@innch/utils';
-
+import { s3 } from '~/server/api/s3';
+import { db } from '~/server/db';
 import type { Age } from '~/types';
+import { DID_API_KEY, DID_API_URL, raise } from '~/utils';
 
 export const POST = async (request: Request) => {
   const user = await currentUser();

@@ -269,6 +269,7 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
       isReconnecting = true;
       await init(age, videoElement!);
     }
+
     retrySendTimeoutId = setTimeout(() => {
       void send(input, gender, age);
     }, 1000);

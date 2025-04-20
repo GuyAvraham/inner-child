@@ -1,7 +1,6 @@
-import { DID_API_KEY, DID_API_URL } from '@innch/utils';
-
 import { getVoiceId } from '~/utils/voices';
 import type { Age } from '~/types';
+import { DID_API_KEY, DID_API_URL } from '~/utils';
 
 export const POST = async (request: Request) => {
   const { input, sessionId, streamId, gender, age } = (await request.json()) as {

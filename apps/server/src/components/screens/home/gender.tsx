@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback } from 'react';
 import { useUser } from '@clerk/nextjs';
 
 import { generateToken } from '~/utils/token';
@@ -12,16 +11,13 @@ export default function GenderForm() {
   const { user } = useUser();
   const { openUpload } = useRouteState();
 
-  const setUserGender = useCallback(
-    (gender: 'male' | 'female') => async () => {
-      if (!user) return;
+  const setUserGender = (gender: 'male' | 'female') => async () => {
+    if (!user) return;
 
-      await user.update({ unsafeMetadata: { gender, token: generateToken() } });
+    await user.update({ unsafeMetadata: { gender, token: generateToken() } });
 
-      openUpload();
-    },
-    [openUpload, user],
-  );
+    openUpload();
+  };
 
   return (
     <div className="flex flex-1 flex-col justify-evenly p-4">
