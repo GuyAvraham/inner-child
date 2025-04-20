@@ -252,7 +252,6 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
     });
 
     isReconnecting = false;
-    retries = 0;
     clearTimeout(retrySendTimeoutId);
 
     if (result.status !== 200 && retries < maxRetries) {
@@ -260,6 +259,10 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
       retrySendTimeoutId = setTimeout(() => {
         void send(input, gender, age);
       }, 1000);
+    }
+
+    if (result.status === 200) {
+      retries = 0;
     }
   } else {
     if (!isReconnecting) {
@@ -270,6 +273,7 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
       console.error('Max retries reached, unable to send message');
       return;
     }
+
     retrySendTimeoutId = setTimeout(() => {
       void send(input, gender, age);
     }, 1000);
