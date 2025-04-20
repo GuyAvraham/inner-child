@@ -269,15 +269,10 @@ export const send = async (input: string, gender: 'male' | 'female', age: Age) =
       isReconnecting = true;
       await init(age, videoElement!);
     }
-    if (retries >= maxRetries) {
-      console.error('Max retries reached, unable to send message');
-      return;
-    }
 
     retrySendTimeoutId = setTimeout(() => {
       void send(input, gender, age);
     }, 1000);
-    retries++;
   }
 };
 
